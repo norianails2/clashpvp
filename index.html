@@ -669,6 +669,7 @@ function pvpRenderLobby(gameType) {
         else av.forEach(r => { html += '<div class="pvp-room"><span class="pv-avatar">' + (r.creator_avatar || '😎') + '</span><div class="pv-info"><div class="pv-name">' + (r.creator_name || 'Player') + '</div></div><span class="pv-bet">' + r.bet + ' ⭐</span><button class="pvp-join" onclick="pvpJoinRoom(\'' + r.id + '\')">⚔️</button></div>'; });
         html += '</div>'; container.innerHTML = html;
     });
+    });
 }
 function pvpSubLobby(gameType) {
     if (currentLobbySub) currentLobbySub.unsubscribe();
