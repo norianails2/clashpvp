@@ -763,6 +763,7 @@ function pvpCompareAndFinish(r) {
         if (draw) { balance += r.bet; updateBalance(); try { _supaSyncBalance(); } catch(e) {} showToast('🤝 НИЧЬЯ!', 'info'); addHistory('draw', 0); }
         else if (winId === me.id) { const p = r.bet * 2; balance += p; updateBalance(); try { _supaSyncBalance(); } catch(e) {} showToast('🏆 ПОБЕДА! +' + p + ' ⭐', 'success'); spawnParticles(document.getElementById('gameArea'), 20, '#22c55e'); addHistory('win', p); playSound('win'); vibrate(100); }
         else if (winId) { showToast('💔 ПОРАЖЕНИЕ -' + r.bet + ' ⭐', 'error'); addHistory('lose', -r.bet); playSound('lose'); vibrate(150); }
+        setTimeout(() => closeGame(), 3000);
     });
 }
 
