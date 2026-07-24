@@ -594,7 +594,7 @@ function pvpCreateRoom(gameType) {
     if (!window._supa) return showToast('❌ Supabase не подключён', 'error');
     const me = pvpMe();
     balance -= bet; updateBalance(); try { if (_supaSyncBalance) _supaSyncBalance(); } catch(e) {}
-    _supa.from('rooms').insert({ game_type: gameType, creator_id: me.id, creator_name: me.name, creator_avatar: me.avatar, bet }).select().single().then(({ data, error }) => {
+    _supa.from('rooms').insert({ game_type: gameType, creator_id: me.id, creator_name: me.name, creator_avatar: me.avatar, bet, updated_at: new Date().toISOString() }).select().single().then(({ data, error }) => {
         if (error) { balance += bet; updateBalance(); showToast('❌ ' + error.message, 'error'); return; }
         currentRoom = data; pvpSubRoom(data.id); pvpStartHeartbeat();
         playSound('bet'); showToast('✅ Комната создана! Жди соперника...', 'success'); vibrate(30);
@@ -763,7 +763,7 @@ function pvpCompareAndFinish(r) {
         if (draw) { balance += r.bet; updateBalance(); try { _supaSyncBalance(); } catch(e) {} showToast('🤝 НИЧЬЯ!', 'info'); addHistory('draw', 0); }
         else if (winId === me.id) { const p = r.bet * 2; balance += p; updateBalance(); try { _supaSyncBalance(); } catch(e) {} showToast('🏆 ПОБЕДА! +' + p + ' ⭐', 'success'); spawnParticles(document.getElementById('gameArea'), 20, '#22c55e'); addHistory('win', p); playSound('win'); vibrate(100); }
         else if (winId) { showToast('💔 ПОРАЖЕНИЕ -' + r.bet + ' ⭐', 'error'); addHistory('lose', -r.bet); playSound('lose'); vibrate(150); }
-        setTimeout(() => closeGame(), 3000);
+        window._pvpAutoClose = setTimeout(() => closeGame(), 3000);
     });
 }
 
@@ -881,6 +881,7 @@ function pvpShowBlackjack(area, r) {
 }
 
 function openGame(game) {
+    if (window._pvpAutoClose) { clearTimeout(window._pvpAutoClose); window._pvpAutoClose = null; }
     currentGameId = game; document.getElementById('gameOverlay').classList.add('show'); updateBalance(); const area = document.getElementById('gameArea');
     if (game==='crash') { renderCrash(area); return; }
     const previewHTML = {
@@ -897,6 +898,7 @@ function openGame(game) {
     try { window._tgShowBack?.(); } catch(e) {}
 }
 function closeGame() {
+    if (window._pvpAutoClose) { clearTimeout(window._pvpAutoClose); window._pvpAutoClose = null; }
     document.getElementById('gameOverlay').classList.remove('show');
     const gs = window._crashState;
     if (gs) { if (gs.mainTimer) { clearInterval(gs.mainTimer); gs.mainTimer = null; } if (gs.countdownTimer) { clearInterval(gs.countdownTimer); gs.countdownTimer = null; } }
