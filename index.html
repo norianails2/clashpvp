@@ -616,6 +616,7 @@ function pvpJoinRoom(roomId) {
         });
     });
 }
+let _pvpLeaveTimer = null;
 function pvpCancelRoom() {
     if (!currentRoom || currentRoom.status !== 'waiting') return;
     const bet = currentRoom.bet, gt = currentRoom.game_type;
@@ -627,6 +628,15 @@ function pvpCancelRoom() {
     });
 }
 function pvpCleanup() { if (currentRoomSub) { currentRoomSub.unsubscribe(); currentRoomSub = null; } if (currentLobbySub) { currentLobbySub.unsubscribe(); currentLobbySub = null; } currentRoom = null; }
+function _pvpWatchLeave() {
+    window.addEventListener('pagehide', () => { if (currentRoom && currentRoom.status === 'waiting') _supa.from('rooms').update({ status: 'cancelled' }).eq('id', currentRoom.id).then(() => currentRoom = null); });
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden && currentRoom && currentRoom.status === 'waiting') {
+            _pvpLeaveTimer = setTimeout(() => { if (currentRoom && currentRoom.status === 'waiting') _supa.from('rooms').update({ status: 'cancelled' }).eq('id', currentRoom.id).then(() => currentRoom = null); }, 10000);
+        } else if (_pvpLeaveTimer) { clearTimeout(_pvpLeaveTimer); _pvpLeaveTimer = null; }
+    });
+}
+_pvpWatchLeave();
 
 function pvpSubRoom(roomId) {
     if (currentRoomSub) currentRoomSub.unsubscribe();
