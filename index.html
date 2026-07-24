@@ -363,7 +363,7 @@
             <div class="balance-left">
                 <div class="label" id="balanceLabel"><span class="label-dot"></span>⭐ Твои Звёзды <span class="auth-badge" id="authBadge">👤 Гость</span></div>
                 <div class="balance-row">
-                    <span class="amount" id="balanceAmount">1000</span>
+                    <span class="amount" id="balanceAmount">0</span>
                     <span class="currency" id="balanceCurrency">⭐ Stars</span>
                 </div>
             </div>
@@ -463,7 +463,7 @@
         <div class="game-header">
             <span class="back" onclick="closeGame()">←</span>
             <h2 id="gameTitle">Игра</h2>
-            <span class="balance" id="balance">1000 ⭐</span>
+            <span class="balance" id="balance">0 ⭐</span>
             <span class="rules-btn" onclick="showRules()">📖</span>
         </div>
         <div class="game-area" id="gameArea"></div>
@@ -481,7 +481,7 @@
 </div>
 <script>
 const MIN_BET = 5;
-var balance = 1000;
+var balance = 0;
 let audioCtx = null, soundEnabled = localStorage.getItem('sfx') !== 'off';
 let transactions = [], currentGameId = null;
 
@@ -1158,7 +1158,7 @@ window._supaOnTelegramAuth = async function(user) {
         const { data: existing } = await _supa.from('profiles').select('*').eq('telegram_id', String(user.id)).maybeSingle();
         if (existing) {
             _supaUser = existing;
-            balance = existing.stars_balance || existing.balance || 1000;
+            balance = existing.stars_balance || existing.balance || 0;
             updateBalance();
         } else {
             const newProfile = {
@@ -1215,7 +1215,7 @@ window._supaLoadLeaderboard = async function() {
                     const ses = JSON.parse(saved);
                     if (ses?.telegram_id === String(tgUser.id)) {
                         _supa.from('profiles').select('*').eq('id', ses.id).maybeSingle().then(({ data }) => {
-                            if (data) { _supaUser = data; _supaAuthed = true; balance = data.stars_balance || data.balance || 1000; updateBalance(); _supaUpdateUI(); return; }
+                            if (data) { _supaUser = data; _supaAuthed = true; balance = data.stars_balance || data.balance || 0; updateBalance(); _supaUpdateUI(); return; }
                             localStorage.removeItem('tg_session');
                         }).catch(() => {});
                     }
@@ -1224,12 +1224,12 @@ window._supaLoadLeaderboard = async function() {
             if (!_supaAuthed) {
                 _supa.from('profiles').select('*').eq('telegram_id', String(tgUser.id)).maybeSingle().then(({ data }) => {
                     if (data) {
-                        _supaUser = data; _supaAuthed = true; balance = data.stars_balance || data.balance || 1000; updateBalance(); _supaUpdateUI();
+                        _supaUser = data; _supaAuthed = true; balance = data.stars_balance || data.balance || 0; updateBalance(); _supaUpdateUI();
                         localStorage.setItem('tg_session', JSON.stringify({ id: data.id, telegram_id: String(tgUser.id) }));
                     } else {
-                        const newProfile = { id: crypto.randomUUID(), telegram_id: String(tgUser.id), username: tgUser.first_name + (tgUser.last_name ? ' ' + tgUser.last_name : ''), avatar: tgUser.photo_url || '😎', balance: 1000, stars_balance: 1000 };
+                        const newProfile = { id: crypto.randomUUID(), telegram_id: String(tgUser.id), username: tgUser.first_name + (tgUser.last_name ? ' ' + tgUser.last_name : ''), avatar: tgUser.photo_url || '😎', balance: 0, stars_balance: 0 };
                         _supa.from('profiles').insert(newProfile).select().single().then(({ data: inserted }) => {
-                            _supaUser = inserted || newProfile; _supaAuthed = true; balance = (_supaUser.stars_balance || _supaUser.balance || 1000); updateBalance(); _supaUpdateUI();
+                            _supaUser = inserted || newProfile; _supaAuthed = true; balance = (_supaUser.stars_balance || _supaUser.balance || 0); updateBalance(); _supaUpdateUI();
                             localStorage.setItem('tg_session', JSON.stringify({ id: _supaUser.id, telegram_id: String(tgUser.id) }));
                         }).catch(() => { _supaUser = newProfile; _supaAuthed = true; balance = newProfile.balance; updateBalance(); _supaUpdateUI(); });
                     }
@@ -1241,7 +1241,7 @@ window._supaLoadLeaderboard = async function() {
                 const ses = JSON.parse(saved);
                 if (ses?.id) {
                     _supa.from('profiles').select('*').eq('id', ses.id).maybeSingle().then(({ data }) => {
-                        if (data) { _supaUser = data; _supaAuthed = true; balance = data.stars_balance || data.balance || 1000; updateBalance(); _supaUpdateUI(); }
+                        if (data) { _supaUser = data; _supaAuthed = true; balance = data.stars_balance || data.balance || 0; updateBalance(); _supaUpdateUI(); }
                         else { localStorage.removeItem('tg_session'); }
                     }).catch(() => { localStorage.removeItem('tg_session'); });
                 }
