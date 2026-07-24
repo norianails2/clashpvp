@@ -596,7 +596,7 @@ function pvpCreateRoom(gameType) {
     balance -= bet; updateBalance(); try { if (_supaSyncBalance) _supaSyncBalance(); } catch(e) {}
     _supa.from('rooms').insert({ game_type: gameType, creator_id: me.id, creator_name: me.name, creator_avatar: me.avatar, bet, updated_at: new Date().toISOString() }).select().single().then(({ data, error }) => {
         if (error) { balance += bet; updateBalance(); showToast('❌ ' + error.message, 'error'); return; }
-        currentRoom = data; pvpSubRoom(data.id); pvpStartHeartbeat();
+        data.game_type = data.game_type || gameType; currentRoom = data; pvpSubRoom(data.id); pvpStartHeartbeat();
         playSound('bet'); showToast('✅ Комната создана! Жди соперника...', 'success'); vibrate(30);
         pvpRenderLobby(gameType);
     });
@@ -881,6 +881,7 @@ function pvpShowBlackjack(area, r) {
 }
 
 function openGame(game) {
+    pvpCleanup();
     if (window._pvpAutoClose) { clearTimeout(window._pvpAutoClose); window._pvpAutoClose = null; }
     currentGameId = game; document.getElementById('gameOverlay').classList.add('show'); updateBalance(); const area = document.getElementById('gameArea');
     if (game==='crash') { renderCrash(area); return; }
