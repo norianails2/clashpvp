@@ -629,7 +629,7 @@ function pvpCancelRoom() {
     });
 }
 function pvpCleanup() {
-    pvpStopTimer(); pvpStopHeartbeat();
+    _pvpFinishing = false; pvpStopTimer(); pvpStopHeartbeat();
     if (currentRoom && currentRoom.status === 'waiting' && window._supa) {
         _supa.from('rooms').update({ status: 'cancelled' }).eq('id', currentRoom.id).then();
     }
