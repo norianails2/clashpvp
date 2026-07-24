@@ -629,7 +629,7 @@ function pvpCancelRoom() {
     });
 }
 function pvpCleanup() {
-    pvpStopHeartbeat();
+    pvpStopTimer(); pvpStopHeartbeat();
     if (currentRoom && currentRoom.status === 'waiting' && window._supa) {
         _supa.from('rooms').update({ status: 'cancelled' }).eq('id', currentRoom.id).then();
     }
@@ -721,13 +721,14 @@ function pvpSubLobby(gameType) {
 
 function pvpMakeMove(move) {
     if (!currentRoom) return;
+    pvpStopTimer();
     const me = pvpMe(), isCreator = currentRoom.creator_id === me.id;
     const field = isCreator ? 'creator_move' : 'opponent_move';
     _supa.from('rooms').update({ [field]: move, updated_at: new Date().toISOString() }).eq('id', currentRoom.id).then(() => {});
 }
 function pvpCompareAndFinish(r) {
     if (r.winner_id || _pvpFinishing) return;
-    _pvpFinishing = true;
+    _pvpFinishing = true; pvpStopTimer();
     const me = pvpMe();
     const cMove = r.creator_move, oMove = r.opponent_move;
     if (!cMove || !oMove) return;
@@ -765,6 +766,34 @@ function pvpCompareAndFinish(r) {
     });
 }
 
+let _pvpTimerSec = 30, _pvpTimerInt = null;
+function pvpStartTimer() {
+    pvpStopTimer(); _pvpTimerSec = 30;
+    const el = document.getElementById('pvpTimer');
+    if (!el) return;
+    el.style.display = 'flex';
+    _pvpTimerInt = setInterval(() => {
+        _pvpTimerSec--;
+        el.textContent = '⏱ ' + _pvpTimerSec + 'с';
+        if (_pvpTimerSec <= 5) el.style.color = '#ef4444';
+        if (_pvpTimerSec <= 0) { pvpStopTimer(); pvpForfeit(); }
+    }, 1000);
+}
+function pvpStopTimer() { if (_pvpTimerInt) { clearInterval(_pvpTimerInt); _pvpTimerInt = null; } const el = document.getElementById('pvpTimer'); if (el) { el.style.display = 'none'; el.style.color = 'rgba(255,255,255,0.4)'; } }
+function pvpForfeit() {
+    if (!currentRoom) return;
+    const me = pvpMe(), isCreator = currentRoom.creator_id === me.id;
+    const field = isCreator ? 'creator_move' : 'opponent_move';
+    let forfeitMove;
+    const gt = currentRoom.game_type;
+    if (gt === 'rps') forfeitMove = { choice: -1 };
+    else if (gt === 'dice') forfeitMove = { value: 0 };
+    else if (gt === 'coin') forfeitMove = { side: -1 };
+    else if (gt === 'mines') forfeitMove = { bomb: true, diamonds: 0 };
+    else if (gt === 'blackjack') forfeitMove = { bust: true, sum: 0 };
+    document.getElementById('gameArea').innerHTML = '<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;"><div style="font-size:48px;">⏰</div><div style="font-size:16px;color:#ef4444;font-weight:700;">Время вышло!</div><div style="font-size:12px;color:rgba(255,255,255,0.3);">Ожидание соперника...</div></div>';
+    _supa.from('rooms').update({ [field]: forfeitMove, updated_at: new Date().toISOString() }).eq('id', currentRoom.id).then(() => {});
+}
 function pvpStartGame(r) {
     const area = document.getElementById('gameArea'), me = pvpMe();
     const isCreator = r.creator_id === me.id;
@@ -776,9 +805,10 @@ function pvpStartGame(r) {
     else if (gt === 'coin') pvpShowCoin(area, r);
     else if (gt === 'mines') pvpShowMines(area, r);
     else if (gt === 'blackjack') pvpShowBlackjack(area, r);
+    pvpStartTimer();
 }
 function pvpShowRPS(area, r) {
-    area.innerHTML = '<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;"><div class="pvp-rps-choices" id="rpsChoices"><div class="pvp-rps-btn" onclick="pvpRPSPick(0)">✊</div><div class="pvp-rps-btn" onclick="pvpRPSPick(1)">✋</div><div class="pvp-rps-btn" onclick="pvpRPSPick(2)">✌️</div></div><div style="font-size:12px;color:rgba(255,255,255,0.4);font-weight:600;min-height:20px;" id="rpsStatus">👆 Выбери ход</div><div class="pvp-rps-showdown" id="rpsShowdown" style="display:none;"><div class="pvp-rps-duo"><div class="pvp-rps-duo-item"><div class="pvp-rps-duo-icon" id="rpsYouIcon">✊</div><div class="pvp-rps-duo-label">Ты</div></div><div class="pvp-rps-duo-vs">⚔️</div><div class="pvp-rps-duo-item"><div class="pvp-rps-duo-icon" id="rpsOppIcon">✊</div><div class="pvp-rps-duo-label">Соперник</div></div></div></div></div>';
+    area.innerHTML = '<div class="pvp-timer" id="pvpTimer" style="display:none;font-size:11px;color:rgba(255,255,255,0.4);font-weight:700;text-align:center;padding:4px 0;">⏱ 30с</div><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;"><div class="pvp-rps-choices" id="rpsChoices"><div class="pvp-rps-btn" onclick="pvpRPSPick(0)">✊</div><div class="pvp-rps-btn" onclick="pvpRPSPick(1)">✋</div><div class="pvp-rps-btn" onclick="pvpRPSPick(2)">✌️</div></div><div style="font-size:12px;color:rgba(255,255,255,0.4);font-weight:600;min-height:20px;" id="rpsStatus">👆 Выбери ход</div><div class="pvp-rps-showdown" id="rpsShowdown" style="display:none;"><div class="pvp-rps-duo"><div class="pvp-rps-duo-item"><div class="pvp-rps-duo-icon" id="rpsYouIcon">✊</div><div class="pvp-rps-duo-label">Ты</div></div><div class="pvp-rps-duo-vs">⚔️</div><div class="pvp-rps-duo-item"><div class="pvp-rps-duo-icon" id="rpsOppIcon">✊</div><div class="pvp-rps-duo-label">Соперник</div></div></div></div></div>';
 }
 function pvpRPSPick(idx) {
     document.getElementById('rpsStatus').textContent = '⏳ Ждём ход соперника...';
@@ -786,7 +816,7 @@ function pvpRPSPick(idx) {
     pvpMakeMove({ choice: idx });
 }
 function pvpShowDice(area, r) {
-    area.innerHTML = '<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;"><div class="pvp-dice-duo"><div class="pvp-dice-side"><div class="pvp-dice-box" id="diceBox">🎲</div><div class="pvp-dice-label">Ты</div></div><div class="pvp-dice-vs">VS</div><div class="pvp-dice-side"><div class="pvp-dice-box opp" id="diceBoxOpp">🎲</div><div class="pvp-dice-label">Соперник</div></div></div><button class="pvp-dice-btn" id="diceBtn" onclick="pvpDiceRoll()">🎲 Бросить</button><div style="font-size:11px;color:rgba(255,255,255,0.35);min-height:18px;" id="diceStatus">Нажми, чтобы бросить</div></div>';
+    area.innerHTML = '<div class="pvp-timer" id="pvpTimer" style="display:none;font-size:11px;color:rgba(255,255,255,0.4);font-weight:700;text-align:center;padding:4px 0;">⏱ 30с</div><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;"><div class="pvp-dice-duo"><div class="pvp-dice-side"><div class="pvp-dice-box" id="diceBox">🎲</div><div class="pvp-dice-label">Ты</div></div><div class="pvp-dice-vs">VS</div><div class="pvp-dice-side"><div class="pvp-dice-box opp" id="diceBoxOpp">🎲</div><div class="pvp-dice-label">Соперник</div></div></div><button class="pvp-dice-btn" id="diceBtn" onclick="pvpDiceRoll()">🎲 Бросить</button><div style="font-size:11px;color:rgba(255,255,255,0.35);min-height:18px;" id="diceStatus">Нажми, чтобы бросить</div></div>';
 }
 function pvpDiceRoll() {
     document.getElementById('diceBtn').disabled = true;
@@ -796,7 +826,7 @@ function pvpDiceRoll() {
     box.classList.add('rolling');
 }
 function pvpShowCoin(area, r) {
-    area.innerHTML = '<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;"><div class="pvp-coin-flip" id="coinFlip">🪙</div><div style="display:flex;gap:10px;justify-content:center;"><button class="pvp-coin-btn" onclick="pvpCoinPick(0)">🦅 Орёл</button><button class="pvp-coin-btn" onclick="pvpCoinPick(1)">🪙 Решка</button></div><div style="font-size:11px;color:rgba(255,255,255,0.35);min-height:18px;" id="coinStatus">Выбери сторону</div></div>';
+    area.innerHTML = '<div class="pvp-timer" id="pvpTimer" style="display:none;font-size:11px;color:rgba(255,255,255,0.4);font-weight:700;text-align:center;padding:4px 0;">⏱ 30с</div><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;"><div class="pvp-coin-flip" id="coinFlip">🪙</div><div style="display:flex;gap:10px;justify-content:center;"><button class="pvp-coin-btn" onclick="pvpCoinPick(0)">🦅 Орёл</button><button class="pvp-coin-btn" onclick="pvpCoinPick(1)">🪙 Решка</button></div><div style="font-size:11px;color:rgba(255,255,255,0.35);min-height:18px;" id="coinStatus">Выбери сторону</div></div>';
 }
 function pvpCoinPick(side) {
     document.querySelectorAll('.pvp-coin-btn').forEach(b => b.disabled = true);
@@ -815,7 +845,7 @@ function pvpShowMines(area, r) {
         for (const i of b) field[i] = true;
     }
     let done = false;
-    area.innerHTML = '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;"><div class="pvp-mines-grid" id="minesGrid" style="margin-bottom:4px;"></div><div style="font-size:12px;color:rgba(255,255,255,0.4);font-weight:600;min-height:20px;" id="minesStatus">Открывай клетки — 💎 алмазы</div></div>';
+    area.innerHTML = '<div class="pvp-timer" id="pvpTimer" style="display:none;font-size:11px;color:rgba(255,255,255,0.4);font-weight:700;text-align:center;padding:4px 0;">⏱ 30с</div><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;"><div class="pvp-mines-grid" id="minesGrid" style="margin-bottom:4px;"></div><div style="font-size:12px;color:rgba(255,255,255,0.4);font-weight:600;min-height:20px;" id="minesStatus">Открывай клетки — 💎 алмазы</div></div>';
     const g = document.getElementById('minesGrid'); let dc = 0, over = false;
     for (let i = 0; i < 9; i++) {
         const c = document.createElement('div'); c.className = 'pvp-mine-cell';
@@ -842,7 +872,7 @@ function pvpShowMines(area, r) {
 function pvpShowBlackjack(area, r) {
     let pC = [bjCard(), bjCard()], over = false, submitted = false;
     function render() {
-        area.innerHTML = '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;"><div class="pvp-bj-table"><div class="pvp-bj-row"><div class="pvp-bj-col"><div class="bj-label">Ты</div><div class="bj-score">' + bjSum(pC) + '</div><div class="pvp-bj-hand">' + pC.map(v => '<div class="bjc' + (v >= 10 ? ' red' : '') + '">' + v + '</div>').join('') + '</div></div></div></div><div class="pvp-bj-actions" id="bjActions"><button class="pvp-bj-btn hit" onclick="bjHit()">➕ Ещё</button><button class="pvp-bj-btn stand" onclick="bjStand()">✋ Хватит</button></div><div style="font-size:12px;color:rgba(255,255,255,0.4);font-weight:600;min-height:20px;" id="bjStatus">Твой ход</div></div>';
+        area.innerHTML = '<div class="pvp-timer" id="pvpTimer" style="display:none;font-size:11px;color:rgba(255,255,255,0.4);font-weight:700;text-align:center;padding:4px 0;">⏱ 30с</div><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;"><div class="pvp-bj-table"><div class="pvp-bj-row"><div class="pvp-bj-col"><div class="bj-label">Ты</div><div class="bj-score">' + bjSum(pC) + '</div><div class="pvp-bj-hand">' + pC.map(v => '<div class="bjc' + (v >= 10 ? ' red' : '') + '">' + v + '</div>').join('') + '</div></div></div></div><div class="pvp-bj-actions" id="bjActions"><button class="pvp-bj-btn hit" onclick="bjHit()">➕ Ещё</button><button class="pvp-bj-btn stand" onclick="bjStand()">✋ Хватит</button></div><div style="font-size:12px;color:rgba(255,255,255,0.4);font-weight:600;min-height:20px;" id="bjStatus">Твой ход</div></div>';
     }
     window.bjHit = function () { if (over) return; pC.push(bjCard()); if (bjSum(pC) > 21) { over = true; submitted = true; document.getElementById('bjActions').style.display = 'none'; document.getElementById('bjStatus').textContent = '💥 Перебор! Ждём соперника...'; pvpMakeMove({ bust: true, sum: 22 }); } else render(); };
     window.bjStand = function () { over = true; submitted = true; document.getElementById('bjActions').innerHTML = '<div style="font-size:12px;color:rgba(255,255,255,0.4);">⏳ Ждём соперника...</div>'; pvpMakeMove({ bust: false, sum: bjSum(pC) }); };
