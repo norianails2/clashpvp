@@ -644,6 +644,8 @@ function pvpRenderLobby(gameType) {
     const container = document.getElementById('gameLobby');
     if (!container) { setTimeout(() => pvpRenderLobby(gameType), 50); return; }
     if (!window._supa) { container.innerHTML = '<div class="pvp-title"><span class="live"></span> Комнаты</div><div style="color:rgba(255,255,255,0.2);text-align:center;padding:12px;">⚠️ Подключение к серверу...</div>'; return; }
+    const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    _supa.from('rooms').update({ status: 'cancelled' }).eq('game_type', gameType).eq('status', 'waiting').lt('created_at', fiveMinAgo).then(() => {
     _supa.from('rooms').select('*').eq('game_type', gameType).eq('status', 'waiting').order('created_at', { ascending: false }).limit(20).then(({ data }) => {
         const rooms = data || []; const me = pvpMe();
         let html = '<div class="pvp-title"><span class="live"></span> Комнаты <span style="color:rgba(255,255,255,0.2);font-weight:400;text-transform:none;letter-spacing:0;">— играй на ⭐</span></div>';
