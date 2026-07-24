@@ -430,34 +430,8 @@
             <h2>🔑 Войти</h2>
             <div id="authForm" style="text-align:center;">
                 <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:12px;">Войди через Telegram для сохранения прогресса</p>
-                <button onclick="tgLogin()" style="background:#2a9df4;color:#fff;border:none;border-radius:12px;padding:12px 24px;font-size:15px;cursor:pointer;font-weight:600;">🔑 Войти через Telegram</button>
-                <script>
-                var TG_BOT_ID = 8920598038;
-                function tgLogin() {
-                    var ret = encodeURIComponent(window.location.href.split('#')[0]);
-                    var url = 'https://oauth.telegram.org/auth?bot_id=' + TG_BOT_ID + '&origin=' + encodeURIComponent(window.location.origin) + '&embed=1&return_to=' + ret;
-                    if (window.Telegram?.WebApp?.initData) {
-                        var ud = window.Telegram.WebApp.initDataUnsafe?.user;
-                        if (ud) { window._supaOnTelegramAuth(ud); return; }
-                    }
-                    if (/Mobi|Android/i.test(navigator.userAgent)) {
-                        window.location.href = url;
-                    } else {
-                        window.open(url, 'tg_auth', 'width=550,height=470');
-                    }
-                }
-                (function() {
-                    var h = window.location.hash;
-                    if (h && h.indexOf('tgAuthResult=') !== -1) {
-                        try {
-                            var raw = decodeURIComponent(h.replace('#tgAuthResult=',''));
-                            var user = JSON.parse(raw);
-                            window._supaOnTelegramAuth(user);
-                            window.location.hash = '';
-                        } catch(e) {}
-                    }
-                })();
-                </script>
+                <a href="https://t.me/clashpvpbot/app" target="_blank" style="display:inline-block;background:#2a9df4;color:#fff;border-radius:12px;padding:12px 24px;font-size:15px;text-decoration:none;font-weight:600;">🔑 Открыть в Telegram</a>
+                <p style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:8px;">Открой Mini App через Telegram — вход автоматический</p>
                 <div style="margin-top:12px;font-size:10px;color:rgba(255,255,255,0.15);">⚡ Без авторизации данные хранятся локально</div>
             </div>
             <button class="modal-cancel" onclick="closeModal('authModal')">Закрыть</button>
