@@ -579,7 +579,7 @@ function navTo(el, idx) { document.querySelectorAll('.nav-item').forEach(n => n.
 let currentRoom = null, currentLobbySub = null, currentRoomSub = null, _pvpFinishing = false;
 
 function pvpMe() {
-    if (_supaUser?.id) return { id: _supaUser.id, name: _supaUser.username || 'Player', avatar: _supaUser.avatar || '😎' };
+    if (_supaUser?.id) return { id: _supaUser.id, name: _d(_supaUser.username) || 'Player', avatar: _supaUser.avatar || '😎' };
     let lid = localStorage.getItem('pvp_local_id');
     if (!lid) { lid = crypto.randomUUID(); localStorage.setItem('pvp_local_id', lid); }
     return { id: lid, name: 'Player', avatar: '😎' };
@@ -650,6 +650,7 @@ function pvpSubRoom(roomId) {
             }).subscribe();
     } catch(e) {}
 }
+function _d(s) { try { return decodeURIComponent(s.replace(/\+/g,' ')); } catch(e) { return s; } }
 function pvpRenderLobby(gameType) {
     const container = document.getElementById('gameLobby');
     if (!container) { setTimeout(() => pvpRenderLobby(gameType), 50); return; }
@@ -666,7 +667,7 @@ function pvpRenderLobby(gameType) {
         html += '<div class="pvp-list">';
         const av = rooms.filter(r => r.creator_id !== me.id);
         if (!av.length) html += '<div style="text-align:center;padding:12px 0;font-size:12px;color:rgba(255,255,255,0.2);">🕐 Нет активных комнат</div>';
-        else av.forEach(r => { html += '<div class="pvp-room"><span class="pv-avatar">' + (r.creator_avatar || '😎') + '</span><div class="pv-info"><div class="pv-name">' + (r.creator_name || 'Player') + '</div></div><span class="pv-bet">' + r.bet + ' ⭐</span><button class="pvp-join" onclick="pvpJoinRoom(\'' + r.id + '\')">⚔️</button></div>'; });
+        else av.forEach(r => { html += '<div class="pvp-room"><span class="pv-avatar">' + (r.creator_avatar || '😎') + '</span><div class="pv-info"><div class="pv-name">' + _d(r.creator_name || 'Player') + '</div></div><span class="pv-bet">' + r.bet + ' ⭐</span><button class="pvp-join" onclick="pvpJoinRoom(\'' + r.id + '\')">⚔️</button></div>'; });
         html += '</div>'; container.innerHTML = html;
     });
     });
@@ -731,7 +732,7 @@ function pvpCompareAndFinish(r) {
 function pvpStartGame(r) {
     const area = document.getElementById('gameArea'), me = pvpMe();
     const isCreator = r.creator_id === me.id;
-    const oppName = isCreator ? (r.opponent_name || 'Player') : (r.creator_name || 'Player');
+    const oppName = isCreator ? _d(r.opponent_name || 'Player') : _d(r.creator_name || 'Player');
     const oppAvatar = isCreator ? (r.opponent_avatar || '😎') : (r.creator_avatar || '😎');
     const gt = r.game_type;
     if (gt === 'rps') pvpShowRPS(area, r);
@@ -1134,7 +1135,7 @@ let _supaUser = null, _supaAuthed = false;
 function _supaUpdateUI() {
     const badge = document.getElementById('authBadge');
     if (_supaAuthed && _supaUser) {
-        const name = _supaUser.username || _supaUser.telegram_username || 'Player';
+        const name = _d(_supaUser.username) || _supaUser.telegram_username || 'Player';
         badge.textContent = '👤 ' + name;
         badge.className = 'auth-badge logged-in';
         badge.onclick = async () => {
