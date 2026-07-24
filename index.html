@@ -628,12 +628,25 @@ function pvpCancelRoom() {
         pvpRenderLobby(gt);
     });
 }
-function pvpCleanup() { pvpStopHeartbeat(); if (currentRoomSub) { currentRoomSub.unsubscribe(); currentRoomSub = null; } if (currentLobbySub) { currentLobbySub.unsubscribe(); currentLobbySub = null; } currentRoom = null; }
+function pvpCleanup() {
+    pvpStopHeartbeat();
+    if (currentRoom && currentRoom.status === 'waiting' && window._supa) {
+        _supa.from('rooms').update({ status: 'cancelled' }).eq('id', currentRoom.id).then();
+    }
+    if (currentRoomSub) { currentRoomSub.unsubscribe(); currentRoomSub = null; }
+    if (currentLobbySub) { currentLobbySub.unsubscribe(); currentLobbySub = null; }
+    currentRoom = null;
+}
+function _pvpCancelBeacon() {
+    if (!currentRoom || currentRoom.status !== 'waiting') return;
+    const id = currentRoom.id, url = SUPABASE_URL + '/rest/v1/rooms?id=eq.' + id;
+    fetch(url, { method: 'PATCH', headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }, body: JSON.stringify({ status: 'cancelled' }), keepalive: true }).catch(() => {});
+}
 function _pvpWatchLeave() {
-    window.addEventListener('pagehide', () => { if (currentRoom && currentRoom.status === 'waiting') _supa.from('rooms').update({ status: 'cancelled' }).eq('id', currentRoom.id).then(() => currentRoom = null); });
+    window.addEventListener('pagehide', _pvpCancelBeacon);
     document.addEventListener('visibilitychange', () => {
         if (document.hidden && currentRoom && currentRoom.status === 'waiting') {
-            _pvpLeaveTimer = setTimeout(() => { if (currentRoom && currentRoom.status === 'waiting') _supa.from('rooms').update({ status: 'cancelled' }).eq('id', currentRoom.id).then(() => currentRoom = null); }, 10000);
+            _pvpLeaveTimer = setTimeout(_pvpCancelBeacon, 8000);
         } else if (_pvpLeaveTimer) { clearTimeout(_pvpLeaveTimer); _pvpLeaveTimer = null; }
     });
 }
