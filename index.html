@@ -575,7 +575,7 @@ function navTo(el, idx) { document.querySelectorAll('.nav-item').forEach(n => n.
 
 
 
-let currentRoom = null, currentLobbySub = null, currentRoomSub = null;
+let currentRoom = null, currentLobbySub = null, currentRoomSub = null, _pvpFinishing = false;
 
 function pvpMe() {
     if (_supaUser?.id) return { id: _supaUser.id, name: _supaUser.username || 'Player', avatar: _supaUser.avatar || '😎' };
@@ -675,7 +675,8 @@ function pvpMakeMove(move) {
     _supa.from('rooms').update({ [field]: move, updated_at: new Date().toISOString() }).eq('id', currentRoom.id).then(() => {});
 }
 function pvpCompareAndFinish(r) {
-    if (r.winner_id) return;
+    if (r.winner_id || _pvpFinishing) return;
+    _pvpFinishing = true;
     const me = pvpMe();
     const cMove = r.creator_move, oMove = r.opponent_move;
     if (!cMove || !oMove) return;
