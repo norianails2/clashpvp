@@ -641,12 +641,11 @@ function pvpSubRoom(roomId) {
 function pvpRenderLobby(gameType) {
     const container = document.getElementById('gameLobby');
     if (!container) { setTimeout(() => pvpRenderLobby(gameType), 50); return; }
+    if (!window._supa) { container.innerHTML = '<div class="pvp-title"><span class="live"></span> Комнаты</div><div style="color:rgba(255,255,255,0.2);text-align:center;padding:12px;">⚠️ Подключение к серверу...</div>'; return; }
     _supa.from('rooms').select('*').eq('game_type', gameType).eq('status', 'waiting').order('created_at', { ascending: false }).limit(20).then(({ data }) => {
         const rooms = data || []; const me = pvpMe();
         let html = '<div class="pvp-title"><span class="live"></span> Комнаты <span style="color:rgba(255,255,255,0.2);font-weight:400;text-transform:none;letter-spacing:0;">— играй на ⭐</span></div>';
-        if (!currentRoom || currentRoom.game_type !== gameType || currentRoom.status !== 'waiting') {
-            html += '<div class="pvp-create"><span class="pvc-label">💵 Ставка:</span><input type="number" id="pvpCreateBet" value="' + MIN_BET + '" min="' + MIN_BET + '"><button class="pvp-join" onclick="pvpCreateRoom(\'' + gameType + '\')">➕ Создать</button></div>';
-        }
+        html += '<div class="pvp-create"><span class="pvc-label">💵 Ставка:</span><input type="number" id="pvpCreateBet" value="' + MIN_BET + '" min="' + MIN_BET + '"><button class="pvp-join" onclick="pvpCreateRoom(\'' + gameType + '\')">➕ Создать</button></div>';
         if (currentRoom && currentRoom.game_type === gameType && currentRoom.status === 'waiting') {
             html += '<div class="pvp-room" style="border-color:rgba(251,191,36,0.3);background:rgba(251,191,36,0.05);"><span class="pv-avatar searching-pulse">😎</span><div class="pv-info"><div class="pv-name" style="color:#fbbf24;">Твоя комната</div><div class="pv-desc">⏳ Ждём соперника <span class="searching-dots"><span></span><span></span><span></span></span></div></div><span class="pv-bet">' + currentRoom.bet + ' ⭐</span><button class="pvp-join cancel" onclick="pvpCancelRoom()">✕</button></div>';
         }
