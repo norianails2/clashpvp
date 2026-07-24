@@ -6,13 +6,7 @@
     <title>ClashPVP</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js?22"></script>
-    <script type="importmap">
-    {
-    "imports": {
-        "@supabase/supabase-js": "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm"
-    }
-    }
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <style>
         * { margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent; }
         :root {
@@ -583,16 +577,21 @@ function navTo(el, idx) { document.querySelectorAll('.nav-item').forEach(n => n.
 
 let currentRoom = null, currentLobbySub = null, currentRoomSub = null;
 
-function pvpMe() { return { id: _supaUser?.id, name: _supaUser?.username || 'Player', avatar: _supaUser?.avatar || '😎' }; }
+function pvpMe() {
+    if (_supaUser?.id) return { id: _supaUser.id, name: _supaUser.username || 'Player', avatar: _supaUser.avatar || '😎' };
+    let lid = localStorage.getItem('pvp_local_id');
+    if (!lid) { lid = crypto.randomUUID(); localStorage.setItem('pvp_local_id', lid); }
+    return { id: lid, name: 'Player', avatar: '😎' };
+}
 
 function pvpCreateRoom(gameType) {
     const bet = parseInt(document.getElementById('pvpCreateBet').value) || MIN_BET;
-    if (!_supaAuthed) return showToast('❌ Войди в аккаунт', 'error');
     if (bet < MIN_BET) return showToast('⚠️ Минимум ' + MIN_BET + ' ⭐', 'warn');
     if (bet > balance) return showToast('❌ Недостаточно ⭐', 'error');
     if (bet > 9999) return showToast('⚠️ Максимум 9 999 ⭐', 'warn');
+    if (!window._supa) return showToast('❌ Supabase не подключён', 'error');
     const me = pvpMe();
-    balance -= bet; updateBalance(); try { _supaSyncBalance(); } catch(e) {}
+    balance -= bet; updateBalance(); try { if (_supaSyncBalance) _supaSyncBalance(); } catch(e) {}
     _supa.from('rooms').insert({ game_type: gameType, creator_id: me.id, creator_name: me.name, creator_avatar: me.avatar, bet }).select().single().then(({ data, error }) => {
         if (error) { balance += bet; updateBalance(); showToast('❌ ' + error.message, 'error'); return; }
         currentRoom = data; pvpSubRoom(data.id);
@@ -603,7 +602,6 @@ function pvpCreateRoom(gameType) {
 function pvpJoinRoom(roomId) {
     _supa.from('rooms').select('*').eq('id', roomId).single().then(({ data: room }) => {
         if (!room || room.status !== 'waiting') return showToast('⚠️ Комната уже занята', 'warn');
-        if (!_supaAuthed) return showToast('❌ Войди в аккаунт', 'error');
         if (room.creator_id === pvpMe().id) return showToast('⚠️ Это твоя комната', 'warn');
         if (balance < room.bet) return showToast('❌ Недостаточно ⭐', 'error');
         const me = pvpMe();
@@ -631,12 +629,15 @@ function pvpCleanup() { if (currentRoomSub) { currentRoomSub.unsubscribe(); curr
 
 function pvpSubRoom(roomId) {
     if (currentRoomSub) currentRoomSub.unsubscribe();
-    currentRoomSub = _supa.channel('room-' + roomId)
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms', filter: 'id=eq.' + roomId }, (payload) => {
-            const r = payload.new; if (!r || !r.opponent_id) return;
-            if (r.creator_move && r.opponent_move) { pvpCompareAndFinish(r); return; }
-            if (!r.winner_id) { currentRoom = r; pvpStartGame(r); }
-        }).subscribe();
+    try {
+        if (!window._supa) return;
+        currentRoomSub = _supa.channel('room-' + roomId)
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms', filter: 'id=eq.' + roomId }, (payload) => {
+                const r = payload.new; if (!r || !r.opponent_id) return;
+                if (r.creator_move && r.opponent_move) { pvpCompareAndFinish(r); return; }
+                if (!r.winner_id) { currentRoom = r; pvpStartGame(r); }
+            }).subscribe();
+    } catch(e) {}
 }
 function pvpRenderLobby(gameType) {
     const container = document.getElementById('gameLobby');
@@ -658,9 +659,12 @@ function pvpRenderLobby(gameType) {
 }
 function pvpSubLobby(gameType) {
     if (currentLobbySub) currentLobbySub.unsubscribe();
-    currentLobbySub = _supa.channel('lobby-' + gameType)
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms', filter: 'game_type=eq.' + gameType }, () => pvpRenderLobby(gameType))
-        .subscribe();
+    try {
+        if (!window._supa) { pvpRenderLobby(gameType); return; }
+        currentLobbySub = _supa.channel('lobby-' + gameType)
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms', filter: 'game_type=eq.' + gameType }, () => pvpRenderLobby(gameType))
+            .subscribe();
+    } catch(e) {}
     pvpRenderLobby(gameType);
 }
 
@@ -1105,11 +1109,10 @@ window.simulateWithdraw = function() {
     if (wdStars) wdStars.textContent = balance.toFixed(0) + ' ⭐';
 };
 </script>
-<script type="module">
-import { createClient } from '@supabase/supabase-js';
-const SUPABASE_URL = 'https://qtqukjkmmdiwuiicnjot.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0cXVramttbWRpd3VpaWNuam90Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3NTE4MzgsImV4cCI6MjEwMDMyNzgzOH0.uLycuUYz8F_QmMEPlB6ndJbeY5eXsVfSzdDWb_dJbrQ';
-const _supa = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+<script>
+var SUPABASE_URL = 'https://qtqukjkmmdiwuiicnjot.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0cXVramttbWRpd3VpaWNuam90Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3NTE4MzgsImV4cCI6MjEwMDMyNzgzOH0.uLycuUYz8F_QmMEPlB6ndJbeY5eXsVfSzdDWb_dJbrQ';
+var _supa = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 window._supa = _supa;
 let _supaUser = null, _supaAuthed = false;
 
@@ -1247,6 +1250,11 @@ window._supaLoadLeaderboard = async function() {
     } catch(e) {}
     _supaUpdateUI();
 })();
+</script>
+
+<script>
+// fallback if supabase CDN failed
+if (!window._supa) { window._supa = null; }
 </script>
 <script>
 (function() {
