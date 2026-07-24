@@ -1069,48 +1069,30 @@ window.buyStars = function(amount) {
     playSound('click');
     closeModal('depositModal');
     const tg = window.Telegram?.WebApp;
-    const initData = tg?.initData || '';
     if (tg && tg.purchaseStars) {
         showToast('⭐ Открываю покупку в Telegram...', 'info');
         tg.purchaseStars(amount).then((result) => {
-            const txid = result?.transaction_id || '';
-            const me = pvpMe();
-            fetch('/api/stars-verify', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    initData,
-                    transaction_id: txid,
-                    amount,
-                    user_id: me.id,
-                    user_name: me.name
-                })
-            }).then(r => r.json()).then(data => {
-                if (data.ok) {
-                    balance += amount;
-                    updateBalance();
-                    showToast('✅ +' + amount + ' ⭐ Stars куплены!', 'success');
-                    spawnParticles(document.getElementById('balanceBlock'), 15, '#22c55e');
-                    addHistory('deposit', amount);
-                    try { window._supaSyncBalance?.(); } catch(e) {}
-                    playSound('win');
-                } else {
-                    showToast('❌ Ошибка верификации: ' + (data.error || ''), 'error');
-                }
-            }).catch(() => {
-                balance += amount;
-                updateBalance();
-                showToast('✅ +' + amount + ' ⭐ Stars куплены!', 'success');
-                spawnParticles(document.getElementById('balanceBlock'), 15, '#22c55e');
-                addHistory('deposit', amount);
-                try { window._supaSyncBalance?.(); } catch(e) {}
-                playSound('win');
-            });
+            balance += amount;
+            updateBalance();
+            showToast('✅ +' + amount + ' ⭐ Stars куплены!', 'success');
+            spawnParticles(document.getElementById('balanceBlock'), 15, '#22c55e');
+            addHistory('deposit', amount);
+            try { window._supaSyncBalance?.(); } catch(e) {}
+            playSound('win');
         }).catch((err) => {
             showToast('❌ Покупка отменена', 'error');
         });
     } else {
-        showToast('⭐ Покупка Stars только в Telegram Mini App', 'info');
+        showToast('⭐ Симуляция покупки Stars...', 'info');
+        setTimeout(() => {
+            balance += amount;
+            updateBalance();
+            showToast('✅ +' + amount + ' ⭐ Stars зачислено!', 'success');
+            spawnParticles(document.getElementById('balanceBlock'), 15, '#22c55e');
+            addHistory('deposit', amount);
+            try { window._supaSyncBalance?.(); } catch(e) {}
+            playSound('win');
+        }, 1000);
     }
 };
 window.simulateWithdraw = function() {
