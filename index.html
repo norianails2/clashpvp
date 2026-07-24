@@ -8,10 +8,9 @@
     <script src="https://telegram.org/js/telegram-web-app.js?22"></script>
     <script type="importmap">
     {
-        "imports": {
-            "@tonconnect/ui": "https://esm.sh/@tonconnect/ui@2.1.0",
-            "@supabase/supabase-js": "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm"
-        }
+    "imports": {
+        "@supabase/supabase-js": "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm"
+    }
     }
     </script>
     <style>
@@ -379,16 +378,7 @@
         @keyframes flicker { 0%{height:10px;opacity:0.7} 100%{height:14px;opacity:1} }
         @keyframes crashBang { 0%{transform:translate(-50%,-50%) scale(0);opacity:0} 40%{transform:translate(-50%,-50%) scale(1.3);opacity:1} 100%{transform:translate(-50%,-50%) scale(1);opacity:1} }
         @keyframes crashPulse { 0%,100%{box-shadow:0 4px 20px rgba(249,115,22,0.3)} 50%{box-shadow:0 4px 35px rgba(249,115,22,0.6)} }
-        .wallet-badge { display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:3px 8px;border-radius:9999px;font-family:'Nunito',sans-serif;cursor:default;margin-left:4px; }
-        .wallet-badge.connected { background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.2); }
-        .wallet-badge.connected:active { background:rgba(239,68,68,0.15);color:#ef4444;cursor:pointer; }
-        .wallet-badge.disconnected { background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.3);border:1px solid rgba(255,255,255,0.06);cursor:pointer; }
-        .wallet-badge.disconnected:active { background:rgba(251,191,36,0.1);color:#fbbf24; }
-        .tc-balance-row { display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.3);margin-top:3px; }
-        .tc-balance-row .ton-amount { color:#22c55e;font-weight:700;font-family:'Fredoka',sans-serif; }
-        .tc-modal-addr { font-family:'Nunito',sans-serif;font-size:11px;color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.04);border-radius:8px;padding:8px 10px;word-break:break-all;text-align:center;border:1px dashed rgba(255,255,255,0.08);margin:8px 0;cursor:pointer; }
-        .tc-modal-addr:active { background:rgba(251,191,36,0.05);border-color:rgba(251,191,36,0.2); }
-        .ton-connect-button-wrap { display:flex;justify-content:center;margin:8px 0; }
+
     </style>
 </head>
 <body>
@@ -408,15 +398,10 @@
 
         <div class="balance-block" id="balanceBlock">
             <div class="balance-left">
-                <div class="label" id="balanceLabel"><span class="label-dot"></span>Твой баланс <span class="wallet-badge disconnected" id="walletBadge" onclick="openModal('depositModal')">👛 Подключить</span><span class="auth-badge" id="authBadge">👤 Гость</span></div>
-                <div class="balance-row" onclick="toggleCurrency()">
-                    <span class="amount" id="balanceAmount">128.50</span>
-                    <span class="currency" id="balanceCurrency">USDT</span>
-                    <span class="toggle" id="balanceToggle">▼</span>
-                </div>
-                <div class="tc-balance-row" id="tcBalanceRow" style="display:none;">
-                    <span>⏳ TON:</span>
-                    <span class="ton-amount" id="tonBalanceDisplay">0</span>
+                <div class="label" id="balanceLabel"><span class="label-dot"></span>⭐ Твои Звёзды <span class="auth-badge" id="authBadge">👤 Гость</span></div>
+                <div class="balance-row">
+                    <span class="amount" id="balanceAmount">1000</span>
+                    <span class="currency" id="balanceCurrency">⭐ Stars</span>
                 </div>
             </div>
             <div class="balance-actions">
@@ -459,34 +444,7 @@
     <div class="modal-overlay" id="depositModal">
         <div class="modal-box">
             <h2>💰 Пополнение</h2>
-            <div style="display:flex;gap:6px;margin-bottom:12px;">
-                <button class="bal-btn deposit" style="flex:1;font-size:12px;padding:10px;" onclick="switchDepositTab('ton')" id="depTabTon">💎 TON</button>
-                <button class="bal-btn withdraw" style="flex:1;font-size:12px;padding:10px;" onclick="switchDepositTab('stars')" id="depTabStars">⭐ Telegram Stars</button>
-            </div>
-            <div id="depositTON">
-                <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px;">Подключи TON кошелёк для депозита в USDT</p>
-                <div id="depositTCDisconnected">
-                    <div class="ton-connect-button-wrap"><div id="tc-deposit-btn"></div></div>
-                    <p style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;margin-top:4px;">Tonkeeper, Tonhub и другие</p>
-                </div>
-                <div id="depositTCConnected" style="display:none;">
-                    <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:6px;">Твой кошелёк:</div>
-                    <div class="tc-modal-addr" id="depositWalletAddr" onclick="copyAddr(this)">⏳</div>
-                    <div style="display:flex;justify-content:space-between;font-size:12px;margin:8px 0;padding:6px 8px;background:rgba(255,255,255,0.03);border-radius:8px;">
-                        <span style="color:rgba(255,255,255,0.3);">💎 TON:</span>
-                        <span style="color:#22c55e;font-weight:700;" id="depositTonBalance">0</span>
-                    </div>
-                    <div style="margin:8px 0;">
-                        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:4px;">💵 Сумма (USDT):</div>
-                        <input class="modal-input" type="number" id="depositAmount" value="10" min="1" style="margin-bottom:0;">
-                    </div>
-                    <p style="font-size:10px;color:rgba(255,255,255,0.15);text-align:center;margin:4px 0 8px;">Отправь TON на адрес ниже, затем нажми кнопку</p>
-                    <div class="tc-modal-addr" id="appWalletAddr" onclick="copyAddr(this)">UQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</div>
-                    <button class="modal-confirm dep" onclick="simulateDeposit()">✅ Зачислить USDT</button>
-                    <button class="modal-confirm history" onclick="disconnectWallet()" style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);">🚪 Отключить кошелёк</button>
-                </div>
-            </div>
-            <div id="depositStars" style="display:none;">
+            <div id="depositStars">
                 <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px;">Купи ⭐ Telegram Stars для игры</p>
                 <div class="modal-btns" style="margin-bottom:10px;">
                     <span class="chip" onclick="buyStars(50)">⭐ 50</span>
@@ -507,40 +465,15 @@
     <div class="modal-overlay" id="withdrawModal">
         <div class="modal-box">
             <h2>💸 Вывод</h2>
-            <div style="display:flex;gap:6px;margin-bottom:12px;">
-                <button class="bal-btn deposit" style="flex:1;font-size:12px;padding:10px;" onclick="switchWithdrawTab('ton')" id="wdTabTon">💎 TON</button>
-                <button class="bal-btn withdraw" style="flex:1;font-size:12px;padding:10px;" onclick="switchWithdrawTab('stars')" id="wdTabStars">⭐ Stars → USDT</button>
-            </div>
-            <div id="withdrawTON">
-                <div id="withdrawTCDisconnected">
-                    <div class="ton-connect-button-wrap"><div id="tc-withdraw-btn"></div></div>
-                    <p style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;margin-top:4px;">Подключи кошелёк для вывода</p>
-                </div>
-                <div id="withdrawTCConnected" style="display:none;">
-                    <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:6px;">На кошелёк:</div>
-                    <div class="tc-modal-addr" id="withdrawWalletAddr">⏳</div>
-                    <div style="display:flex;justify-content:space-between;font-size:12px;margin:8px 0;padding:6px 8px;background:rgba(255,255,255,0.03);border-radius:8px;">
-                        <span style="color:rgba(255,255,255,0.3);">💰 Доступно:</span>
-                        <span style="color:#fbbf24;font-weight:700;" id="withdrawAvail">0 USDT</span>
-                    </div>
-                    <input class="modal-input" type="number" id="withdrawAmount" value="10" placeholder="Сумма в USDT" min="1">
-                    <div class="modal-error" id="withdrawError"></div>
-                    <button class="modal-confirm wd" onclick="simulateWithdraw()">💸 Отправить USDT</button>
-                    <button class="modal-confirm history" onclick="disconnectWallet()" style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);">🚪 Отключить кошелёк</button>
-                </div>
-            </div>
-            <div id="withdrawStars" style="display:none;">
-                <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px;">Конвертируй ⭐ Stars в USDT (1 ⭐ = $0.01)</p>
-                <div style="display:flex;gap:6px;margin-bottom:8px;">
-                    <span class="chip" onclick="convertStars(100)">⭐ 100 → $1</span>
-                    <span class="chip" onclick="convertStars(500)">⭐ 500 → $5</span>
-                    <span class="chip" onclick="convertStars(1000)">⭐ 1,000 → $10</span>
-                </div>
+            <div id="withdrawStars">
+                <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px;">Списание ⭐ Stars</p>
                 <div style="display:flex;justify-content:space-between;font-size:12px;margin:8px 0;padding:6px 8px;background:rgba(255,255,255,0.03);border-radius:8px;">
                     <span style="color:rgba(255,255,255,0.3);">⭐ Твои Звёзды:</span>
-                    <span style="color:#22c55e;font-weight:700;" id="wdStarsBalance">0</span>
+                    <span style="color:#22c55e;font-weight:700;" id="wdStarsBalance">0 ⭐</span>
                 </div>
-                <p style="font-size:9px;color:rgba(255,255,255,0.15);text-align:center;">⭐ конвертируются по курсу 100:1. Минимум — 100 ⭐</p>
+                <input class="modal-input" type="number" id="withdrawAmount" value="10" placeholder="Сумма в ⭐" min="1">
+                <div class="modal-error" id="withdrawError"></div>
+                <button class="modal-confirm wd" onclick="simulateWithdraw()">💸 Списать Stars</button>
             </div>
             <button class="modal-cancel" onclick="closeModal('withdrawModal')">Закрыть</button>
         </div>
@@ -567,7 +500,7 @@
         <div class="game-header">
             <span class="back" onclick="closeGame()">←</span>
             <h2 id="gameTitle">Игра</h2>
-            <span class="balance" id="balance">128.50 USDT</span>
+            <span class="balance" id="balance">1000 ⭐</span>
             <span class="rules-btn" onclick="showRules()">📖</span>
         </div>
         <div class="game-area" id="gameArea"></div>
@@ -605,12 +538,7 @@
 </div>
 <script>
 const MIN_BET = 5;
-var balance = 128.50;
-var starsBalance = 1000;
-var activeCurrency = 'usdt'; // 'usdt' | 'stars'
-function getActiveBal() { return activeCurrency === 'stars' ? starsBalance : balance; }
-function decBal(n) { if (activeCurrency === 'stars') { starsBalance -= n; } else { balance -= n; } updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {} }
-function incBal(n) { if (activeCurrency === 'stars') { starsBalance += n; } else { balance += n; } updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {} }
+var balance = 1000;
 let audioCtx = null, soundEnabled = localStorage.getItem('sfx') !== 'off';
 let myRoom = null, myRoomJoinTimer = null, fakeRooms = [], lobbyInterval = null, currentGameId = null;
 let transactions = [];
@@ -645,21 +573,12 @@ function toggleSound() {
     localStorage.setItem('sfx', soundEnabled ? 'on' : 'off');
 }
 
-function toggleCurrency() {
-    playSound('click');
-    activeCurrency = activeCurrency === 'usdt' ? 'stars' : 'usdt';
-    updateBalance();
-    const t = document.getElementById('balanceToggle');
-    if (t) t.classList.toggle('flipped', activeCurrency === 'stars');
-}
 function updateBalance() {
-    const amt = activeCurrency === 'stars' ? starsBalance : balance;
-    const cur = activeCurrency === 'stars' ? '⭐ Stars' : 'USDT';
-    document.getElementById('balanceAmount').textContent = activeCurrency === 'stars' ? amt.toFixed(0) : amt.toFixed(2);
-    document.getElementById('balanceAmount').style.fontSize = activeCurrency === 'stars' ? '20px' : '24px';
-    document.getElementById('balance').textContent = (activeCurrency === 'stars' ? amt.toFixed(0) : amt.toFixed(2)) + ' ' + cur;
-    document.getElementById('balanceCurrency').textContent = cur;
-    document.getElementById('balanceLabel').textContent = activeCurrency === 'stars' ? '⭐ Твои Звёзды' : 'Твой баланс';
+    const amt = balance;
+    document.getElementById('balanceAmount').textContent = amt.toFixed(0);
+    document.getElementById('balanceAmount').style.fontSize = '20px';
+    document.getElementById('balance').textContent = amt.toFixed(0) + ' ⭐';
+    document.getElementById('balanceCurrency').textContent = '⭐ Stars';
 }
 
 function spawnParticles(parent, count, color) {
@@ -675,17 +594,17 @@ function spawnParticles(parent, count, color) {
 }
 function showBalFlash(parent, amount, isPlus) {
     const el = document.createElement('div'); el.className = 'bal-flash ' + (isPlus ? 'plus' : 'minus');
-    el.textContent = (isPlus ? '+' : '') + amount + ' USDT'; parent.style.position = 'relative'; parent.appendChild(el);
+    el.textContent = (isPlus ? '+' : '') + amount + ' ⭐'; parent.style.position = 'relative'; parent.appendChild(el);
     setTimeout(() => el.remove(), 1000);
 }
 
 function openModal(id) { document.getElementById(id).classList.add('show'); const e = document.querySelector('#' + id + ' .modal-error'); if (e) e.classList.remove('show'); playSound('click'); }
 function closeModal(id) { document.getElementById(id).classList.remove('show'); const e = document.querySelector('#' + id + ' .modal-error'); if (e) e.classList.remove('show'); }
-function addHistory(type, amount, currency) {
+function addHistory(type, amount) {
     const icons = {deposit:'💰',withdraw:'💸',game:'🎮',win:'🏆',lose:'💔'}, titles = {deposit:'Пополнение',withdraw:'Вывод',game:'Ставка',win:'Выигрыш',lose:'Проигрыш'};
-    transactions.unshift({icon:icons[type]||'💫',title:titles[type]||'Операция',amount:amount,currency:currency||'USDT',date:new Date().toLocaleString('ru-RU',{hour:'2-digit',minute:'2-digit'})});
+    transactions.unshift({icon:icons[type]||'💫',title:titles[type]||'Операция',amount:amount,currency:'⭐',date:new Date().toLocaleString('ru-RU',{hour:'2-digit',minute:'2-digit'})});
     if (transactions.length > 20) transactions.pop();
-    try { window._supaSaveTx?.(type, amount, currency); } catch(e) {}
+    try { window._supaSaveTx?.(type, amount); } catch(e) {}
 }
 function showHistory() {
     const list = document.getElementById('historyList');
@@ -693,8 +612,7 @@ function showHistory() {
     else list.innerHTML = transactions.map(t => {
         const cls = t.amount > 0 ? 'green' : (t.amount < 0 ? 'red' : 'gold');
         const sign = t.amount > 0 ? '+' : '';
-        const cur = t.currency || 'USDT';
-        return '<div class="history-item"><span class="h-icon">' + t.icon + '</span><div class="h-info"><div class="h-title">' + t.title + '</div><div class="h-date">' + t.date + '</div></div><span class="h-amount ' + cls + '">' + sign + t.amount + ' ' + cur + '</span></div>';
+        return '<div class="history-item"><span class="h-icon">' + t.icon + '</span><div class="h-info"><div class="h-title">' + t.title + '</div><div class="h-date">' + t.date + '</div></div><span class="h-amount ' + cls + '">' + sign + t.amount + ' ⭐</span></div>';
     }).join('');
     closeModal('depositModal'); closeModal('withdrawModal'); document.getElementById('historyModal').classList.add('show');
 }
@@ -730,15 +648,15 @@ function startLobbySimulation(gameId) {
     if (lobbyInterval) clearInterval(lobbyInterval);
     generateFakeRooms(gameId);
     function render() {
-        let html = '<div class="pvp-title"><span class="live"></span> Комнаты <span style="color:rgba(255,255,255,0.2);font-weight:400;text-transform:none;letter-spacing:0;">— играй на USDT</span></div>';
+        let html = '<div class="pvp-title"><span class="live"></span> Комнаты <span style="color:rgba(255,255,255,0.2);font-weight:400;text-transform:none;letter-spacing:0;">— играй на ⭐ Stars</span></div>';
         if (myRoom && myRoom.gameId === gameId) {
             const w = myRoom.status === 'waiting' ? '<span style="display:inline-flex;align-items:center;gap:4px;">⏳ Ждём соперника <span class="searching-dots"><span></span><span></span><span></span></span></span>' : '⚔️ Игра началась!';
-            html += '<div class="pvp-room" style="border-color:rgba(251,191,36,0.3);background:rgba(251,191,36,0.05);"><span class="pv-avatar searching-pulse" style="background:rgba(251,191,36,0.1);">😎</span><div class="pv-info"><div class="pv-name" style="color:#fbbf24;">Твоя комната</div><div class="pv-desc">' + w + '</div></div><span class="pv-bet">' + myRoom.bet + ' USDT</span>' + (myRoom.status === 'waiting' ? '<button class="pvp-join cancel" onclick="cancelMyRoom()">✕ Отмена</button>' : '<button class="pvp-join ingame">⚔️</button>') + '</div>';
+            html += '<div class="pvp-room" style="border-color:rgba(251,191,36,0.3);background:rgba(251,191,36,0.05);"><span class="pv-avatar searching-pulse" style="background:rgba(251,191,36,0.1);">😎</span><div class="pv-info"><div class="pv-name" style="color:#fbbf24;">Твоя комната</div><div class="pv-desc">' + w + '</div></div><span class="pv-bet">' + myRoom.bet + ' ⭐</span>' + (myRoom.status === 'waiting' ? '<button class="pvp-join cancel" onclick="cancelMyRoom()">✕ Отмена</button>' : '<button class="pvp-join ingame">⚔️</button>') + '</div>';
         } else html += '<div class="pvp-create"><span class="pvc-label">💵 Ставка:</span><input type="number" id="pvpCreateBet" value="10" min="' + MIN_BET + '"><button class="pvp-join" onclick="createPvPRoom()">➕ Создать</button></div>';
         html += '<div class="pvp-list">';
         const av = fakeRooms.filter(r => r.gameId === gameId);
         if (!av.length) html += '<div style="text-align:center;padding:12px 0;font-size:12px;color:rgba(255,255,255,0.2);">🕐 Нет активных комнат</div>';
-        else av.forEach((r,i) => { html += '<div class="pvp-room"><span class="pv-avatar">' + r.avatar + '</span><div class="pv-info"><div class="pv-name">' + r.name + '</div><div class="pv-desc">' + r.desc + '</div></div><span class="pv-bet">' + r.bet + ' USDT</span><button class="pvp-join" onclick="joinPvPRoom(' + r.id + ')">⚔️</button></div>'; });
+        else av.forEach((r,i) => { html += '<div class="pvp-room"><span class="pv-avatar">' + r.avatar + '</span><div class="pv-info"><div class="pv-name">' + r.name + '</div><div class="pv-desc">' + r.desc + '</div></div><span class="pv-bet">' + r.bet + ' ⭐</span><button class="pvp-join" onclick="joinPvPRoom(' + r.id + ')">⚔️</button></div>'; });
         html += '</div>'; container.innerHTML = html;
     }
     render();
@@ -749,9 +667,9 @@ function stopAllLobbySimulations() { if (lobbyInterval) { clearInterval(lobbyInt
 function createPvPRoom() {
     if (!currentGameId) return;
     const bet = parseInt(document.getElementById('pvpCreateBet').value) || MIN_BET;
-    if (bet < MIN_BET) return showToast('⚠️ Минимум ' + MIN_BET + ' USDT', 'warn');
-    if (bet > balance) return showToast('❌ Недостаточно USDT. Доступно: ' + balance + ' USDT', 'error');
-    if (bet > 9999) return showToast('⚠️ Максимум 9 999 USDT', 'warn');
+    if (bet < MIN_BET) return showToast('⚠️ Минимум ' + MIN_BET + ' ⭐', 'warn');
+    if (bet > balance) return showToast('❌ Недостаточно ⭐. Доступно: ' + balance + ' ⭐', 'error');
+    if (bet > 9999) return showToast('⚠️ Максимум 9 999 ⭐', 'warn');
     balance -= bet; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {} myRoom = { gameId: currentGameId, bet, status: 'waiting' };
     playSound('bet'); showToast('✅ Комната создана! Ждём соперника...', 'success'); vibrate(30);
     if (lobbyInterval && currentGameId) startLobbySimulation(currentGameId);
@@ -774,7 +692,7 @@ function joinPvPRoom(roomId) {
         if (currentGameId) startLobbySimulation(currentGameId);
         return showToast('⚠️ Все комнаты уже заняты, создай свою', 'warn');
     }
-    if (room.bet > balance) return showToast('❌ Недостаточно USDT для ставки ' + room.bet + ' USDT', 'error');
+    if (room.bet > balance) return showToast('❌ Недостаточно ⭐ для ставки ' + room.bet + ' ⭐', 'error');
     balance -= room.bet; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {}
     fakeRooms = fakeRooms.filter(r => r.id !== roomId);
     playSound('bet'); startPvPMatch(room, room.bet);
@@ -785,8 +703,8 @@ function startPvPMatch(opponent, bet) {
     document.getElementById('pvpYouName').textContent = 'Ты';
     document.getElementById('pvpOppName').textContent = opponent.name;
     document.getElementById('pvpOppAvatar').textContent = opponent.avatar;
-    document.getElementById('pvpYouBet').textContent = bet + ' USDT';
-    document.getElementById('pvpOppBet').textContent = bet + ' USDT';
+    document.getElementById('pvpYouBet').textContent = bet + ' ⭐';
+    document.getElementById('pvpOppBet').textContent = bet + ' ⭐';
     document.getElementById('pvpResult').style.display = 'none';
     document.getElementById('pvpPayout').style.display = 'none';
     document.querySelector('.vs-close-btn').style.display = 'none';
@@ -801,16 +719,16 @@ function startPvPMatch(opponent, bet) {
     function endPvP(youWon, draw, bet, resultText) {
         const res = document.getElementById('pvpResult'), payout = document.getElementById('pvpPayout');
         res.style.display = 'block'; payout.style.display = 'block'; document.querySelector('.vs-close-btn').style.display = 'block';
-        if (draw) { balance += bet; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {} payout.textContent = '0 USDT (возврат)'; res.textContent = resultText; res.className = 'vs-res draw'; showToast('🤝 ' + resultText, 'info'); }
+        if (draw) { balance += bet; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {} payout.textContent = '0 ⭐ (возврат)'; res.textContent = resultText; res.className = 'vs-res draw'; showToast('🤝 ' + resultText, 'info'); }
         else if (youWon) {
-            const p = bet * 2; balance += p; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {} payout.textContent = '+' + p + ' USDT'; res.textContent = resultText; res.className = 'vs-res win';
+            const p = bet * 2; balance += p; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {} payout.textContent = '+' + p + ' ⭐'; res.textContent = resultText; res.className = 'vs-res win';
             const avs = document.querySelectorAll('#pvpMatch .v-avatar'); if (avs[0]) avs[0].classList.add('win'); if (avs[1]) avs[1].classList.add('lose');
-            playSound('win'); vibrate(100); showToast('🏆 ' + resultText + ' +' + p + ' USDT', 'success');
+            playSound('win'); vibrate(100); showToast('🏆 ' + resultText + ' +' + p + ' ⭐', 'success');
             spawnParticles(document.getElementById('pvpMatch'), 20, '#22c55e'); showBalFlash(document.getElementById('pvpMatch'), p, true);
         } else {
-            payout.textContent = '-' + bet + ' USDT'; res.textContent = resultText; res.className = 'vs-res lose';
+            payout.textContent = '-' + bet + ' ⭐'; res.textContent = resultText; res.className = 'vs-res lose';
             const avs = document.querySelectorAll('#pvpMatch .v-avatar'); if (avs[0]) avs[0].classList.add('lose'); if (avs[1]) avs[1].classList.add('win');
-            playSound('lose'); vibrate(150); showToast('💔 ' + resultText + ' -' + bet + ' USDT', 'error');
+            playSound('lose'); vibrate(150); showToast('💔 ' + resultText + ' -' + bet + ' ⭐', 'error');
         }
         updateBalance(); addHistory(youWon ? 'win' : 'lose', youWon ? bet * 2 : -bet);
         if (myRoom) { myRoom = null; if (myRoomJoinTimer) { clearTimeout(myRoomJoinTimer); myRoomJoinTimer = null; } }
@@ -1034,7 +952,7 @@ function crashHistory() {
 function crashMainBtn() {
     const gs = window._crashState, btn = document.getElementById('crashMainBtn');
     if (!btn) return;
-    const cur = activeCurrency === 'stars' ? '⭐' : 'USDT';
+    const cur = '⭐';
     const tg = window.Telegram?.WebApp;
     if (gs.phase === 'betting') {
         btn.className = 'crash-main-btn bet'; btn.textContent = '🚀 Сделать ставку (' + gs.bet + ' ' + cur + ')'; btn.disabled = false;
@@ -1141,7 +1059,7 @@ function crashDoBang() {
     const gm = document.querySelector('.crash-graph-mini'); if (gm) gm.style.borderColor = 'rgba(239,68,68,0.3)';
     const cl = document.getElementById('crashLine'); if (cl) cl.innerHTML = crashBuildGraph(1, gs.crashPoint);
     gs.players.forEach(p => { if (p.status === 'flying') { p.status = 'busted'; p.cashoutAt = null; } });
-    if (!gs.cashed) { playSound('lose'); vibrate(150); showToast('💥 Взорвалась! -' + gs.bet + ' ' + (activeCurrency === 'stars' ? '⭐' : 'USDT'), 'error'); spawnParticles(document.getElementById('crashGame'), 15, '#ef4444'); addHistory('lose', -gs.bet, activeCurrency === 'stars' ? '⭐' : 'USDT'); }
+    if (!gs.cashed) { playSound('lose'); vibrate(150); showToast('💥 Взорвалась! -' + gs.bet + ' ⭐', 'error'); spawnParticles(document.getElementById('crashGame'), 15, '#ef4444'); addHistory('lose', -gs.bet); }
     try { window._supa?.from('crash_rounds')?.insert?.({ crash_point: gs.crashPoint, round_number: gs.round }); } catch(e) {}
     gs.history.unshift(Math.floor(gs.crashPoint * 100) / 100); if (gs.history.length > 15) gs.history.pop();
     crashUI();
@@ -1152,22 +1070,22 @@ function crashDoCashout() {
     const gs = window._crashState;
     if (gs.cashed || gs.phase !== 'flying') return;
     gs.cashed = true; gs.cashoutMult = gs.mult;
-    const win = Math.floor(gs.bet * gs.mult); gs.lastWin = win; incBal(win);
+    const win = Math.floor(gs.bet * gs.mult); gs.lastWin = win; balance += win; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {}
     const me = gs.players.find(p => p.avatar === '😎');
     if (me) { me.status = 'cashed'; me.cashoutAt = gs.mult; me.profit = win; }
-    playSound('win'); vibrate(100); showToast('🏆 +' + win + ' ' + (activeCurrency === 'stars' ? '⭐' : 'USDT') + ' (x' + gs.mult.toFixed(2) + ')', 'success');
+    playSound('win'); vibrate(100); showToast('🏆 +' + win + ' ⭐ (x' + gs.mult.toFixed(2) + ')', 'success');
     spawnParticles(document.getElementById('crashGame'), 20, '#22c55e'); showBalFlash(document.getElementById('crashGame'), win, true);
-    addHistory('win', win, activeCurrency === 'stars' ? '⭐' : 'USDT'); crashUI();
+    addHistory('win', win); crashUI();
 }
 
 function crashMainAction() {
     const gs = window._crashState, inp = document.getElementById('crashBetInput');
     if (gs.phase === 'betting') {
         const bet = parseInt(inp ? inp.value : 10) || MIN_BET;
-        if (bet < MIN_BET) return showToast('⚠️ Минимум ' + MIN_BET + ' USDT', 'warn');
-        if (bet > getActiveBal()) return showToast('❌ Недостаточно ' + (activeCurrency === 'stars' ? '⭐ Stars' : 'USDT'), 'error');
-        if (bet > 9999) return showToast('⚠️ Максимум 9 999 USDT', 'warn');
-        decBal(bet); gs.bet = bet;
+        if (bet < MIN_BET) return showToast('⚠️ Минимум ' + MIN_BET + ' ⭐', 'warn');
+        if (bet > balance) return showToast('❌ Недостаточно ⭐ Stars', 'error');
+        if (bet > 9999) return showToast('⚠️ Максимум 9 999 ⭐', 'warn');
+        balance -= bet; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {} gs.bet = bet;
         if (gs.mainTimer) { clearInterval(gs.mainTimer); gs.mainTimer = null; }
         if (gs.countdownTimer) { clearInterval(gs.countdownTimer); gs.countdownTimer = null; }
         crashStartRound();
@@ -1177,7 +1095,7 @@ function crashMainAction() {
 function crashQuickBet(val) {
     const inp = document.getElementById('crashBetInput'); if (!inp) return;
     let cur = parseInt(inp.value) || MIN_BET;
-    if (val === 'max') cur = Math.floor(getActiveBal() / 5) * 5;
+    if (val === 'max') cur = Math.floor(balance / 5) * 5;
     else if (val === 'x2') cur *= 2;
     else cur += val;
     inp.value = Math.max(MIN_BET, Math.min(cur, 9999));
@@ -1195,145 +1113,7 @@ function crashToggleAuto() {
 
 if (localStorage.getItem('sfx') === 'off') { document.getElementById('soundToggle').textContent = '🔇'; document.getElementById('soundToggle').classList.add('muted'); }
 </script>
-<script type="module">
-import { TonConnectUI } from '@tonconnect/ui';
-const manifest = window.location.href.includes('localhost') || window.location.href.includes('127.0.0.1')
-    ? window.location.origin + '/tonconnect-manifest.json'
-    : 'https://clashpvp.app/tonconnect-manifest.json';
-window._tcUI = new TonConnectUI({ manifestUrl: manifest });
-const depBtnRoot = document.getElementById('tc-deposit-btn');
-const wdBtnRoot = document.getElementById('tc-withdraw-btn');
-if (depBtnRoot) depBtnRoot.appendChild(window._tcUI.createConnectButton());
-if (wdBtnRoot) wdBtnRoot.appendChild(window._tcUI.createConnectButton());
-window._tcUI.onStatusChange(wallet => {
-    const badge = document.getElementById('walletBadge');
-    const tcRow = document.getElementById('tcBalanceRow');
-    const depDisc = document.getElementById('depositTCDisconnected');
-    const depConn = document.getElementById('depositTCConnected');
-    const wdDisc = document.getElementById('withdrawTCDisconnected');
-    const wdConn = document.getElementById('withdrawTCConnected');
-    if (wallet) {
-        const addr = wallet.account.address;
-        const friendly = addr.length > 10 ? addr.slice(0, 4) + '...' + addr.slice(-4) : addr;
-        badge.className = 'wallet-badge connected';
-        badge.textContent = '👛 ' + friendly + ' | Откл.';
-        badge.onclick = () => window._tcUI.disconnect();
-        tcRow.style.display = 'flex';
-        if (depDisc) depDisc.style.display = 'none';
-        if (depConn) depConn.style.display = 'block';
-        if (wdDisc) wdDisc.style.display = 'none';
-        if (wdConn) wdConn.style.display = 'block';
-        const da = document.getElementById('depositWalletAddr');
-        if (da) da.textContent = friendly;
-        const wa = document.getElementById('withdrawWalletAddr');
-        if (wa) wa.textContent = friendly;
-        const wa2 = document.getElementById('withdrawAvail');
-        if (wa2) wa2.textContent = balance.toFixed(2) + ' USDT';
-        updateTonBalance();
-    } else {
-        badge.className = 'wallet-badge disconnected';
-        badge.textContent = '👛 Подключить';
-        badge.onclick = () => window._tcUI.connect();
-        tcRow.style.display = 'none';
-        if (depDisc) depDisc.style.display = 'block';
-        if (depConn) depConn.style.display = 'none';
-        if (wdDisc) wdDisc.style.display = 'block';
-        if (wdConn) wdConn.style.display = 'none';
-        updateTonBalance();
-    }
-});
-window._tcUI.connect({ jsBridgeKey: 'tonconnect' }).catch(() => {});
-async function updateTonBalance() {
-    try {
-        const bal = await window._tcUI.getBalance();
-        const ton = (bal / 1e9).toFixed(2);
-        document.getElementById('tonBalanceDisplay').textContent = ton + ' TON';
-        document.getElementById('depositTonBalance').textContent = ton + ' TON';
-    } catch(e) { document.getElementById('tonBalanceDisplay').textContent = '—'; }
-}
-window.simulateDeposit = async function() {
-    const amt = parseInt(document.getElementById('depositAmount').value) || 10;
-    if (amt <= 0) return;
-    if (amt > 9999) return showToast('⚠️ Максимум 9 999 USDT', 'warn');
-    const baseUrl = window.location.origin;
-    let credited = false, uid = window._supaUser?.id || '';
-    try {
-        const userWallet = document.getElementById('depositWalletAddr')?.textContent || '';
-        if (userWallet && userWallet.length > 10) {
-            const resp = await fetch(baseUrl + '/api/ton-verify', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: uid, userWallet })
-            });
-            const data = await resp.json();
-            if (data.verified && data.amountUSDT > 0) {
-                balance += data.amountUSDT; updateBalance();
-                addHistory('deposit', data.amountUSDT);
-                showToast('✅ Обнаружен перевод! +' + data.amountUSDT.toFixed(2) + ' USDT', 'success');
-                credited = true;
-            }
-        }
-    } catch(e) { console.log('verify error:', e); }
-    if (!credited) {
-        balance += amt; updateBalance();
-        addHistory('deposit', amt);
-        showToast('✅ +' + amt.toFixed(2) + ' USDT (симуляция)', 'success');
-    }
-    closeModal('depositModal');
-    playSound('bet'); spawnParticles(document.getElementById('balanceBlock'), 12, '#fbbf24');
-    try { window._supaSyncBalance?.(); } catch(e) {}
-};
-window.simulateWithdraw = async function() {
-    const amt = parseFloat(document.getElementById('withdrawAmount').value) || 0, err = document.getElementById('withdrawError');
-    if (amt <= 0) { err.textContent = '⚠️ Введи сумму больше 0'; err.classList.add('show'); return; }
-    if (amt > balance) { err.textContent = '❌ Недостаточно. Доступно: ' + balance.toFixed(2) + ' USDT'; err.classList.add('show'); return; }
-    if (amt < 1) { err.textContent = '⚠️ Минимум 1 USDT'; err.classList.add('show'); return; }
-    err.classList.remove('show');
-    const baseUrl = window.location.origin, uid = window._supaUser?.id || '';
-    let sent = false;
-    try {
-        const userWallet = document.getElementById('withdrawWalletAddr')?.textContent || '';
-        if (userWallet && userWallet.length > 10) {
-            const resp = await fetch(baseUrl + '/api/ton-withdraw', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: uid, amountUSDT: amt, userWallet })
-            });
-            const data = await resp.json();
-            if (data.success || data.simulated) {
-                balance -= amt; updateBalance();
-                addHistory('withdraw', -amt);
-                showToast('💸 Отправлено ' + amt.toFixed(2) + ' USDT' + (data.simulated ? ' (симуляция)' : ''), 'info');
-                sent = true;
-            } else {
-                err.textContent = '❌ ' + (data.error || 'Ошибка вывода');
-                err.classList.add('show'); return;
-            }
-        }
-    } catch(e) { console.log('withdraw error:', e); }
-    if (!sent) {
-        balance -= amt; updateBalance(); closeModal('withdrawModal');
-        addHistory('withdraw', -amt); showToast('💸 Отправлено ' + amt.toFixed(2) + ' USDT (симуляция)', 'info');
-    }
-    closeModal('withdrawModal');
-    playSound('click');
-    try { window._supaSyncBalance?.(); } catch(e) {}
-};
-window.disconnectWallet = () => { window._tcUI.disconnect(); showToast('👛 Кошелёк отключён', 'info'); };
-window.copyAddr = (el) => { navigator.clipboard.writeText(el.textContent).then(() => showToast('✅ Адрес скопирован', 'success')).catch(() => {}); };
-window.switchDepositTab = function(tab) {
-    const tonTab = document.getElementById('depositTON');
-    const starsTab = document.getElementById('depositStars');
-    const tonBtn = document.getElementById('depTabTon');
-    const starsBtn = document.getElementById('depTabStars');
-    if (tab === 'ton') {
-        tonTab.style.display = 'block'; starsTab.style.display = 'none';
-        tonBtn.className = 'bal-btn deposit'; starsBtn.className = 'bal-btn withdraw';
-    } else {
-        tonTab.style.display = 'none'; starsTab.style.display = 'block';
-        tonBtn.className = 'bal-btn withdraw'; starsBtn.className = 'bal-btn deposit';
-    }
-};
+<script>
 window.buyStars = function(amount) {
     playSound('click');
     closeModal('depositModal');
@@ -1341,11 +1121,11 @@ window.buyStars = function(amount) {
     if (tg && tg.purchaseStars) {
         showToast('⭐ Открываю покупку в Telegram...', 'info');
         tg.purchaseStars(amount).then((result) => {
-            starsBalance += amount;
-            if (activeCurrency === 'stars') updateBalance();
+            balance += amount;
+            updateBalance();
             showToast('✅ +' + amount + ' ⭐ Stars куплены!', 'success');
             spawnParticles(document.getElementById('balanceBlock'), 15, '#22c55e');
-            addHistory('deposit', amount, '⭐');
+            addHistory('deposit', amount);
             try { window._supaSyncBalance?.(); } catch(e) {}
             playSound('win');
         }).catch((err) => {
@@ -1354,46 +1134,28 @@ window.buyStars = function(amount) {
     } else {
         showToast('⭐ Симуляция покупки Stars...', 'info');
         setTimeout(() => {
-            starsBalance += amount;
-            if (activeCurrency === 'stars') updateBalance();
+            balance += amount;
+            updateBalance();
             showToast('✅ +' + amount + ' ⭐ Stars зачислено!', 'success');
             spawnParticles(document.getElementById('balanceBlock'), 15, '#22c55e');
-            addHistory('deposit', amount, '⭐');
+            addHistory('deposit', amount);
             try { window._supaSyncBalance?.(); } catch(e) {}
             playSound('win');
         }, 1200);
     }
 };
-window.switchWithdrawTab = function(tab) {
-    const tonTab = document.getElementById('withdrawTON');
-    const starsTab = document.getElementById('withdrawStars');
-    const tonBtn = document.getElementById('wdTabTon');
-    const starsBtn = document.getElementById('wdTabStars');
-    if (tab === 'ton') {
-        tonTab.style.display = 'block'; starsTab.style.display = 'none';
-        tonBtn.className = 'bal-btn deposit'; starsBtn.className = 'bal-btn withdraw';
-    } else {
-        tonTab.style.display = 'none'; starsTab.style.display = 'block';
-        tonBtn.className = 'bal-btn withdraw'; starsBtn.className = 'bal-btn deposit';
-    }
-    const wdStars = document.getElementById('wdStarsBalance');
-    if (wdStars) wdStars.textContent = starsBalance.toFixed(0) + ' ⭐';
-};
-window.convertStars = function(amount) {
-    if (starsBalance < amount) {
-        showToast('❌ Недостаточно ⭐ Stars. Нужно: ' + amount, 'error');
-        return;
-    }
-    starsBalance -= amount;
-    const usdt = amount / 100;
-    balance += usdt;
-    updateBalance();
-    closeModal('withdrawModal');
-    showToast('✅ Конвертировано ' + amount + ' ⭐ → ' + usdt.toFixed(2) + ' USDT', 'success');
-    playSound('win');
-    spawnParticles(document.getElementById('balanceBlock'), 12, '#22c55e');
-    addHistory('deposit', usdt);
+window.simulateWithdraw = function() {
+    const amt = parseFloat(document.getElementById('withdrawAmount').value) || 0, err = document.getElementById('withdrawError');
+    if (amt <= 0) { err.textContent = '⚠️ Введи сумму больше 0'; err.classList.add('show'); return; }
+    if (amt > balance) { err.textContent = '❌ Недостаточно. Доступно: ' + balance.toFixed(0) + ' ⭐'; err.classList.add('show'); return; }
+    if (amt < 1) { err.textContent = '⚠️ Минимум 1 ⭐'; err.classList.add('show'); return; }
+    err.classList.remove('show');
+    balance -= amt; updateBalance(); closeModal('withdrawModal');
+    addHistory('withdraw', -amt); showToast('💸 Списано ' + amt.toFixed(0) + ' ⭐', 'info');
+    playSound('click');
     try { window._supaSyncBalance?.(); } catch(e) {}
+    const wdStars = document.getElementById('wdStarsBalance');
+    if (wdStars) wdStars.textContent = balance.toFixed(0) + ' ⭐';
 };
 </script>
 <script type="module">
@@ -1430,11 +1192,11 @@ function _supaLogout() {
 }
 async function _supaSyncBalance() {
     if (!_supaAuthed || !_supaUser?.id) return;
-    await _supa.from('profiles').update({ balance, stars_balance }).eq('id', _supaUser.id);
+    await _supa.from('profiles').update({ balance, stars_balance: balance }).eq('id', _supaUser.id);
 }
-async function _supaSaveTx(type, amount, currency) {
+async function _supaSaveTx(type, amount) {
     if (!_supaAuthed || !_supaUser?.id) return;
-    await _supa.from('transactions').insert({ user_id: _supaUser.id, type, amount, currency: currency || 'USDT' });
+    await _supa.from('transactions').insert({ user_id: _supaUser.id, type, amount, currency: 'stars' });
 }
 window._supaSyncBalance = _supaSyncBalance;
 window._supaSaveTx = _supaSaveTx;
@@ -1446,8 +1208,7 @@ window._supaOnTelegramAuth = async function(user) {
         const { data: existing } = await _supa.from('profiles').select('*').eq('telegram_id', String(user.id)).maybeSingle();
         if (existing) {
             _supaUser = existing;
-            balance = existing.balance;
-            starsBalance = existing.stars_balance;
+            balance = existing.stars_balance || existing.balance || 1000;
             updateBalance();
         } else {
             const newProfile = {
@@ -1455,7 +1216,7 @@ window._supaOnTelegramAuth = async function(user) {
                 telegram_id: String(user.id),
                 username: user.first_name + (user.last_name ? ' ' + user.last_name : ''),
                 avatar: user.photo_url || '😎',
-                balance: 128.50,
+                balance: 1000,
                 stars_balance: 1000
             };
             const { data: inserted } = await _supa.from('profiles').insert(newProfile).select().single();
@@ -1472,7 +1233,7 @@ window._supaOnTelegramAuth = async function(user) {
                     icon: { deposit:'💰',withdraw:'💸',win:'🏆',lose:'💔' }[t.type] || '💫',
                     title: { deposit:'Пополнение',withdraw:'Вывод',win:'Выигрыш',lose:'Проигрыш' }[t.type] || 'Операция',
                     amount: t.amount,
-                    currency: t.currency || 'USDT',
+                    currency: '⭐',
                     date: new Date(t.created_at).toLocaleString('ru-RU', { hour:'2-digit', minute:'2-digit' })
                 }));
             }
@@ -1489,7 +1250,7 @@ window._supaLoadLeaderboard = async function() {
         const { data, error } = await _supa.from('profiles').select('username,avatar,balance,stars_balance').order('balance', { ascending: false }).limit(20);
         if (error) { list.innerHTML = '<div style="text-align:center;padding:20px;color:#ef4444;font-size:13px;">❌ Ошибка</div>'; return; }
         if (!data || !data.length) { list.innerHTML = '<div style="text-align:center;padding:20px;color:rgba(255,255,255,0.3);font-size:13px;">📭 Пока никого нет</div>'; return; }
-        list.innerHTML = data.map((p,i) => '<div class="history-item"><span class="h-icon">' + ['🥇','🥈','🥉','','','','','','','','','','','','','','','','',''][i] + '</span><div class="h-info"><div class="h-title">' + (p.avatar||'😎') + ' ' + (p.username||'Player') + '</div></div><span class="h-amount green">' + p.balance.toFixed(2) + ' USDT</span></div>').join('');
+        list.innerHTML = data.map((p,i) => '<div class="history-item"><span class="h-icon">' + ['🥇','🥈','🥉','','','','','','','','','','','','','','','','',''][i] + '</span><div class="h-info"><div class="h-title">' + (p.avatar||'😎') + ' ' + (p.username||'Player') + '</div></div><span class="h-amount green">' + (p.stars_balance || p.balance || 0).toFixed(0) + ' ⭐</span></div>').join('');
     } catch(e) { list.innerHTML = '<div style="text-align:center;padding:20px;color:#ef4444;font-size:13px;">❌ Ошибка загрузки</div>'; }
 };
 
@@ -1504,7 +1265,7 @@ window._supaLoadLeaderboard = async function() {
                     const ses = JSON.parse(saved);
                     if (ses?.telegram_id === String(tgUser.id)) {
                         _supa.from('profiles').select('*').eq('id', ses.id).maybeSingle().then(({ data }) => {
-                            if (data) { _supaUser = data; _supaAuthed = true; balance = data.balance; starsBalance = data.stars_balance; updateBalance(); _supaUpdateUI(); return; }
+                            if (data) { _supaUser = data; _supaAuthed = true; balance = data.stars_balance || data.balance || 1000; updateBalance(); _supaUpdateUI(); return; }
                             localStorage.removeItem('tg_session');
                         }).catch(() => {});
                     }
@@ -1513,14 +1274,14 @@ window._supaLoadLeaderboard = async function() {
             if (!_supaAuthed) {
                 _supa.from('profiles').select('*').eq('telegram_id', String(tgUser.id)).maybeSingle().then(({ data }) => {
                     if (data) {
-                        _supaUser = data; _supaAuthed = true; balance = data.balance; starsBalance = data.stars_balance; updateBalance(); _supaUpdateUI();
+                        _supaUser = data; _supaAuthed = true; balance = data.stars_balance || data.balance || 1000; updateBalance(); _supaUpdateUI();
                         localStorage.setItem('tg_session', JSON.stringify({ id: data.id, telegram_id: String(tgUser.id) }));
                     } else {
-                        const newProfile = { id: crypto.randomUUID(), telegram_id: String(tgUser.id), username: tgUser.first_name + (tgUser.last_name ? ' ' + tgUser.last_name : ''), avatar: tgUser.photo_url || '😎', balance: 128.50, stars_balance: 1000 };
+                        const newProfile = { id: crypto.randomUUID(), telegram_id: String(tgUser.id), username: tgUser.first_name + (tgUser.last_name ? ' ' + tgUser.last_name : ''), avatar: tgUser.photo_url || '😎', balance: 1000, stars_balance: 1000 };
                         _supa.from('profiles').insert(newProfile).select().single().then(({ data: inserted }) => {
-                            _supaUser = inserted || newProfile; _supaAuthed = true; balance = (_supaUser.balance || 128.50); starsBalance = (_supaUser.stars_balance || 1000); updateBalance(); _supaUpdateUI();
+                            _supaUser = inserted || newProfile; _supaAuthed = true; balance = (_supaUser.stars_balance || _supaUser.balance || 1000); updateBalance(); _supaUpdateUI();
                             localStorage.setItem('tg_session', JSON.stringify({ id: _supaUser.id, telegram_id: String(tgUser.id) }));
-                        }).catch(() => { _supaUser = newProfile; _supaAuthed = true; balance = newProfile.balance; starsBalance = newProfile.stars_balance; updateBalance(); _supaUpdateUI(); });
+                        }).catch(() => { _supaUser = newProfile; _supaAuthed = true; balance = newProfile.balance; updateBalance(); _supaUpdateUI(); });
                     }
                 }).catch(() => {});
             }
@@ -1530,7 +1291,7 @@ window._supaLoadLeaderboard = async function() {
                 const ses = JSON.parse(saved);
                 if (ses?.id) {
                     _supa.from('profiles').select('*').eq('id', ses.id).maybeSingle().then(({ data }) => {
-                        if (data) { _supaUser = data; _supaAuthed = true; balance = data.balance; starsBalance = data.stars_balance; updateBalance(); _supaUpdateUI(); }
+                        if (data) { _supaUser = data; _supaAuthed = true; balance = data.stars_balance || data.balance || 1000; updateBalance(); _supaUpdateUI(); }
                         else { localStorage.removeItem('tg_session'); }
                     }).catch(() => { localStorage.removeItem('tg_session'); });
                 }
