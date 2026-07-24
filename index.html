@@ -1229,7 +1229,9 @@ window._supaLoadLeaderboard = async function() {
                         _supaUser = data; _supaAuthed = true; balance = data.stars_balance || data.balance || 0; updateBalance(); _supaUpdateUI();
                         localStorage.setItem('tg_session', JSON.stringify({ id: data.id, telegram_id: String(tgUser.id) }));
                     } else {
-                        const newProfile = { id: crypto.randomUUID(), telegram_id: String(tgUser.id), username: tgUser.first_name + (tgUser.last_name ? ' ' + tgUser.last_name : ''), avatar: tgUser.photo_url || '😎', balance: 0, stars_balance: 0 };
+                        let _tgName = (tgUser.first_name + (tgUser.last_name ? ' ' + tgUser.last_name : '')).replace(/\+/g,' ');
+                        try { _tgName = decodeURIComponent(_tgName); } catch(e) {}
+                        const newProfile = { id: crypto.randomUUID(), telegram_id: String(tgUser.id), username: _tgName, avatar: tgUser.photo_url || '😎', balance: 0, stars_balance: 0 };
                         _supa.from('profiles').insert(newProfile).select().single().then(({ data: inserted }) => {
                             _supaUser = inserted || newProfile; _supaAuthed = true; balance = (_supaUser.stars_balance || _supaUser.balance || 0); updateBalance(); _supaUpdateUI();
                             localStorage.setItem('tg_session', JSON.stringify({ id: _supaUser.id, telegram_id: String(tgUser.id) }));
