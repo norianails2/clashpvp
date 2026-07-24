@@ -47,20 +47,30 @@
         .sound-indicator:hover { opacity:0.7; }
         .sound-indicator.muted { opacity:0.15; }
 
-        .balance-block { background:linear-gradient(135deg,rgba(255,255,255,0.12),rgba(255,255,255,0.05));backdrop-filter:blur(10px);border:2px solid rgba(255,255,255,0.15);border-radius:24px;padding:14px 16px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;gap:10px;animation:slideUp 0.5s ease;position:relative; }
-        .balance-left { min-width:0; }
-        .balance-left .label { font-size:10px;color:rgba(255,255,255,0.5);font-weight:600;letter-spacing:1px;font-family:'Nunito',sans-serif; }
-        .balance-row { display:flex;align-items:center;gap:6px;margin-top:2px;cursor:pointer;border-radius:8px;padding:2px 4px;transition:background 0.2s;user-select:none; }
-        .balance-row:active { background:rgba(255,255,255,0.05); }
-        .balance-row .amount { font-family:'Fredoka',sans-serif;font-size:24px;font-weight:700;background:linear-gradient(135deg,#fbbf24,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;transition:all 0.3s; }
-        .balance-row .currency { font-size:12px;font-weight:600;color:rgba(255,255,255,0.6); }
-        .balance-row .toggle { font-size:10px;color:rgba(255,255,255,0.4);padding:2px;flex-shrink:0;transition:transform 0.3s; }
+        .balance-block { background:linear-gradient(145deg,rgba(30,15,55,0.95),rgba(20,10,40,0.98));backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08);border-radius:28px;padding:18px 20px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;gap:12px;animation:slideUp 0.5s ease;position:relative;overflow:hidden; }
+        .balance-block::before { content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:conic-gradient(from 0deg,transparent,rgba(251,191,36,0.03),transparent,rgba(34,197,94,0.03),transparent);animation:rotate 8s linear infinite;pointer-events:none; }
+        .balance-block::after { content:'';position:absolute;inset:1px;background:linear-gradient(145deg,rgba(30,15,55,0.95),rgba(20,10,40,0.98));border-radius:27px;pointer-events:none; }
+        @keyframes rotate { to { transform:rotate(360deg); } }
+        .balance-left { min-width:0;position:relative;z-index:1; }
+        .balance-left .label { font-size:9px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1.5px;font-family:'Nunito',sans-serif;text-transform:uppercase;display:flex;align-items:center;gap:6px;margin-bottom:4px; }
+        .balance-left .label .label-dot { width:5px;height:5px;border-radius:50%;background:#22c55e;display:inline-block;animation:pulse 2s ease infinite; }
+        @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+        .balance-row { display:flex;align-items:baseline;gap:6px;cursor:pointer;border-radius:12px;padding:4px 6px;transition:all 0.2s;user-select:none;position:relative;z-index:1; }
+        .balance-row:hover { background:rgba(255,255,255,0.03); }
+        .balance-row:active { transform:scale(0.97); }
+        .balance-row .amount { font-family:'Fredoka',sans-serif;font-size:28px;font-weight:800;background:linear-gradient(135deg,#fbbf24,#facc15,#fbbf24);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;transition:all 0.3s;letter-spacing:-0.5px;animation:shimmer 3s ease infinite; }
+        @keyframes shimmer { 0%,100%{background-position:0% center;} 50%{background-position:200% center;} }
+        .balance-row .currency { font-size:13px;font-weight:700;color:rgba(255,255,255,0.4);transition:color 0.3s; }
+        .balance-row .toggle { font-size:11px;color:rgba(255,255,255,0.25);padding:2px;flex-shrink:0;transition:transform 0.3s,color 0.3s; }
         .balance-row .toggle.flipped { transform:rotate(180deg); }
-        .balance-actions { display:flex;gap:6px;flex-shrink:0; }
-        .bal-btn { padding:7px 12px;border-radius:9999px;border:none;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:transform 0.1s,box-shadow 0.2s;white-space:nowrap; }
-        .bal-btn:active { transform:scale(0.92); }
-        .bal-btn.deposit { background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1a0a2e;box-shadow:0 4px 15px rgba(251,191,36,0.4); }
-        .bal-btn.withdraw { background:rgba(255,255,255,0.12);color:#fff;border:2px solid rgba(255,255,255,0.25); }
+        .balance-actions { display:flex;gap:6px;flex-shrink:0;position:relative;z-index:1; }
+        .bal-btn { padding:8px 14px;border-radius:9999px;border:none;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all 0.15s;white-space:nowrap;position:relative;overflow:hidden; }
+        .bal-btn::after { content:'';position:absolute;inset:0;border-radius:inherit;opacity:0;transition:opacity 0.2s; }
+        .bal-btn:active { transform:scale(0.9); }
+        .bal-btn.deposit { background:linear-gradient(135deg,#fbbf24,#d97706);color:#1a0a2e;box-shadow:0 4px 20px rgba(251,191,36,0.3); }
+        .bal-btn.deposit:hover { box-shadow:0 6px 25px rgba(251,191,36,0.5);transform:translateY(-1px); }
+        .bal-btn.withdraw { background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.9);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(4px); }
+        .bal-btn.withdraw:hover { background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2); }
         .auth-badge { display:inline-flex;align-items:center;gap:3px;margin-left:4px;padding:2px 8px;border-radius:9999px;font-size:9px;font-weight:700;cursor:pointer;vertical-align:middle;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5);transition:all 0.2s; }
         .auth-badge:hover { background:rgba(255,255,255,0.1); }
         .auth-badge.logged-in { background:rgba(34,197,94,0.12);color:#22c55e; }
@@ -398,7 +408,7 @@
 
         <div class="balance-block" id="balanceBlock">
             <div class="balance-left">
-                <div class="label" id="balanceLabel">Твой баланс <span class="wallet-badge disconnected" id="walletBadge" onclick="openModal('depositModal')">👛 Подключить</span><span class="auth-badge" id="authBadge">👤 Гость</span></div>
+                <div class="label" id="balanceLabel"><span class="label-dot"></span>Твой баланс <span class="wallet-badge disconnected" id="walletBadge" onclick="openModal('depositModal')">👛 Подключить</span><span class="auth-badge" id="authBadge">👤 Гость</span></div>
                 <div class="balance-row" onclick="toggleCurrency()">
                     <span class="amount" id="balanceAmount">128.50</span>
                     <span class="currency" id="balanceCurrency">USDT</span>
