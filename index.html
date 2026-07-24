@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -129,7 +129,6 @@
         .game-header .rules-btn:active { background:rgba(255,255,255,0.05); }
         .game-area { flex:1;overflow-y:auto;padding:12px 16px 20px;display:flex;flex-direction:column;-webkit-overflow-scrolling:touch; }
 
-        .pvp-lobby { width:100%;margin-top:12px;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px;animation:fadeIn 0.4s ease; }
         .game-preview { text-align:center;padding:16px 0;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;animation:fadeIn 0.4s ease; }
         .pv-icon-wrap { position:relative;margin-bottom:16px; }
         .pv-icon-wrap .pv-icon-bg { width:80px;height:80px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:42px;position:relative;overflow:hidden; }
@@ -143,58 +142,11 @@
         .pv-icon-wrap .pv-icon { font-size:42px;position:relative;z-index:1; }
         .pv-title-text { font-family:'Fredoka',sans-serif;font-size:22px;color:#fff;margin-bottom:4px;font-weight:800; }
         .pv-sub-text { font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:16px;max-width:240px;line-height:1.4; }
-        .pv-players-count { display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:12px; }
-        .pv-players-count .dot { width:5px;height:5px;border-radius:50%;background:#22c55e;animation:liveDot 1s ease-in-out infinite; }
         @keyframes fadeIn { from { opacity:0;transform:scale(0.95); } to { opacity:1;transform:scale(1); } }
-        .pvp-title { font-size:11px;color:rgba(255,255,255,0.35);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:6px; }
-        .pvp-title .live { width:6px;height:6px;border-radius:50%;background:#22c55e;animation:liveDot 1s ease-in-out infinite;display:inline-block; }
         @keyframes liveDot { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
-        .pvp-list { display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto; }
-        .pvp-list::-webkit-scrollbar { width:3px; }
-        .pvp-list::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1);border-radius:10px; }
-        .pvp-room { display:flex;align-items:center;gap:10px;padding:10px 12px;background:linear-gradient(135deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01));border-radius:14px;border:1px solid rgba(255,255,255,0.06);animation:lobbyIn 0.3s ease backwards;font-size:12px;transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1); }
-        .pvp-room:hover { border-color:rgba(255,255,255,0.12);background:linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));transform:translateX(2px); }
-        .pvp-room .pv-avatar { font-size:20px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02));border-radius:50%;flex-shrink:0;border:1px solid rgba(255,255,255,0.06); }
-        .pvp-room .pv-info { flex:1;min-width:0; }
-        .pvp-room .pv-info .pv-name { font-weight:700;color:rgba(255,255,255,0.85);font-size:13px;letter-spacing:-0.2px; }
-        .pvp-room .pv-info .pv-desc { font-size:10px;color:rgba(255,255,255,0.3);margin-top:2px; }
-        .pvp-room .pv-bet { font-family:'Fredoka',sans-serif;font-weight:700;color:#fbbf24;flex-shrink:0;font-size:13px;margin-right:4px;text-shadow:0 0 10px rgba(251,191,36,0.2); }
-        .pvp-join { padding:7px 16px;border-radius:9999px;border:none;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1a0a2e;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;cursor:pointer;flex-shrink:0;transition:all 0.2s;box-shadow:0 2px 10px rgba(251,191,36,0.15); }
-        .pvp-join:hover { transform:scale(1.05);box-shadow:0 4px 20px rgba(251,191,36,0.35); }
-        .pvp-join:active { transform:scale(0.95); }
-        .pvp-join.cancel { background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);box-shadow:none;border:1px solid rgba(255,255,255,0.06); }
-        .pvp-join.cancel:active { background:rgba(239,68,68,0.15);color:#ef4444;border-color:rgba(239,68,68,0.2); }
-        .pvp-join.ingame { background:rgba(34,197,94,0.15);color:#22c55e;pointer-events:none;opacity:0.8;border:1px solid rgba(34,197,94,0.2); }
-        .pvp-create { display:flex;align-items:center;gap:8px;padding:10px 14px;background:linear-gradient(135deg,rgba(251,191,36,0.06),rgba(251,191,36,0.02));border-radius:14px;border:1px dashed rgba(251,191,36,0.2);margin-bottom:8px;animation:fadeIn 0.3s ease;flex-wrap:wrap; }
-        .pvp-create .pvc-label { font-size:11px;color:rgba(255,255,255,0.4);font-weight:600; }
-        .pvp-create input { width:60px;padding:5px 8px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.06);color:#fff;font-family:'Fredoka',sans-serif;font-size:14px;font-weight:600;text-align:center;outline:none;transition:border-color 0.2s; }
-        .pvp-create input:focus { border-color:#fbbf24; }
-        .pvp-create .pvp-join { font-size:11px;padding:6px 14px; }
-        @keyframes lobbyIn { from { opacity:0;transform:translateX(-10px); } to { opacity:1;transform:translateX(0); } }
-
-        .searching-dots { display:inline-flex;gap:4px;align-items:center; }
-        .searching-dots span { width:6px;height:6px;border-radius:50%;background:#fbbf24;animation:dotBounce 1.2s ease-in-out infinite; }
-        .searching-dots span:nth-child(2) { animation-delay:0.2s; }
-        .searching-dots span:nth-child(3) { animation-delay:0.4s; }
-        @keyframes dotBounce { 0%,80%,100% { transform:scale(0.6);opacity:0.3; } 40% { transform:scale(1);opacity:1; } }
-        .searching-pulse { animation:searchPulse 1.5s ease-in-out infinite; }
-        @keyframes searchPulse { 0%,100% { box-shadow:0 0 0 0 rgba(251,191,36,0.2); } 50% { box-shadow:0 0 0 12px rgba(251,191,36,0); } }
-
-        .pvp-match { position:absolute;inset:0;background:linear-gradient(180deg,#0d0d14,#1a1040);display:none;flex-direction:column;z-index:25;border-radius:0;padding:16px 16px 20px;animation:slideUp 0.3s ease; }
-        @media (min-width:500px) { .pvp-match { border-radius:36px; } }
-        .pvp-match.show { display:flex; }
-        .pvp-match .vs-row { display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:4px; }
-        .pvp-match .vs-player { text-align:center; }
-        .pvp-match .vs-player .v-avatar { font-size:32px;width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.06);border-radius:50%;margin:0 auto 4px;border:2px solid rgba(255,255,255,0.1);transition:all 0.3s; }
-        .pvp-match .vs-player .v-avatar.waiting { border-color:#fbbf24;animation:searchPulse 1.5s ease-in-out infinite; }
-        .pvp-match .vs-player .v-avatar.win { border-color:#22c55e;box-shadow:0 0 30px rgba(34,197,94,0.4); }
-        .pvp-match .vs-player .v-avatar.lose { border-color:#ef4444; }
-        .pvp-match .vs-player .v-name { font-size:12px;font-weight:600;color:rgba(255,255,255,0.6); }
-        .pvp-match .vs-player .v-bet { font-size:10px;color:#fbbf24;font-weight:700; }
-        .pvp-match .vs-vs { font-size:24px;font-weight:800;color:rgba(255,255,255,0.12);font-family:'Fredoka',sans-serif; }
-        .pvp-game-area { flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 0;min-height:100px; }
-        .pvp-game-label { font-size:11px;color:rgba(255,255,255,0.3);font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px; }
-        .pvp-game-status { font-size:11px;color:rgba(255,255,255,0.35);margin-top:6px;min-height:18px; }
+        @keyframes diamondPop { 0% { transform:scale(0.3) rotate(-10deg);opacity:0; } 60% { transform:scale(1.2) rotate(5deg); } 100% { transform:scale(1) rotate(0);opacity:1; } }
+        @keyframes shake { 0%,100% { transform:translateX(0); } 20% { transform:translateX(-8px); } 40% { transform:translateX(8px); } 60% { transform:translateX(-5px); } 80% { transform:translateX(5px); } }
+        @keyframes dealCard { from { transform:translateY(-20px) scale(0.8);opacity:0; } to { transform:translateY(0) scale(1);opacity:1; } }
 
         .pvp-rps-choices { display:flex;gap:14px; }
         .pvp-rps-btn { width:68px;height:68px;border-radius:50%;border:2px solid rgba(255,255,255,0.06);background:linear-gradient(145deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));font-size:32px;cursor:pointer;transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 15px rgba(0,0,0,0.2); }
@@ -273,14 +225,7 @@
         .pvp-bj-btn:disabled { opacity:0.25;cursor:not-allowed;transform:none!important;box-shadow:none!important; }
 
 
-        .pvp-match .vs-result { text-align:center;margin:4px 0; }
-        .pvp-match .vs-result .vs-res { font-family:'Fredoka',sans-serif;font-size:24px;font-weight:800; }
-        .pvp-match .vs-result .vs-res.win { color:#22c55e;text-shadow:0 0 20px rgba(34,197,94,0.5); }
-        .pvp-match .vs-result .vs-res.lose { color:#ef4444;text-shadow:0 0 20px rgba(239,68,68,0.3); }
-        .pvp-match .vs-result .vs-res.draw { color:#fbbf24; }
-        .pvp-match .vs-result .vs-payout { font-size:14px;color:rgba(255,255,255,0.6);margin-top:2px; }
-        .pvp-match .vs-close-btn { padding:10px 28px;border-radius:9999px;border:none;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1a0a2e;margin:4px auto 0;transition:all 0.2s;flex-shrink:0; }
-        .pvp-match .vs-close-btn:active { transform:scale(0.95); }
+
 
 
         .toast { position:absolute;bottom:100px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:9999px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:#fff;display:none;z-index:30;white-space:nowrap;pointer-events:none; }
@@ -506,27 +451,7 @@
         <div class="game-area" id="gameArea"></div>
     </div>
 
-    <div class="pvp-match" id="pvpMatch">
-        <div class="vs-row">
-            <div class="vs-player">
-                <div class="v-avatar" id="pvpYouAvatar" style="font-size:24px;">😎</div>
-                <div class="v-name" id="pvpYouName">Ты</div>
-                <div class="v-bet" id="pvpYouBet"></div>
-            </div>
-            <div class="vs-vs" style="font-size:18px;">VS</div>
-            <div class="vs-player">
-                <div class="v-avatar" id="pvpOppAvatar">🤖</div>
-                <div class="v-name" id="pvpOppName">...</div>
-                <div class="v-bet" id="pvpOppBet"></div>
-            </div>
-        </div>
-        <div class="pvp-game-area" id="pvpGameArea"></div>
-        <div class="vs-result">
-            <div class="vs-res" id="pvpResult" style="display:none;"></div>
-            <div class="vs-payout" id="pvpPayout" style="display:none;"></div>
-        </div>
-        <button class="vs-close-btn" onclick="closePvPMatch()" style="display:none;">✕ Закрыть</button>
-    </div>
+
 
     <div class="bottom-nav">
         <div class="nav-item active" onclick="navTo(this,0)"><span class="icon">🕹️</span><span class="label">Игры</span></div>
@@ -540,15 +465,7 @@
 const MIN_BET = 5;
 var balance = 1000;
 let audioCtx = null, soundEnabled = localStorage.getItem('sfx') !== 'off';
-let myRoom = null, myRoomJoinTimer = null, fakeRooms = [], lobbyInterval = null, currentGameId = null;
-let transactions = [];
-const PLAYER_POOL = [
-    {name:'StarKing',avatar:'👑'},{name:'CyberPunk',avatar:'🤖'},{name:'NeonNinja',avatar:'🥷'},
-    {name:'MoonWalker',avatar:'🌙'},{name:'DragonSlayer',avatar:'🐉'},{name:'ShadowFox',avatar:'🦊'},
-    {name:'IceQueen',avatar:'👸'},{name:'BlazeLord',avatar:'🔥'},{name:'DarkMage',avatar:'🧙'},
-    {name:'ThunderCat',avatar:'🐱'},{name:'PhantomX',avatar:'👻'},{name:'WolfKing',avatar:'🐺'},
-    {name:'CryptoKing',avatar:'💰'},{name:'PixelWar',avatar:'🎮'},{name:'LunaStorm',avatar:'🌪️'},{name:'GoldHand',avatar:'🖐️'},
-];
+let transactions = [], currentGameId = null;
 
 function getAudioCtx() { if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); return audioCtx; }
 function playSound(type) {
@@ -601,7 +518,7 @@ function showBalFlash(parent, amount, isPlus) {
 function openModal(id) { document.getElementById(id).classList.add('show'); const e = document.querySelector('#' + id + ' .modal-error'); if (e) e.classList.remove('show'); playSound('click'); }
 function closeModal(id) { document.getElementById(id).classList.remove('show'); const e = document.querySelector('#' + id + ' .modal-error'); if (e) e.classList.remove('show'); }
 function addHistory(type, amount) {
-    const icons = {deposit:'💰',withdraw:'💸',game:'🎮',win:'🏆',lose:'💔'}, titles = {deposit:'Пополнение',withdraw:'Вывод',game:'Ставка',win:'Выигрыш',lose:'Проигрыш'};
+    const icons = {deposit:'💰',withdraw:'💸',game:'🎮',win:'🏆',lose:'💔',draw:'🤝'}, titles = {deposit:'Пополнение',withdraw:'Вывод',game:'Ставка',win:'Выигрыш',lose:'Проигрыш',draw:'Ничья'};
     transactions.unshift({icon:icons[type]||'💫',title:titles[type]||'Операция',amount:amount,currency:'⭐',date:new Date().toLocaleString('ru-RU',{hour:'2-digit',minute:'2-digit'})});
     if (transactions.length > 20) transactions.pop();
     try { window._supaSaveTx?.(type, amount); } catch(e) {}
@@ -636,234 +553,236 @@ function closeRules() { document.getElementById('rulesPopup').classList.remove('
 
 function navTo(el, idx) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); el.classList.add('active'); showToast('🔄 Раздел в разработке', 'info'); playSound('click'); }
 
-let _roomIdCounter = 0;
-function getRoomDescs(g) { const m = {rps:'✊✋✌️ Дуэль',dice:'🎲 Кто выше',coin:'🪙 Орёл/Решка',mines:'💣 Алмазы',blackjack:'🃏 21 очко'}; return (m[g]||'🎮 Игра') + ' ' + ['⚡','🔥','💫','🎯','💵','💎'][Math.floor(Math.random()*6)]; }
-function generateFakeRooms(gameId) {
-    const s = [...PLAYER_POOL].sort(() => Math.random() - 0.5);
-    fakeRooms = s.slice(0, 2+Math.floor(Math.random()*3)).map(p => ({...p, gameId, id: _roomIdCounter++, bet: (Math.floor(Math.random()*12)+1)*5, desc: getRoomDescs(gameId)}));
-}
 
-function startLobbySimulation(gameId) {
-    currentGameId = gameId; const container = document.getElementById('gameLobby'); if (!container) return;
-    if (lobbyInterval) clearInterval(lobbyInterval);
-    generateFakeRooms(gameId);
-    function render() {
-        let html = '<div class="pvp-title"><span class="live"></span> Комнаты <span style="color:rgba(255,255,255,0.2);font-weight:400;text-transform:none;letter-spacing:0;">— играй на ⭐ Stars</span></div>';
-        if (myRoom && myRoom.gameId === gameId) {
-            const w = myRoom.status === 'waiting' ? '<span style="display:inline-flex;align-items:center;gap:4px;">⏳ Ждём соперника <span class="searching-dots"><span></span><span></span><span></span></span></span>' : '⚔️ Игра началась!';
-            html += '<div class="pvp-room" style="border-color:rgba(251,191,36,0.3);background:rgba(251,191,36,0.05);"><span class="pv-avatar searching-pulse" style="background:rgba(251,191,36,0.1);">😎</span><div class="pv-info"><div class="pv-name" style="color:#fbbf24;">Твоя комната</div><div class="pv-desc">' + w + '</div></div><span class="pv-bet">' + myRoom.bet + ' ⭐</span>' + (myRoom.status === 'waiting' ? '<button class="pvp-join cancel" onclick="cancelMyRoom()">✕ Отмена</button>' : '<button class="pvp-join ingame">⚔️</button>') + '</div>';
-        } else html += '<div class="pvp-create"><span class="pvc-label">💵 Ставка:</span><input type="number" id="pvpCreateBet" value="10" min="' + MIN_BET + '"><button class="pvp-join" onclick="createPvPRoom()">➕ Создать</button></div>';
-        html += '<div class="pvp-list">';
-        const av = fakeRooms.filter(r => r.gameId === gameId);
-        if (!av.length) html += '<div style="text-align:center;padding:12px 0;font-size:12px;color:rgba(255,255,255,0.2);">🕐 Нет активных комнат</div>';
-        else av.forEach((r,i) => { html += '<div class="pvp-room"><span class="pv-avatar">' + r.avatar + '</span><div class="pv-info"><div class="pv-name">' + r.name + '</div><div class="pv-desc">' + r.desc + '</div></div><span class="pv-bet">' + r.bet + ' ⭐</span><button class="pvp-join" onclick="joinPvPRoom(' + r.id + ')">⚔️</button></div>'; });
-        html += '</div>'; container.innerHTML = html;
-    }
-    render();
-    lobbyInterval = setInterval(render, 18000);
-}
-function stopAllLobbySimulations() { if (lobbyInterval) { clearInterval(lobbyInterval); lobbyInterval = null; } if (myRoomJoinTimer) { clearTimeout(myRoomJoinTimer); myRoomJoinTimer = null; } myRoom = null; currentGameId = null; }
 
-function createPvPRoom() {
-    if (!currentGameId) return;
-    const bet = parseInt(document.getElementById('pvpCreateBet').value) || MIN_BET;
-    if (bet < MIN_BET) return showToast('⚠️ Минимум ' + MIN_BET + ' ⭐', 'warn');
-    if (bet > balance) return showToast('❌ Недостаточно ⭐. Доступно: ' + balance + ' ⭐', 'error');
-    if (bet > 9999) return showToast('⚠️ Максимум 9 999 ⭐', 'warn');
-    balance -= bet; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {} myRoom = { gameId: currentGameId, bet, status: 'waiting' };
-    playSound('bet'); showToast('✅ Комната создана! Ждём соперника...', 'success'); vibrate(30);
-    if (lobbyInterval && currentGameId) startLobbySimulation(currentGameId);
-    if (myRoomJoinTimer) clearTimeout(myRoomJoinTimer);
-    myRoomJoinTimer = setTimeout(() => {
-        if (!myRoom || myRoom.status !== 'waiting') return;
-        myRoom.status = 'playing';
-        startPvPMatch(PLAYER_POOL[Math.floor(Math.random() * PLAYER_POOL.length)], myRoom.bet);
-    }, 3000 + Math.random() * 4000);
-}
-function cancelMyRoom() {
-    if (myRoom && myRoom.status === 'waiting') { balance += myRoom.bet; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {} showToast('✕ Комната закрыта, ставка возвращена', 'info'); }
-    if (myRoomJoinTimer) { clearTimeout(myRoomJoinTimer); myRoomJoinTimer = null; } myRoom = null;
-    if (currentGameId) startLobbySimulation(currentGameId);
-}
-function joinPvPRoom(roomId) {
-    let room = fakeRooms.find(r => r.gameId === currentGameId && r.id === roomId);
-    if (!room) room = fakeRooms.find(r => r.gameId === currentGameId);
-    if (!room) {
-        if (currentGameId) startLobbySimulation(currentGameId);
-        return showToast('⚠️ Все комнаты уже заняты, создай свою', 'warn');
-    }
-    if (room.bet > balance) return showToast('❌ Недостаточно ⭐ для ставки ' + room.bet + ' ⭐', 'error');
-    balance -= room.bet; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {}
-    fakeRooms = fakeRooms.filter(r => r.id !== roomId);
-    playSound('bet'); startPvPMatch(room, room.bet);
-}
 
-function startPvPMatch(opponent, bet) {
-    const gameId = currentGameId, ov = document.getElementById('pvpMatch');
-    document.getElementById('pvpYouName').textContent = 'Ты';
-    document.getElementById('pvpOppName').textContent = opponent.name;
-    document.getElementById('pvpOppAvatar').textContent = opponent.avatar;
-    document.getElementById('pvpYouBet').textContent = bet + ' ⭐';
-    document.getElementById('pvpOppBet').textContent = bet + ' ⭐';
-    document.getElementById('pvpResult').style.display = 'none';
-    document.getElementById('pvpPayout').style.display = 'none';
-    document.querySelector('.vs-close-btn').style.display = 'none';
-    document.querySelectorAll('#pvpMatch .v-avatar').forEach(a => { a.className = 'v-avatar'; a.classList.add('waiting'); });
-    ov.classList.add('show'); playSound('click');
-    setTimeout(() => document.querySelectorAll('#pvpMatch .v-avatar').forEach(a => a.classList.remove('waiting')), 300);
-    if (lobbyInterval) { clearInterval(lobbyInterval); lobbyInterval = null; }
-
-    const area = document.getElementById('pvpGameArea');
-    (window._pvpTimers || []).forEach(t => clearTimeout(t)); window._pvpTimers = [];
-
-    function endPvP(youWon, draw, bet, resultText) {
-        const res = document.getElementById('pvpResult'), payout = document.getElementById('pvpPayout');
-        res.style.display = 'block'; payout.style.display = 'block'; document.querySelector('.vs-close-btn').style.display = 'block';
-        if (draw) { balance += bet; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {} payout.textContent = '0 ⭐ (возврат)'; res.textContent = resultText; res.className = 'vs-res draw'; showToast('🤝 ' + resultText, 'info'); }
-        else if (youWon) {
-            const p = bet * 2; balance += p; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {} payout.textContent = '+' + p + ' ⭐'; res.textContent = resultText; res.className = 'vs-res win';
-            const avs = document.querySelectorAll('#pvpMatch .v-avatar'); if (avs[0]) avs[0].classList.add('win'); if (avs[1]) avs[1].classList.add('lose');
-            playSound('win'); vibrate(100); showToast('🏆 ' + resultText + ' +' + p + ' ⭐', 'success');
-            spawnParticles(document.getElementById('pvpMatch'), 20, '#22c55e'); showBalFlash(document.getElementById('pvpMatch'), p, true);
-        } else {
-            payout.textContent = '-' + bet + ' ⭐'; res.textContent = resultText; res.className = 'vs-res lose';
-            const avs = document.querySelectorAll('#pvpMatch .v-avatar'); if (avs[0]) avs[0].classList.add('lose'); if (avs[1]) avs[1].classList.add('win');
-            playSound('lose'); vibrate(150); showToast('💔 ' + resultText + ' -' + bet + ' ⭐', 'error');
-        }
-        updateBalance(); addHistory(youWon ? 'win' : 'lose', youWon ? bet * 2 : -bet);
-        if (myRoom) { myRoom = null; if (myRoomJoinTimer) { clearTimeout(myRoomJoinTimer); myRoomJoinTimer = null; } }
-        if (currentGameId) startLobbySimulation(currentGameId);
-    }
-    function addTimer(ms, fn) { const t = setTimeout(() => { try { fn(); } catch(e) {} }, ms); window._pvpTimers.push(t); return t; }
-
-    if (gameId === 'rps') {
-        area.innerHTML = '<div style="text-align:center;"><div class="pvp-game-label">✊✋✌️ Выбери ход</div><div class="pvp-rps-choices"><div class="pvp-rps-btn" data-rps="0" onclick="pvpRPSPick(this)">✊</div><div class="pvp-rps-btn" data-rps="1" onclick="pvpRPSPick(this)">✋</div><div class="pvp-rps-btn" data-rps="2" onclick="pvpRPSPick(this)">✌️</div></div><div class="pvp-rps-status" id="pvpRPSStatus">👆 Нажми на кнопку</div><div class="pvp-rps-showdown" id="pvpRPSShowdown" style="display:none;margin-top:8px;"><div class="pvp-rps-duo"><div class="pvp-rps-duo-item"><div class="pvp-rps-duo-icon" id="pvpRPSYouIcon">✊</div><div class="pvp-rps-duo-label">Ты</div></div><div class="pvp-rps-duo-vs">⚔️</div><div class="pvp-rps-duo-item"><div class="pvp-rps-duo-icon" id="pvpRPSOppIcon">✊</div><div class="pvp-rps-duo-label">Соперник</div></div></div></div></div>';
-        window._pvpRPSResolve = function(youIdx) {
-            const opts = ['✊','✋','✌️'], oppIdx = Math.floor(Math.random() * 3);
-            document.querySelectorAll('.pvp-rps-btn').forEach(b => b.style.pointerEvents = 'none');
-            document.getElementById('pvpRPSStatus').textContent = '⏳ 3...';
-            addTimer(300, () => { document.getElementById('pvpRPSStatus').textContent = '⏳ 2...'; });
-            addTimer(600, () => { document.getElementById('pvpRPSStatus').textContent = '⏳ 1...'; });
-            addTimer(900, () => {
-                document.getElementById('pvpRPSStatus').textContent = '';
-                document.getElementById('pvpRPSShowdown').style.display = 'block';
-                document.getElementById('pvpRPSYouIcon').textContent = opts[youIdx];
-                document.getElementById('pvpRPSYouIcon').className = 'pvp-rps-duo-icon' + (youIdx===oppIdx?' draw':(youIdx===0&&oppIdx===2)||(youIdx===1&&oppIdx===0)||(youIdx===2&&oppIdx===1)?' win':' lose');
-                document.getElementById('pvpRPSOppIcon').textContent = opts[oppIdx];
-                document.getElementById('pvpRPSOppIcon').className = 'pvp-rps-duo-icon' + (youIdx===oppIdx?' draw':(youIdx===0&&oppIdx===2)||(youIdx===1&&oppIdx===0)||(youIdx===2&&oppIdx===1)?' lose':' win');
-                addTimer(600, () => {
-                    if (youIdx === oppIdx) endPvP(false, true, bet, '🤝 НИЧЬЯ');
-                    else if ((youIdx===0&&oppIdx===2)||(youIdx===1&&oppIdx===0)||(youIdx===2&&oppIdx===1)) endPvP(true, false, bet, '🏆 ПОБЕДА!');
-                    else endPvP(false, false, bet, '💔 ПОРАЖЕНИЕ');
-                });
-            });
-        };
-    } else if (gameId === 'dice') {
-        area.innerHTML = '<div style="text-align:center;"><div class="pvp-game-label">🎲 Кости — кто выше</div><div class="pvp-dice-duo"><div class="pvp-dice-side"><div class="pvp-dice-box" id="pvpDiceBox">🎲</div><div class="pvp-dice-label">Ты</div></div><div class="pvp-dice-vs">VS</div><div class="pvp-dice-side"><div class="pvp-dice-box opp" id="pvpDiceBoxOpp">🎲</div><div class="pvp-dice-label">Соперник</div></div></div><button class="pvp-dice-btn" id="pvpDiceBtn" onclick="pvpDiceRoll()">🎲 Бросить</button><div class="pvp-game-status" id="pvpDiceStatus">Нажми, чтобы бросить</div></div>';
-        window._pvpDiceRollDone = false;
-        window._pvpDiceResolve = function(youVal) {
-            const f = ['⚀','⚁','⚂','⚃','⚄','⚅'], oppVal = Math.floor(Math.random() * 6) + 1, db = document.getElementById('pvpDiceBox'), dob = document.getElementById('pvpDiceBoxOpp');
-            let ot = 0; const oi = setInterval(() => { dob.textContent = f[Math.floor(Math.random() * 6)]; ot++; if (ot > 8) { clearInterval(oi); dob.textContent = f[oppVal - 1]; dob.className = 'pvp-dice-box opp'; } }, 100);
-            addTimer(900, () => {
-                document.getElementById('pvpDiceStatus').innerHTML = youVal + ' vs ' + oppVal;
-                if (youVal > oppVal) { db.classList.add('win'); dob.classList.add('lose'); addTimer(200, () => endPvP(true, false, bet, '🏆 ВЫШЕ!')); }
-                else if (youVal === oppVal) { db.classList.add('win'); dob.classList.add('win'); addTimer(200, () => endPvP(false, true, bet, '🤝 НИЧЬЯ')); }
-                else { db.classList.add('lose'); dob.classList.add('win'); addTimer(200, () => endPvP(false, false, bet, '💔 НИЖЕ')); }
-            });
-        };
-    } else if (gameId === 'coin') {
-        area.innerHTML = '<div style="text-align:center;"><div class="pvp-game-label">🪙 Орёл или Решка</div><div class="pvp-coin-flip" id="pvpCoinFlip">🪙</div><div style="display:flex;gap:10px;justify-content:center;margin-top:6px;"><button class="pvp-coin-btn" onclick="pvpCoinPick(this,0)">🦅 Орёл</button><button class="pvp-coin-btn" onclick="pvpCoinPick(this,1)">🪙 Решка</button></div><div class="pvp-game-status" id="pvpCoinStatus">Выбери сторону</div><div class="pvp-coin-result" id="pvpCoinResult" style="display:none;margin-top:8px;"><div class="pvp-coin-duo"><div class="pvp-coin-choice"><div class="pvp-coin-choice-icon" id="pvpCoinYouIcon">🦅</div><div class="pvp-coin-choice-label">Твой выбор</div></div><div class="pvp-coin-arrow">→</div><div class="pvp-coin-choice"><div class="pvp-coin-choice-icon" id="pvpCoinResultIcon">🪙</div><div class="pvp-coin-choice-label">Выпало</div></div></div></div></div>';
-        window._pvpCoinResolve = function(youSide) {
-            const sides = ['🦅','🪙'], result = Math.floor(Math.random() * 2), el = document.getElementById('pvpCoinFlip');
-            el.classList.add('fp'); document.querySelectorAll('.pvp-coin-btn').forEach(b => b.disabled = true);
-            addTimer(1200, () => {
-                el.classList.remove('fp'); el.textContent = sides[result];
-                document.getElementById('pvpCoinResult').style.display = 'block';
-                document.getElementById('pvpCoinYouIcon').textContent = sides[youSide];
-                document.getElementById('pvpCoinResultIcon').textContent = sides[result];
-                document.getElementById('pvpCoinResultIcon').className = 'pvp-coin-choice-icon' + (youSide === result ? ' win' : ' lose');
-                if (youSide === result) addTimer(400, () => endPvP(true, false, bet, '🏆 УГАДАЛ!'));
-                else addTimer(400, () => endPvP(false, false, bet, '💔 НЕ УГАДАЛ'));
-            });
-        };
-    } else if (gameId === 'mines') {
-        let dc = 0, over = false, oppRevealed = false; const bombPos = Math.floor(Math.random() * 9);
-        area.innerHTML = '<div style="text-align:center;"><div class="pvp-game-label">💣 Найди алмазы</div><div class="pvp-mines-grid" id="pvpMinesGrid"></div><div class="pvp-mine-info">💎 <span id="pvpMineCount">0</span></div><div class="pvp-game-status" id="pvpMinesStatus" style="font-size:11px;">Открывай клетки</div></div>';
-        const g = document.getElementById('pvpMinesGrid');
-        for (let i = 0; i < 9; i++) {
-            const c = document.createElement('div'); c.className = 'pvp-mine-cell'; c.dataset.idx = i;
-            c.onclick = function () {
-                if (over || this.classList.contains('diamond') || this.classList.contains('bomb')) return;
-                if (i === bombPos) {
-                    this.classList.add('bomb'); this.textContent = '💣'; over = true;
-                    document.querySelectorAll('.pvp-mine-cell').forEach(cell => { cell.style.pointerEvents = 'none'; if (cell === c) return; cell.style.opacity = '0.5'; });
-                    const oppD = Math.floor(Math.random() * 6);
-                    document.getElementById('pvpMinesStatus').textContent = '💥 Бомба! Соперник собрал ' + oppD + '💎';
-                    if (dc > oppD) addTimer(600, () => endPvP(true, false, bet, '🏆 БОЛЬШЕ!'));
-                    else if (dc === oppD) addTimer(600, () => endPvP(false, true, bet, '🤝 НИЧЬЯ'));
-                    else addTimer(600, () => endPvP(false, false, bet, '💔 МЕНЬШЕ (' + oppD + '💎)'));
-                } else { this.classList.add('diamond'); this.textContent = '💎'; dc++; document.getElementById('pvpMineCount').textContent = dc; document.getElementById('pvpMinesStatus').textContent = '+' + dc + '💎'; }
-            }; g.appendChild(c);
-        }
-    } else if (gameId === 'blackjack') {
-        let pC = [bjCard(), bjCard()], dC = [bjCard(), bjCard()], bjOver = false;
-        function rBJ() {
-            area.innerHTML = '<div style="text-align:center;"><div class="pvp-game-label">🃏 Кто ближе к 21</div><div class="pvp-bj-table"><div class="pvp-bj-row"><div class="pvp-bj-col"><div class="bj-label">Ты</div><div class="bj-score" id="pvpBJYouScore">' + bjSum(pC) + '</div><div class="pvp-bj-hand">' + pC.map(v => '<div class="bjc' + (v >= 10 ? ' red' : '') + '">' + v + '</div>').join('') + '</div></div><div class="pvp-bj-vs">⚔️</div><div class="pvp-bj-col"><div class="bj-label">Соперник</div><div class="bj-score" id="pvpBJDealerScore">' + dC[0] + ' + ?</div><div class="pvp-bj-hand">' + dC.map((v, i) => '<div class="bjc' + (i === 0 ? '' : ' back') + '" data-val="' + (i === 0 ? '' : v) + '">' + (i === 0 ? v : '🂠') + '</div>').join('') + '</div></div></div></div><div class="pvp-bj-actions"><button class="pvp-bj-btn hit" id="pvpBJHit" onclick="pvpBJHit()">➕ Ещё</button><button class="pvp-bj-btn stand" id="pvpBJStand" onclick="pvpBJStand()">✋ Хватит</button></div><div class="pvp-game-status" id="pvpBJStatus">Твой ход</div></div>';
-        } rBJ();
-        window._pvpBJHit = function () { if (bjOver) return; pC.push(bjCard()); if (bjSum(pC) > 21) { bjOver = true; bjEnd('lose'); } else rBJ(); };
-        window._pvpBJStand = function () {
-            if (bjOver) return; bjOver = true; document.getElementById('pvpBJHit').disabled = true; document.getElementById('pvpBJStand').disabled = true;
-            document.getElementById('pvpBJStatus').textContent = 'Соперник открывает карты...';
-            addTimer(800, () => {
-                document.getElementById('pvpBJDealerScore').textContent = bjSum(dC) + '';
-                document.querySelectorAll('.bjc.back').forEach(c => { c.className = 'bjc' + (c.textContent >= 10 ? ' red' : ''); c.textContent = c.dataset.val; });
-                const oppTotal = bjSum(dC);
-                addTimer(400, () => {
-                    if (bjSum(pC) > 21) bjEnd('lose');
-                    else if (oppTotal > 21 || bjSum(pC) > oppTotal) bjEnd('win');
-                    else if (bjSum(pC) === oppTotal) bjEnd('draw');
-                    else bjEnd('lose');
-                });
-            });
-        };
-        function bjEnd(r) { document.getElementById('pvpBJHit').disabled = true; document.getElementById('pvpBJStand').disabled = true; if (r === 'win') endPvP(true, false, bet, '🏆 ПОБЕДА!'); else if (r === 'lose') endPvP(false, false, bet, '💔 ПРОИГРЫШ'); else endPvP(false, true, bet, '🤝 НИЧЬЯ'); }
-    } else {
-        area.innerHTML = '<div style="text-align:center;padding:20px;color:rgba(255,255,255,0.5);">🎮 Игра...</div>';
-        addTimer(1000, () => endPvP(Math.random()<0.5, false, bet, Math.random()<0.5 ? '🏆 ПОБЕДА!' : '💔 ПОРАЖЕНИЕ'));
-    }
-}
-
-function closePvPMatch() { document.getElementById('pvpMatch').classList.remove('show'); (window._pvpTimers||[]).forEach(t=>clearTimeout(t)); window._pvpTimers=[]; }
-
-function pvpRPSPick(el) {
-    const idx = parseInt(el.dataset.rps); document.querySelectorAll('.pvp-rps-btn').forEach(b=>b.classList.remove('sel')); el.classList.add('sel');
-    document.getElementById('pvpRPSStatus').textContent = '✊✋✌️ Ждём соперника...'; if (window._pvpRPSResolve) window._pvpRPSResolve(idx);
-}
-function pvpDiceRoll() {
-    if (window._pvpDiceRollDone) return; window._pvpDiceRollDone = true;
-    const box = document.getElementById('pvpDiceBox'), btn = document.getElementById('pvpDiceBtn'); btn.disabled = true; box.classList.add('rolling');
-    const f=['⚀','⚁','⚂','⚃','⚄','⚅']; let t=0;
-    const ri=setInterval(()=>{box.textContent=f[Math.floor(Math.random()*6)]; t++; if(t>6){clearInterval(ri); const v=Math.floor(Math.random()*6)+1; box.textContent=f[v-1]; box.classList.remove('rolling'); document.getElementById('pvpDiceStatus').textContent='Твой бросок: '+f[v-1]; if(window._pvpDiceResolve) window._pvpDiceResolve(v); }},100);
-}
-function pvpCoinPick(el, side) { document.querySelectorAll('.pvp-coin-btn').forEach(b=>b.classList.remove('sel')); el.classList.add('sel'); el.disabled=true; document.getElementById('pvpCoinStatus').textContent='🪙 Подбрасываем...'; if(window._pvpCoinResolve) window._pvpCoinResolve(side); }
-function pvpBJHit() { if(window._pvpBJHit) window._pvpBJHit(); }
-function pvpBJStand() { if(window._pvpBJStand) window._pvpBJStand(); }
 
 function openGame(game) {
-    document.getElementById('gameOverlay').classList.add('show'); updateBalance(); const area = document.getElementById('gameArea');
+    currentGameId = game; document.getElementById('gameOverlay').classList.add('show'); updateBalance(); const area = document.getElementById('gameArea');
     if (game==='rps') renderRPS(area); else if (game==='dice') renderDice(area); else if (game==='coin') renderCoin(area);
     else if (game==='mines') renderMines(area); else if (game==='blackjack') renderBlackjack(area);
     else if (game==='crash') { renderCrash(area); return; }
-    setTimeout(() => startLobbySimulation(game), 100);
     try { window._tgShowBack?.(); } catch(e) {}
 }
-function closeGame() { stopAllLobbySimulations(); document.getElementById('gameOverlay').classList.remove('show'); try { window._tgHideBack?.(); window._tgHideMain?.(); } catch(e) {} }
+function closeGame() {
+    document.getElementById('gameOverlay').classList.remove('show');
+    const gs = window._crashState;
+    if (gs) { if (gs.mainTimer) { clearInterval(gs.mainTimer); gs.mainTimer = null; } if (gs.countdownTimer) { clearInterval(gs.countdownTimer); gs.countdownTimer = null; } }
+    try { window._tgHideBack?.(); window._tgHideMain?.(); } catch(e) {}
+}
 
-function renderRPS(area) { document.getElementById('gameTitle').textContent='✊ Камень-Ножницы-Бумага'; area.innerHTML='<div class="game-preview"><div class="pv-icon-wrap"><div class="pv-icon-bg rps"><span class="pv-icon">✊✋✌️</span></div></div><div class="pv-title-text">Камень-Ножницы-Бумага</div><div class="pv-sub-text">Дуэль на ставки. Кто кого перехитрит?</div><div class="pv-players-count"><span class="dot"></span> <span id="pvOnlineCount1">12</span> онлайн</div><div class="game-lobby" id="gameLobby"></div></div>'; }
-function renderDice(area) { document.getElementById('gameTitle').textContent='🎲 Кости'; area.innerHTML='<div class="game-preview"><div class="pv-icon-wrap"><div class="pv-icon-bg dice"><span class="pv-icon">🎲</span></div></div><div class="pv-title-text">Кости</div><div class="pv-sub-text">Кто выбросит больше — тот забирает банк</div><div class="pv-players-count"><span class="dot"></span> <span id="pvOnlineCount2">18</span> онлайн</div><div class="game-lobby" id="gameLobby"></div></div>'; }
-function renderCoin(area) { document.getElementById('gameTitle').textContent='🪙 Монетка'; area.innerHTML='<div class="game-preview"><div class="pv-icon-wrap"><div class="pv-icon-bg coin"><span class="pv-icon">🪙</span></div></div><div class="pv-title-text">Монетка</div><div class="pv-sub-text">Орёл или Решка? Угадай и забери ставку</div><div class="pv-players-count"><span class="dot"></span> <span id="pvOnlineCount3">24</span> онлайн</div><div class="game-lobby" id="gameLobby"></div></div>'; }
-function renderMines(area) { document.getElementById('gameTitle').textContent='💣 Мины'; area.innerHTML='<div class="game-preview"><div class="pv-icon-wrap"><div class="pv-icon-bg mines"><span class="pv-icon">💣</span></div></div><div class="pv-title-text">Мины</div><div class="pv-sub-text">Найди больше алмазов, чем соперник — избегай бомб</div><div class="pv-players-count"><span class="dot"></span> <span id="pvOnlineCount4">8</span> онлайн</div><div class="game-lobby" id="gameLobby"></div></div>'; }
-function renderBlackjack(area) { document.getElementById('gameTitle').textContent='🃏 Блекджек'; area.innerHTML='<div class="game-preview"><div class="pv-icon-wrap"><div class="pv-icon-bg blackjack"><span class="pv-icon">🃏</span></div></div><div class="pv-title-text">Блекджек</div><div class="pv-sub-text">Кто ближе к 21 — тот победил. Hit или Stand?</div><div class="pv-players-count"><span class="dot"></span> <span id="pvOnlineCount5">15</span> онлайн</div><div class="game-lobby" id="gameLobby"></div></div>'; }
+function rpsPlay() {
+    const bet = parseInt(document.getElementById('rpsBet').value) || MIN_BET;
+    if (bet < MIN_BET) return showToast('⚠️ Минимум ' + MIN_BET + ' ⭐', 'warn');
+    if (bet > balance) return showToast('❌ Недостаточно ⭐', 'error');
+    if (bet > 9999) return showToast('⚠️ Максимум 9 999 ⭐', 'warn');
+    balance -= bet; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {}
+    document.getElementById('rpsPlayBtn').style.display = 'none';
+    document.getElementById('rpsBetRow').style.display = 'none';
+    document.getElementById('rpsChoices').style.display = 'flex';
+    document.getElementById('rpsStatus').textContent = '👆 Выбери ход';
+    window._rpsBet = bet;
+}
+function rpsPick(idx) {
+    const youIdx = idx, opts = ['✊','✋','✌️'], oppIdx = Math.floor(Math.random() * 3), bet = window._rpsBet;
+    document.querySelectorAll('.pvp-rps-btn').forEach(b => b.style.pointerEvents = 'none');
+    const st = document.getElementById('rpsStatus'); st.textContent = '⏳ 3...';
+    setTimeout(() => { st.textContent = '⏳ 2...'; }, 300);
+    setTimeout(() => { st.textContent = '⏳ 1...'; }, 600);
+    setTimeout(() => {
+        st.textContent = ''; document.getElementById('rpsShowdown').style.display = 'block';
+        document.getElementById('rpsYouIcon').textContent = opts[youIdx];
+        document.getElementById('rpsYouIcon').className = 'pvp-rps-duo-icon' + (youIdx===oppIdx?' draw':(youIdx===0&&oppIdx===2)||(youIdx===1&&oppIdx===0)||(youIdx===2&&oppIdx===1)?' win':' lose');
+        document.getElementById('rpsOppIcon').textContent = opts[oppIdx];
+        document.getElementById('rpsOppIcon').className = 'pvp-rps-duo-icon' + (youIdx===oppIdx?' draw':(youIdx===0&&oppIdx===2)||(youIdx===1&&oppIdx===0)||(youIdx===2&&oppIdx===1)?' lose':' win');
+        setTimeout(() => {
+            if (youIdx === oppIdx) { balance += bet; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {} showToast('🤝 НИЧЬЯ!', 'info'); addHistory('draw', 0); }
+            else if ((youIdx===0&&oppIdx===2)||(youIdx===1&&oppIdx===0)||(youIdx===2&&oppIdx===1)) { const p = bet * 2; balance += p; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {} showToast('🏆 ПОБЕДА! +' + p + ' ⭐', 'success'); spawnParticles(document.getElementById('gameArea'), 20, '#22c55e'); addHistory('win', p); playSound('win'); vibrate(100); }
+            else { showToast('💔 ПОРАЖЕНИЕ -' + bet + ' ⭐', 'error'); addHistory('lose', -bet); playSound('lose'); vibrate(150); }
+            document.getElementById('rpsPlayBtn').style.display = 'block';
+            document.getElementById('rpsChoices').style.display = 'none';
+            document.getElementById('rpsShowdown').style.display = 'none';
+            document.getElementById('rpsBetRow').style.display = 'flex';
+            document.querySelectorAll('.pvp-rps-btn').forEach(b => { b.style.pointerEvents = 'auto'; b.classList.remove('sel'); });
+        }, 600);
+    }, 900);
+}
+function renderRPS(area) {
+    document.getElementById('gameTitle').textContent='✊ Камень-Ножницы-Бумага';
+    area.innerHTML = '<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px 0;"><div class="pv-icon-wrap"><div class="pv-icon-bg rps"><span class="pv-icon">✊✋✌️</span></div></div><div class="pv-title-text">Камень-Ножницы-Бумага</div><div class="pv-sub-text">Победи — забери ставку x2</div><div id="rpsBetRow" style="display:flex;align-items:center;gap:8px;margin:4px 0;"><span style="font-size:13px;color:rgba(255,255,255,0.4);">Ставка:</span><input type="number" id="rpsBet" value="' + MIN_BET + '" min="' + MIN_BET + '" style="width:80px;padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.06);color:#fff;font-family:\'Fredoka\',sans-serif;font-size:16px;font-weight:600;text-align:center;"></div><button class="crash-main-btn" id="rpsPlayBtn" onclick="rpsPlay()" style="position:static;margin:0;">✊✋✌️ Играть</button><div class="pvp-rps-choices" id="rpsChoices" style="justify-content:center;display:none;"><div class="pvp-rps-btn" onclick="rpsPick(0)">✊</div><div class="pvp-rps-btn" onclick="rpsPick(1)">✋</div><div class="pvp-rps-btn" onclick="rpsPick(2)">✌️</div></div><div style="font-size:12px;color:rgba(255,255,255,0.4);font-weight:600;min-height:20px;" id="rpsStatus"></div><div class="pvp-rps-showdown" id="rpsShowdown" style="display:none;"><div class="pvp-rps-duo"><div class="pvp-rps-duo-item"><div class="pvp-rps-duo-icon" id="rpsYouIcon">✊</div><div class="pvp-rps-duo-label">Ты</div></div><div class="pvp-rps-duo-vs">⚔️</div><div class="pvp-rps-duo-item"><div class="pvp-rps-duo-icon" id="rpsOppIcon">✊</div><div class="pvp-rps-duo-label">Бот</div></div></div></div></div>';
+}
+
+function diceRoll() {
+    const bet = parseInt(document.getElementById('diceBet').value) || MIN_BET;
+    if (bet < MIN_BET) return showToast('⚠️ Минимум ' + MIN_BET + ' ⭐', 'warn');
+    if (bet > balance) return showToast('❌ Недостаточно ⭐', 'error');
+    if (bet > 9999) return showToast('⚠️ Максимум 9 999 ⭐', 'warn');
+    balance -= bet; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {}
+    document.getElementById('diceBetRow').style.display = 'none';
+    const box = document.getElementById('diceBox'), btn = document.getElementById('diceBtn'); btn.disabled = true; btn.style.display = 'none'; box.classList.add('rolling');
+    const f=['⚀','⚁','⚂','⚃','⚄','⚅']; let t=0;
+    const ri=setInterval(()=>{box.textContent=f[Math.floor(Math.random()*6)]; t++; if(t>6){clearInterval(ri); const v=Math.floor(Math.random()*6)+1; box.textContent=f[v-1]; box.classList.remove('rolling'); document.getElementById('diceStatus').textContent='Твой бросок: '+f[v-1]; diceEnd(v, bet); }},100);
+}
+function diceEnd(youVal, bet) {
+    const f = ['⚀','⚁','⚂','⚃','⚄','⚅'], oppVal = Math.floor(Math.random() * 6) + 1;
+    const db = document.getElementById('diceBox'), dob = document.getElementById('diceBoxOpp');
+    let ot = 0; const oi = setInterval(() => { dob.textContent = f[Math.floor(Math.random() * 6)]; ot++; if (ot > 8) { clearInterval(oi); dob.textContent = f[oppVal - 1]; dob.className = 'pvp-dice-box opp'; } }, 100);
+    setTimeout(() => {
+        document.getElementById('diceStatus').innerHTML = youVal + ' vs ' + oppVal;
+        if (youVal > oppVal) { db.classList.add('win'); dob.classList.add('lose'); setTimeout(() => { const p = bet * 2; balance += p; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {} showToast('🏆 ВЫШЕ! +' + p + ' ⭐', 'success'); spawnParticles(document.getElementById('gameArea'), 20, '#22c55e'); addHistory('win', p); playSound('win'); vibrate(100); diceReset(); }, 200); }
+        else if (youVal === oppVal) { db.classList.add('win'); dob.classList.add('win'); setTimeout(() => { balance += bet; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {} showToast('🤝 НИЧЬЯ!', 'info'); addHistory('draw', 0); diceReset(); }, 200); }
+        else { db.classList.add('lose'); dob.classList.add('win'); setTimeout(() => { showToast('💔 НИЖЕ -' + bet + ' ⭐', 'error'); addHistory('lose', -bet); playSound('lose'); vibrate(150); diceReset(); }, 200); }
+    }, 900);
+}
+function diceReset() {
+    const db = document.getElementById('diceBox'), dob = document.getElementById('diceBoxOpp'), btn = document.getElementById('diceBtn');
+    if (db) { db.textContent = '🎲'; db.className = 'pvp-dice-box'; }
+    if (dob) { dob.textContent = '🎲'; dob.className = 'pvp-dice-box opp'; }
+    if (btn) { btn.disabled = false; btn.style.display = 'block'; }
+    const br = document.getElementById('diceBetRow'); if (br) br.style.display = 'flex';
+    const st = document.getElementById('diceStatus'); if (st) st.textContent = 'Нажми, чтобы бросить';
+}
+function renderDice(area) {
+    document.getElementById('gameTitle').textContent='🎲 Кости';
+    area.innerHTML = '<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px 0;"><div class="pv-icon-wrap"><div class="pv-icon-bg dice"><span class="pv-icon">🎲</span></div></div><div class="pv-title-text">Кости</div><div class="pv-sub-text">Кто выше — тот забирает x2</div><div id="diceBetRow" style="display:flex;align-items:center;gap:8px;margin:4px 0;"><span style="font-size:13px;color:rgba(255,255,255,0.4);">Ставка:</span><input type="number" id="diceBet" value="' + MIN_BET + '" min="' + MIN_BET + '" style="width:80px;padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.06);color:#fff;font-family:\'Fredoka\',sans-serif;font-size:16px;font-weight:600;text-align:center;"></div><div class="pvp-dice-duo"><div class="pvp-dice-side"><div class="pvp-dice-box" id="diceBox">🎲</div><div class="pvp-dice-label">Ты</div></div><div class="pvp-dice-vs">VS</div><div class="pvp-dice-side"><div class="pvp-dice-box opp" id="diceBoxOpp">🎲</div><div class="pvp-dice-label">Бот</div></div></div><button class="pvp-dice-btn" id="diceBtn" onclick="diceRoll()">🎲 Бросить</button><div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:4px;min-height:18px;" id="diceStatus">Нажми, чтобы бросить</div></div>';
+}
+
+function coinPick(side) {
+    const bet = parseInt(document.getElementById('coinBet').value) || MIN_BET;
+    if (bet < MIN_BET) return showToast('⚠️ Минимум ' + MIN_BET + ' ⭐', 'warn');
+    if (bet > balance) return showToast('❌ Недостаточно ⭐', 'error');
+    if (bet > 9999) return showToast('⚠️ Максимум 9 999 ⭐', 'warn');
+    balance -= bet; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {}
+    document.getElementById('coinBetRow').style.display = 'none';
+    document.querySelectorAll('.pvp-coin-btn').forEach(b => b.disabled = true);
+    document.getElementById('coinStatus').textContent = '🪙 Подбрасываем...';
+    const sides = ['🦅','🪙'], result = Math.floor(Math.random() * 2), el = document.getElementById('coinFlip');
+    el.classList.add('fp');
+    setTimeout(() => {
+        el.classList.remove('fp'); el.textContent = sides[result];
+        document.getElementById('coinResult').style.display = 'block';
+        document.getElementById('coinYouIcon').textContent = sides[side];
+        document.getElementById('coinResultIcon').textContent = sides[result];
+        document.getElementById('coinResultIcon').className = 'pvp-coin-choice-icon' + (side === result ? ' win' : ' lose');
+        setTimeout(() => {
+            if (side === result) { const p = bet * 2; balance += p; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {} showToast('🏆 УГАДАЛ! +' + p + ' ⭐', 'success'); spawnParticles(document.getElementById('gameArea'), 20, '#22c55e'); addHistory('win', p); playSound('win'); vibrate(100); }
+            else { showToast('💔 НЕ УГАДАЛ -' + bet + ' ⭐', 'error'); addHistory('lose', -bet); playSound('lose'); vibrate(150); }
+            document.getElementById('coinBetRow').style.display = 'flex';
+            document.querySelectorAll('.pvp-coin-btn').forEach(b => { b.disabled = false; b.classList.remove('sel'); });
+            document.getElementById('coinResult').style.display = 'none';
+            document.getElementById('coinFlip').textContent = '🪙'; document.getElementById('coinFlip').className = 'pvp-coin-flip';
+            document.getElementById('coinStatus').textContent = 'Выбери сторону';
+        }, 400);
+    }, 1200);
+}
+function renderCoin(area) {
+    document.getElementById('gameTitle').textContent='🪙 Монетка';
+    area.innerHTML = '<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px 0;"><div class="pv-icon-wrap"><div class="pv-icon-bg coin"><span class="pv-icon">🪙</span></div></div><div class="pv-title-text">Монетка</div><div class="pv-sub-text">Угадай сторону — забери x2</div><div id="coinBetRow" style="display:flex;align-items:center;gap:8px;margin:4px 0;"><span style="font-size:13px;color:rgba(255,255,255,0.4);">Ставка:</span><input type="number" id="coinBet" value="' + MIN_BET + '" min="' + MIN_BET + '" style="width:80px;padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.06);color:#fff;font-family:\'Fredoka\',sans-serif;font-size:16px;font-weight:600;text-align:center;"></div><div class="pvp-coin-flip" id="coinFlip">🪙</div><div style="display:flex;gap:10px;justify-content:center;margin-top:4px;"><button class="pvp-coin-btn" onclick="coinPick(0)">🦅 Орёл</button><button class="pvp-coin-btn" onclick="coinPick(1)">🪙 Решка</button></div><div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:4px;min-height:18px;" id="coinStatus">Выбери сторону</div><div class="pvp-coin-result" id="coinResult" style="display:none;"><div class="pvp-coin-duo"><div class="pvp-coin-choice"><div class="pvp-coin-choice-icon" id="coinYouIcon">🦅</div><div class="pvp-coin-choice-label">Твой выбор</div></div><div class="pvp-coin-arrow">→</div><div class="pvp-coin-choice"><div class="pvp-coin-choice-icon" id="coinResultIcon">🪙</div><div class="pvp-coin-choice-label">Выпало</div></div></div></div></div>';
+}
+
+function renderMines(area) {
+    document.getElementById('gameTitle').textContent='💣 Мины';
+    area.innerHTML = '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px 0;"><div class="pv-icon-wrap"><div class="pv-icon-bg mines"><span class="pv-icon">💣</span></div></div><div class="pv-title-text">Мины</div><div class="pv-sub-text">Найди алмазы, избегай бомб</div><div id="minesBetRow" style="display:flex;align-items:center;gap:8px;margin:4px 0;"><span style="font-size:13px;color:rgba(255,255,255,0.4);">Ставка:</span><input type="number" id="minesBet" value="' + MIN_BET + '" min="' + MIN_BET + '" style="width:80px;padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.06);color:#fff;font-family:\'Fredoka\',sans-serif;font-size:16px;font-weight:600;text-align:center;"></div><button class="crash-main-btn" id="minesPlayBtn" onclick="minesStart()" style="position:static;margin:0;">💣 Играть</button><div class="pvp-mines-grid" id="minesGrid"></div><div style="font-size:13px;color:#fbbf24;font-weight:700;font-family:\'Fredoka\',sans-serif;">💎 <span id="minesCount">0</span> | 💰 <span id="minesPotential">0</span> ⭐</div><button class="pvp-dice-btn" id="minesCashoutBtn" style="display:none;" onclick="minesCashout()">💰 Забрать</button><div style="font-size:12px;color:rgba(255,255,255,0.4);font-weight:600;min-height:20px;margin-top:4px;" id="minesStatus"></div></div>';
+    window._minesState = { diamonds: 0, over: false, bet: 0 };
+}
+function minesStart() {
+    const bet = parseInt(document.getElementById('minesBet').value) || MIN_BET;
+    if (bet < MIN_BET) return showToast('⚠️ Минимум ' + MIN_BET + ' ⭐', 'warn');
+    if (bet > balance) return showToast('❌ Недостаточно ⭐', 'error');
+    if (bet > 9999) return showToast('⚠️ Максимум 9 999 ⭐', 'warn');
+    balance -= bet; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {}
+    const st = window._minesState; st.diamonds = 0; st.over = false; st.bet = bet;
+    document.getElementById('minesBetRow').style.display = 'none';
+    document.getElementById('minesPlayBtn').style.display = 'none';
+    document.getElementById('minesCashoutBtn').style.display = 'block';
+    document.getElementById('minesPotential').textContent = bet;
+    const bombs = 2, field = [];
+    for (let i = 0; i < 9; i++) field.push(i < bombs);
+    for (let i = field.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [field[i], field[j]] = [field[j], field[i]]; }
+    const g = document.getElementById('minesGrid'); g.innerHTML = '';
+    for (let i = 0; i < 9; i++) {
+        const c = document.createElement('div'); c.className = 'pvp-mine-cell'; c.dataset.idx = i;
+        c.onclick = function () {
+            if (st.over || this.classList.contains('diamond') || this.classList.contains('bomb')) return;
+            if (field[i]) {
+                this.classList.add('bomb'); this.textContent = '💣'; st.over = true;
+                document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(cell => cell.style.pointerEvents = 'none');
+                document.getElementById('minesCashoutBtn').style.display = 'none';
+                document.getElementById('minesStatus').textContent = '💥 Бомба! -' + st.bet + ' ⭐';
+                addHistory('lose', -st.bet); playSound('lose'); vibrate(150);
+            } else {
+                this.classList.add('diamond'); this.textContent = '💎'; st.diamonds++;
+                const mult = 1 + st.diamonds * 0.5;
+                document.getElementById('minesCount').textContent = st.diamonds;
+                document.getElementById('minesPotential').textContent = Math.floor(st.bet * mult);
+                document.getElementById('minesStatus').textContent = '+' + st.diamonds + '💎 x' + mult.toFixed(1);
+                playSound('reveal');
+                if (st.diamonds >= 7) minesCashout();
+            }
+        }; g.appendChild(c);
+    }
+    document.getElementById('minesStatus').textContent = 'Открывай клетки';
+}
+function minesCashout() {
+    const st = window._minesState;
+    if (st.over || !st.diamonds) return;
+    st.over = true;
+    const mult = 1 + st.diamonds * 0.5, win = Math.floor(st.bet * mult);
+    balance += win; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {}
+    document.getElementById('minesCashoutBtn').style.display = 'none';
+    document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(cell => cell.style.pointerEvents = 'none');
+    document.getElementById('minesStatus').textContent = '🏆 +' + win + ' ⭐ (x' + mult.toFixed(1) + ')';
+    showToast('🏆 +' + win + ' ⭐', 'success'); spawnParticles(document.getElementById('gameArea'), 20, '#22c55e'); addHistory('win', win); playSound('win'); vibrate(100);
+}
+
+function renderBlackjack(area) {
+    document.getElementById('gameTitle').textContent='🃏 Блекджек';
+    area.innerHTML = '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;padding:16px 0;"><div class="pv-icon-wrap"><div class="pv-icon-bg blackjack"><span class="pv-icon">🃏</span></div></div><div class="pv-title-text">Блекджек</div><div class="pv-sub-text">Собери 21 — обыграй дилера</div><div id="bjBetRow" style="display:flex;align-items:center;gap:8px;margin:4px 0;"><span style="font-size:13px;color:rgba(255,255,255,0.4);">Ставка:</span><input type="number" id="bjBet" value="' + MIN_BET + '" min="' + MIN_BET + '" style="width:80px;padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.06);color:#fff;font-family:\'Fredoka\',sans-serif;font-size:16px;font-weight:600;text-align:center;"></div><button class="crash-main-btn" id="bjPlayBtn" onclick="bjStart()" style="position:static;margin:0;">🃏 Играть</button><div id="bjTable" style="display:none;"><div class="pvp-bj-table"><div class="pvp-bj-row"><div class="pvp-bj-col"><div class="bj-label">Ты</div><div class="bj-score" id="bjYouScore">0</div><div class="pvp-bj-hand" id="bjYouHand"></div></div><div class="pvp-bj-vs">⚔️</div><div class="pvp-bj-col"><div class="bj-label">Дилер</div><div class="bj-score" id="bjDealerScore">?</div><div class="pvp-bj-hand" id="bjDealerHand"></div></div></div></div></div><div class="pvp-bj-actions" id="bjActions" style="display:none;"><button class="pvp-bj-btn hit" id="bjHitBtn" onclick="bjHit()">➕ Ещё</button><button class="pvp-bj-btn stand" id="bjStandBtn" onclick="bjStand()">✋ Хватит</button></div><div style="font-size:12px;color:rgba(255,255,255,0.4);font-weight:600;min-height:20px;margin-top:4px;" id="bjStatus"></div></div>';
+}
+
+function bjStart() {
+    const bet = parseInt(document.getElementById('bjBet').value) || MIN_BET;
+    if (bet < MIN_BET) return showToast('⚠️ Минимум ' + MIN_BET + ' ⭐', 'warn');
+    if (bet > balance) return showToast('❌ Недостаточно ⭐', 'error');
+    if (bet > 9999) return showToast('⚠️ Максимум 9 999 ⭐', 'warn');
+    balance -= bet; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {}
+    window._bjState = { bet, pC: [bjCard(), bjCard()], dC: [bjCard(), bjCard()], over: false };
+    document.getElementById('bjBetRow').style.display = 'none';
+    document.getElementById('bjPlayBtn').style.display = 'none';
+    document.getElementById('bjTable').style.display = 'block';
+    document.getElementById('bjActions').style.display = 'flex';
+    document.getElementById('bjHitBtn').disabled = false; document.getElementById('bjStandBtn').disabled = false;
+    document.getElementById('bjStatus').textContent = 'Твой ход';
+    bjRender();
+}
+function bjRender() {
+    const s = window._bjState;
+    document.getElementById('bjYouScore').textContent = bjSum(s.pC);
+    document.getElementById('bjYouHand').innerHTML = s.pC.map(v => '<div class="bjc' + (v >= 10 ? ' red' : '') + '">' + v + '</div>').join('');
+    document.getElementById('bjDealerHand').innerHTML = s.dC.map((v, i) => '<div class="bjc' + (i === 0 ? '' : ' back') + '" data-val="' + (i === 0 ? '' : v) + '">' + (i === 0 ? v : '🂠') + '</div>').join('');
+    document.getElementById('bjDealerScore').textContent = s.dC[0] + ' + ?';
+}
+function bjHit() {
+    const s = window._bjState;
+    if (s.over) return; s.pC.push(bjCard());
+    if (bjSum(s.pC) > 21) { s.over = true; document.getElementById('bjHitBtn').disabled = true; document.getElementById('bjStandBtn').disabled = true; document.getElementById('bjStatus').textContent = '💥 Перебор! -' + s.bet + ' ⭐'; showToast('💔 Перебор -' + s.bet + ' ⭐', 'error'); addHistory('lose', -s.bet); playSound('lose'); vibrate(150); bjRender(); return; }
+    bjRender();
+}
+function bjStand() {
+    const s = window._bjState;
+    if (s.over) return; s.over = true; document.getElementById('bjHitBtn').disabled = true; document.getElementById('bjStandBtn').disabled = true;
+    document.getElementById('bjStatus').textContent = 'Дилер открывает карты...';
+    setTimeout(() => {
+        document.getElementById('bjDealerScore').textContent = bjSum(s.dC) + '';
+        document.querySelectorAll('#bjDealerHand .bjc.back').forEach(c => { c.className = 'bjc' + (c.textContent >= 10 ? ' red' : ''); c.textContent = c.dataset.val; });
+        const pS = bjSum(s.pC), dS = bjSum(s.dC);
+        setTimeout(() => {
+            if (dS > 21 || pS > dS) { const p = s.bet * 2; balance += p; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {} document.getElementById('bjStatus').textContent = '🏆 ПОБЕДА! +' + p + ' ⭐'; showToast('🏆 ПОБЕДА! +' + p + ' ⭐', 'success'); spawnParticles(document.getElementById('gameArea'), 20, '#22c55e'); addHistory('win', p); playSound('win'); vibrate(100); }
+            else if (pS === dS) { balance += s.bet; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {} document.getElementById('bjStatus').textContent = '🤝 НИЧЬЯ'; showToast('🤝 НИЧЬЯ', 'info'); }
+            else { document.getElementById('bjStatus').textContent = '💔 ПРОИГРЫШ -' + s.bet + ' ⭐'; showToast('💔 Проигрыш -' + s.bet + ' ⭐', 'error'); addHistory('lose', -s.bet); playSound('lose'); vibrate(150); }
+        }, 400);
+    }, 800);
+}
 function bjCard() { return Math.floor(Math.random()*10)+2; }
 function bjSum(arr) { return arr.reduce((a,b)=>a+b,0); }
 
@@ -906,11 +825,7 @@ function crashGenPoint() {
     return Math.min(Math.floor(cp * 100) / 100, 100);
 }
 
-function crashSpawnAI() {
-    return [...PLAYER_POOL].sort(() => Math.random() - 0.5).slice(0, 3 + Math.floor(Math.random() * 5)).map(p => ({
-        ...p, bet: (Math.floor(Math.random() * 8) + 1) * 5, cashoutAt: null, profit: null, status: 'waiting'
-    }));
-}
+
 
 function crashUI() {
     const gs = window._crashState;
@@ -1007,8 +922,7 @@ function crashGetPos(progress, cp) {
 function crashStartRound() {
     const gs = window._crashState;
     crashReset(); gs.round++; gs.crashPoint = crashGenPoint(); gs.countdown = 6; gs.phase = 'betting';
-    gs.players = crashSpawnAI();
-    gs.players.unshift({ avatar: '😎', name: 'Ты', bet: gs.bet, status: 'waiting', cashoutAt: null, profit: null });
+    gs.players = [{ avatar: '😎', name: 'Ты', bet: gs.bet, status: 'waiting', cashoutAt: null, profit: null }];
     crashUI(); playSound('click');
     const rk = document.getElementById('crashRocket'); if (rk) rk.innerHTML = '';
     const cl = document.getElementById('crashLine'); if (cl) cl.innerHTML = '';
@@ -1036,7 +950,6 @@ function crashBeginFly() {
         const md = document.getElementById('crashMultDisplay');
         if (md) { const mc = gs.mult < 2 ? '#22c55e' : (gs.mult < 4 ? '#fbbf24' : '#ef4444'); md.innerHTML = gs.mult.toFixed(2) + '<span class="x-suffix">x</span>'; md.style.color = mc; md.style.textShadow = gs.mult < 2 ? '0 0 30px rgba(34,197,94,0.3)' : gs.mult < 4 ? '0 0 30px rgba(251,191,36,0.3)' : '0 0 40px rgba(239,68,68,0.5)'; }
         if (gs.autoCashout && !gs.cashed && gs.mult >= gs.autoCashoutAt) crashDoCashout();
-        gs.players.forEach(p => { if (p.status === 'flying' && p.avatar !== '😎' && !p.cashoutAt) { const t = 1.1 + Math.random() * (gs.crashPoint - 1) * 0.7; if (gs.mult >= t) { p.cashoutAt = gs.mult; p.profit = Math.floor(p.bet * gs.mult); p.status = 'cashed'; } } });
         const progress = Math.min((gs.mult - 1) / (gs.crashPoint - 1), 1);
         const cl = document.getElementById('crashLine'); if (cl) cl.innerHTML = crashBuildGraph(progress, gs.crashPoint);
         const rk = document.getElementById('crashRocket');
