@@ -659,6 +659,7 @@ function pvpCleanup() {
     }
     if (currentRoomSub) { currentRoomSub.unsubscribe(); currentRoomSub = null; }
     if (currentLobbySub) { currentLobbySub.unsubscribe(); currentLobbySub = null; }
+    if (_pvpLobbyPoller) { clearInterval(_pvpLobbyPoller); _pvpLobbyPoller = null; }
     currentRoom = null;
 }
 function _pvpCancelBeacon() {
@@ -744,8 +745,10 @@ function pvpStartGlobalClean() {
         });
     }, 15000);
 }
+let _pvpLobbyPoller = null;
 function pvpSubLobby(gameType) {
     if (currentLobbySub) currentLobbySub.unsubscribe();
+    if (_pvpLobbyPoller) { clearInterval(_pvpLobbyPoller); _pvpLobbyPoller = null; }
     pvpStartGlobalClean();
     try {
         if (!window._supa) { pvpRenderLobby(gameType); return; }
@@ -754,6 +757,7 @@ function pvpSubLobby(gameType) {
             .subscribe();
     } catch(e) {}
     pvpRenderLobby(gameType);
+    _pvpLobbyPoller = setInterval(() => pvpRenderLobby(gameType), 3000);
 }
 
 function pvpMakeMove(move) {
