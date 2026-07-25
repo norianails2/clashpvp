@@ -577,7 +577,7 @@ function navTo(el, idx) { document.querySelectorAll('.nav-item').forEach(n => n.
 
 
 
-let currentRoom = null, currentLobbySub = null, currentRoomSub = null, _pvpFinishing = false;
+let currentRoom = null, currentLobbySub = null, currentRoomSub = null, _pvpFinishing = false, _pvpGameStarted = false;
 
 function pvpMe() {
     if (_supaUser?.id) return { id: _supaUser.id, name: _d(_supaUser.username) || 'Player', avatar: _supaUser.avatar || '😎' };
@@ -586,41 +586,53 @@ function pvpMe() {
     return { id: lid, name: 'Player', avatar: '😎' };
 }
 
+async function _supaFetchBalance() {
+    if (!_supaAuthed || !_supaUser?.id || !window._supa) return balance;
+    try {
+        const { data } = await _supa.from('profiles').select('stars_balance,balance').eq('id', _supaUser.id).maybeSingle();
+        if (data) { const sb = data.stars_balance || data.balance || 0; if (sb !== balance) { balance = sb; updateBalance(); } return sb; }
+    } catch(e) {}
+    return balance;
+}
 function pvpCreateRoom(gameType) {
-    const bet = parseInt(document.getElementById('pvpCreateBet').value) || MIN_BET;
-    if (bet < MIN_BET) return showToast('⚠️ Минимум ' + MIN_BET + ' ⭐', 'warn');
-    if (bet > balance) return showToast('❌ Недостаточно ⭐', 'error');
+    const bet = parseInt(document.getElementById('pvpCreateBet').value);
+    if (isNaN(bet) || bet < MIN_BET) return showToast('⚠️ Минимум ' + MIN_BET + ' ⭐', 'warn');
     if (bet > 9999) return showToast('⚠️ Максимум 9 999 ⭐', 'warn');
     if (!window._supa) return showToast('❌ Supabase не подключён', 'error');
     const me = pvpMe();
-    balance -= bet; updateBalance(); try { if (_supaSyncBalance) _supaSyncBalance(); } catch(e) {}
-    _supa.from('rooms').insert({ game_type: gameType, creator_id: me.id, creator_name: me.name, creator_avatar: me.avatar, bet, updated_at: new Date().toISOString() }).select().single().then(({ data, error }) => {
-        if (error || !data || !data.id) {
-            balance += bet; updateBalance(); showToast('❌ ' + (error?.message || 'Пустой ответ сервера'), 'error'); return;
-        }
-        data.game_type = data.game_type || gameType; currentRoom = data;
-        pvpSubRoom(data.id); pvpStartHeartbeat();
-        playSound('bet'); showToast('✅ Комната создана! Жди соперника...', 'success'); vibrate(30);
-        pvpRenderLobby(gameType);
-    }).catch((e) => {
-        balance += bet; updateBalance(); showToast('❌ Ошибка сети: ' + (e?.message || 'неизвестная'), 'error');
+    _supaFetchBalance().then(sb => {
+        if (bet > sb) { showToast('❌ Недостаточно ⭐ (сервер: ' + sb + ')', 'error'); return; }
+        balance = sb; balance -= bet; updateBalance(); try { if (_supaSyncBalance) _supaSyncBalance(); } catch(e) {}
+        _supa.from('rooms').insert({ game_type: gameType, creator_id: me.id, creator_name: me.name, creator_avatar: me.avatar, bet, updated_at: new Date().toISOString() }).select().single().then(({ data, error }) => {
+            if (error || !data || !data.id) {
+                balance += bet; updateBalance(); showToast('❌ ' + (error?.message || 'Пустой ответ сервера'), 'error'); return;
+            }
+            data.game_type = data.game_type || gameType; currentRoom = data;
+            pvpSubRoom(data.id); pvpStartHeartbeat();
+            playSound('bet'); showToast('✅ Комната создана! Жди соперника...', 'success'); vibrate(30);
+            pvpRenderLobby(gameType);
+        }).catch((e) => {
+            balance += bet; updateBalance(); showToast('❌ Ошибка сети: ' + (e?.message || 'неизвестная'), 'error');
+        });
     });
 }
 function pvpJoinRoom(roomId) {
     _supa.from('rooms').select('*').eq('id', roomId).single().then(({ data: room }) => {
         if (!room || room.status !== 'waiting') return showToast('⚠️ Комната уже занята', 'warn');
         if (room.creator_id === pvpMe().id) return showToast('⚠️ Это твоя комната', 'warn');
-        if (balance < room.bet) return showToast('❌ Недостаточно ⭐', 'error');
-        const me = pvpMe();
-        balance -= room.bet; updateBalance(); try { _supaSyncBalance(); } catch(e) {}
-        _supa.from('rooms').update({ opponent_id: me.id, opponent_name: me.name, opponent_avatar: me.avatar, status: 'playing', updated_at: new Date().toISOString() })
-            .eq('id', room.id).eq('status', 'waiting').select().single().then(({ data, error }) => {
-            if (error || !data) { balance += room.bet; updateBalance(); showToast('⚠️ Комната уже занята', 'warn'); pvpRenderLobby(room.game_type); return; }
-            pvpStopHeartbeat(); currentRoom = data; pvpSubRoom(data.id);
-            playSound('bet'); showToast('⚔️ Матч начался!', 'success'); vibrate(50);
-            pvpStartGame(data);
-        }).catch((e) => {
-            balance += room.bet; updateBalance(); showToast('❌ Ошибка сети при входе: ' + (e?.message || ''), 'error'); pvpRenderLobby(room.game_type);
+        _supaFetchBalance().then(sb => {
+            if (room.bet > sb) { showToast('❌ Недостаточно ⭐ (сервер: ' + sb + ')', 'error'); return; }
+            balance = sb; const me = pvpMe();
+            balance -= room.bet; updateBalance(); try { _supaSyncBalance(); } catch(e) {}
+            _supa.from('rooms').update({ opponent_id: me.id, opponent_name: me.name, opponent_avatar: me.avatar, status: 'playing', updated_at: new Date().toISOString() })
+                .eq('id', room.id).eq('status', 'waiting').select().single().then(({ data, error }) => {
+                if (error || !data) { balance += room.bet; updateBalance(); showToast('⚠️ Комната уже занята', 'warn'); pvpRenderLobby(room.game_type); return; }
+                pvpStopHeartbeat(); currentRoom = data; pvpSubRoom(data.id);
+                playSound('bet'); showToast('⚔️ Матч начался!', 'success'); vibrate(50);
+                pvpStartGame(data);
+            }).catch((e) => {
+                balance += room.bet; updateBalance(); showToast('❌ Ошибка сети при входе: ' + (e?.message || ''), 'error'); pvpRenderLobby(room.game_type);
+            });
         });
     });
 }
@@ -628,17 +640,21 @@ let _pvpLeaveTimer = null;
 function pvpCancelRoom() {
     if (!currentRoom || currentRoom.status !== 'waiting') return;
     const bet = currentRoom.bet, gt = currentRoom.game_type;
-    _supa.from('rooms').update({ status: 'cancelled' }).eq('id', currentRoom.id).then(() => {
+    _supa.from('rooms').update({ status: 'cancelled', updated_at: new Date().toISOString() }).eq('id', currentRoom.id).then(() => {
         balance += bet; updateBalance(); try { _supaSyncBalance(); } catch(e) {}
         pvpStopHeartbeat(); currentRoom = null; showToast('✕ Комната закрыта', 'info');
         if (currentLobbySub) currentLobbySub.unsubscribe();
         pvpRenderLobby(gt);
+    }).catch(() => {
+        balance += bet; updateBalance(); showToast('⚠️ Комната закрыта (офлайн)', 'warn');
+        pvpStopHeartbeat(); currentRoom = null; pvpRenderLobby(gt);
     });
 }
 function pvpCleanup() {
-    _pvpFinishing = false; pvpStopTimer(); pvpStopHeartbeat();
+    _pvpFinishing = false; _pvpGameStarted = false; pvpStopTimer(); pvpStopHeartbeat();
+    if (_pvpLeaveTimer) { clearTimeout(_pvpLeaveTimer); _pvpLeaveTimer = null; }
     if (currentRoom && currentRoom.status === 'waiting' && window._supa) {
-        _supa.from('rooms').update({ status: 'cancelled' }).eq('id', currentRoom.id).then();
+        _supa.from('rooms').update({ status: 'cancelled', updated_at: new Date().toISOString() }).eq('id', currentRoom.id).then().catch(()=>{});
     }
     if (currentRoomSub) { currentRoomSub.unsubscribe(); currentRoomSub = null; }
     if (currentLobbySub) { currentLobbySub.unsubscribe(); currentLobbySub = null; }
@@ -663,11 +679,13 @@ function pvpSubRoom(roomId) {
     if (currentRoomSub) currentRoomSub.unsubscribe();
     try {
         if (!window._supa) return;
+        _pvpGameStarted = false;
         currentRoomSub = _supa.channel('room-' + roomId)
             .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms', filter: 'id=eq.' + roomId }, (payload) => {
                 const r = payload.new; if (!r || !r.opponent_id) return;
+                if (currentRoom) Object.assign(currentRoom, r);
                 if (r.creator_move && r.opponent_move) { pvpCompareAndFinish(r); return; }
-                if (!r.winner_id) { currentRoom = r; pvpStartGame(r); }
+                if (!r.winner_id && !_pvpGameStarted) { _pvpGameStarted = true; pvpStartGame(r); }
             }).subscribe();
     } catch(e) {}
 }
@@ -678,7 +696,7 @@ function pvpStartHeartbeat() {
     if (_pvpHeartbeat) clearInterval(_pvpHeartbeat);
     _pvpHeartbeat = setInterval(() => {
         if (currentRoom && currentRoom.status === 'waiting' && window._supa)
-            _supa.from('rooms').update({ updated_at: new Date().toISOString() }).eq('id', currentRoom.id).then();
+            _supa.from('rooms').update({ updated_at: new Date().toISOString() }).eq('id', currentRoom.id).then().catch(()=>{});
     }, 10000);
 }
 function pvpStopHeartbeat() { if (_pvpHeartbeat) { clearInterval(_pvpHeartbeat); _pvpHeartbeat = null; } }
@@ -716,8 +734,10 @@ function pvpStartGlobalClean() {
         if (!window._supa) return;
         const stale = new Date(Date.now() - 30 * 1000).toISOString();
         const uid = _supaUser?.id || 'none';
+        const oldFinished = new Date(Date.now() - 300 * 1000).toISOString();
         ['rps','dice','coin','mines','blackjack'].forEach(gt => {
-            _supa.from('rooms').update({ status: 'cancelled' }).eq('game_type', gt).eq('status', 'waiting').neq('creator_id', uid).lt('updated_at', stale).then();
+            _supa.from('rooms').update({ status: 'cancelled' }).eq('game_type', gt).eq('status', 'waiting').neq('creator_id', uid).lt('updated_at', stale).then().catch(()=>{});
+            _supa.from('rooms').update({ status: 'cancelled' }).eq('game_type', gt).eq('status', 'finished').lt('updated_at', oldFinished).then().catch(()=>{});
         });
     }, 15000);
 }
@@ -738,7 +758,7 @@ function pvpMakeMove(move) {
     pvpStopTimer();
     const me = pvpMe(), isCreator = currentRoom.creator_id === me.id;
     const field = isCreator ? 'creator_move' : 'opponent_move';
-    _supa.from('rooms').update({ [field]: move, updated_at: new Date().toISOString() }).eq('id', currentRoom.id).then(() => {});
+    _supa.from('rooms').update({ [field]: move, updated_at: new Date().toISOString() }).eq('id', currentRoom.id).then().catch(()=>{});
 }
 function pvpCompareAndFinish(r) {
     if (r.winner_id || _pvpFinishing) return;
@@ -778,7 +798,7 @@ function pvpCompareAndFinish(r) {
         else if (winId === me.id) { const p = r.bet * 2; balance += p; updateBalance(); try { _supaSyncBalance(); } catch(e) {} showToast('🏆 ПОБЕДА! +' + p + ' ⭐', 'success'); spawnParticles(document.getElementById('gameArea'), 20, '#22c55e'); addHistory('win', p); playSound('win'); vibrate(100); }
         else if (winId) { showToast('💔 ПОРАЖЕНИЕ -' + r.bet + ' ⭐', 'error'); addHistory('lose', -r.bet); playSound('lose'); vibrate(150); }
         window._pvpAutoClose = setTimeout(() => closeGame(), 3000);
-    });
+    }).catch(()=>{});
 }
 
 let _pvpTimerSec = 30, _pvpTimerInt = null;
@@ -807,7 +827,7 @@ function pvpForfeit() {
     else if (gt === 'mines') forfeitMove = { bomb: true, diamonds: 0 };
     else if (gt === 'blackjack') forfeitMove = { bust: true, sum: 0 };
     document.getElementById('gameArea').innerHTML = '<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;"><div style="font-size:48px;">⏰</div><div style="font-size:16px;color:#ef4444;font-weight:700;">Время вышло!</div><div style="font-size:12px;color:rgba(255,255,255,0.3);">Ожидание соперника...</div></div>';
-    _supa.from('rooms').update({ [field]: forfeitMove, updated_at: new Date().toISOString() }).eq('id', currentRoom.id).then(() => {});
+    _supa.from('rooms').update({ [field]: forfeitMove, updated_at: new Date().toISOString() }).eq('id', currentRoom.id).then().catch(()=>{});
 }
 function pvpStartGame(r) {
     const area = document.getElementById('gameArea'), me = pvpMe();
@@ -881,7 +901,7 @@ function pvpShowMines(area, r) {
     }
     if (!r.seed) {
         const s = Math.random().toString(36).substring(2);
-        _supa.from('rooms').update({ seed: s }).eq('id', r.id).then(() => {});
+        _supa.from('rooms').update({ seed: s }).eq('id', r.id).then().catch(()=>{});
     }
 }
 function pvpShowBlackjack(area, r) {
@@ -1132,8 +1152,8 @@ function crashDoCashout() {
 function crashMainAction() {
     const gs = window._crashState, inp = document.getElementById('crashBetInput');
     if (gs.phase === 'betting') {
-        const bet = parseInt(inp ? inp.value : 10) || MIN_BET;
-        if (bet < MIN_BET) return showToast('⚠️ Минимум ' + MIN_BET + ' ⭐', 'warn');
+        const bet = parseInt(inp ? inp.value : '');
+        if (isNaN(bet) || bet < MIN_BET) return showToast('⚠️ Минимум ' + MIN_BET + ' ⭐', 'warn');
         if (bet > balance) return showToast('❌ Недостаточно ⭐ Stars', 'error');
         if (bet > 9999) return showToast('⚠️ Максимум 9 999 ⭐', 'warn');
         balance -= bet; updateBalance(); try { window._supaSyncBalance?.(); } catch(e) {} gs.bet = bet;
@@ -1242,11 +1262,11 @@ function _supaLogout() {
 }
 async function _supaSyncBalance() {
     if (!_supaAuthed || !_supaUser?.id) return;
-    await _supa.from('profiles').update({ balance, stars_balance: balance }).eq('id', _supaUser.id);
+    await _supa.from('profiles').update({ balance, stars_balance: balance }).eq('id', _supaUser.id).then().catch(()=>{});
 }
 async function _supaSaveTx(type, amount) {
     if (!_supaAuthed || !_supaUser?.id) return;
-    await _supa.from('transactions').insert({ user_id: _supaUser.id, type, amount, currency: 'stars' });
+    await _supa.from('transactions').insert({ user_id: _supaUser.id, type, amount, currency: 'stars' }).then().catch(()=>{});
 }
 window._supaSyncBalance = _supaSyncBalance;
 window._supaSaveTx = _supaSaveTx;
