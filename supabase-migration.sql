@@ -25,5 +25,28 @@ CREATE TABLE IF NOT EXISTS rooms (
 -- Enable Realtime for rooms
 ALTER PUBLICATION supabase_realtime ADD TABLE IF NOT EXISTS rooms;
 
--- Disable RLS on rooms (app-level auth handles security)
+-- Transactions table for audit trail
+CREATE TABLE IF NOT EXISTS transactions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  type TEXT NOT NULL CHECK (type IN ('deposit','withdraw','win','lose','bet','refund')),
+  amount INTEGER NOT NULL,
+  currency TEXT NOT NULL DEFAULT 'stars',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Auto-update updated_at on rooms
+CREATE OR REPLACE FUNCTION update_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN NEW.updated_at = NOW(); RETURN NEW;
+END; $$ LANGUAGE plpgsql;
+CREATE OR REPLACE TRIGGER rooms_updated_at
+  BEFORE UPDATE ON rooms FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- Enable Realtime for transactions
+ALTER PUBLICATION supabase_realtime ADD TABLE IF NOT EXISTS transactions;
+
+-- Disable RLS (app-level auth handles security)
+ALTER TABLE profiles DISABLE ROW LEVEL SECURITY;
 ALTER TABLE rooms DISABLE ROW LEVEL SECURITY;
+ALTER TABLE transactions DISABLE ROW LEVEL SECURITY;
