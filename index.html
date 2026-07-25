@@ -596,6 +596,7 @@ function pvpCreateRoom(gameType) {
     balance -= bet; updateBalance(); try { if (_supaSyncBalance) _supaSyncBalance(); } catch(e) {}
     _supa.from('rooms').insert({ game_type: gameType, creator_id: me.id, creator_name: me.name, creator_avatar: me.avatar, bet, updated_at: new Date().toISOString() }).select().single().then(({ data, error }) => {
         if (error) { balance += bet; updateBalance(); showToast('❌ ' + error.message, 'error'); return; }
+        if (!data || !data.id) { balance += bet; updateBalance(); showToast('❌ Ошибка создания комнаты', 'error'); return; }
         data.game_type = data.game_type || gameType; currentRoom = data; pvpSubRoom(data.id); pvpStartHeartbeat();
         playSound('bet'); showToast('✅ Комната создана! Жди соперника...', 'success'); vibrate(30);
         pvpRenderLobby(gameType);
@@ -680,7 +681,7 @@ function pvpRenderLobby(gameType) {
     if (!container) { setTimeout(() => pvpRenderLobby(gameType), 50); return; }
     if (!window._supa) { container.innerHTML = '<div class="pvp-title"><span class="live"></span> Комнаты</div><div style="color:rgba(255,255,255,0.2);text-align:center;padding:12px;">⚠️ Подключение к серверу...</div>'; return; }
     const staleAgo = new Date(Date.now() - 30 * 1000).toISOString();
-    _supa.from('rooms').update({ status: 'cancelled' }).eq('game_type', gameType).eq('status', 'waiting').lt('updated_at', staleAgo).then(() => {
+    _supa.from('rooms').update({ status: 'cancelled' }).eq('game_type', gameType).eq('status', 'waiting').lt('updated_at', staleAgo).then().catch(()=>{});
     _supa.from('rooms').select('*').eq('game_type', gameType).eq('status', 'waiting').order('created_at', { ascending: false }).limit(20).then(({ data }) => {
         const rooms = data || []; const me = pvpMe();
         let html = '<div class="pvp-title"><span class="live"></span> Комнаты <span style="color:rgba(255,255,255,0.2);font-weight:400;text-transform:none;letter-spacing:0;">— играй на ⭐</span></div>';
@@ -693,8 +694,7 @@ function pvpRenderLobby(gameType) {
         if (!av.length) html += '<div style="text-align:center;padding:12px 0;font-size:12px;color:rgba(255,255,255,0.2);">🕐 Нет активных комнат</div>';
         else av.forEach(r => { html += '<div class="pvp-room"><span class="pv-avatar">' + _a(r.creator_avatar) + '</span><div class="pv-info"><div class="pv-name">' + _d(r.creator_name || 'Player') + '</div></div><span class="pv-bet">' + r.bet + ' ⭐</span><button class="pvp-join" onclick="pvpJoinRoom(\'' + r.id + '\')">⚔️</button></div>'; });
         html += '</div>'; container.innerHTML = html;
-    });
-    });
+    }).catch(() => { container.innerHTML = '<div class="pvp-title" style="color:#ef4444;font-size:12px;">❌ Ошибка загрузки комнат</div>'; });
 }
 let _pvpCleanInterval = null;
 function pvpStartGlobalClean() {
