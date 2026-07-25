@@ -630,7 +630,7 @@ function pvpJoinRoom(roomId) {
                 if (error || !data) { balance += room.bet; updateBalance(); showToast('⚠️ Комната уже занята', 'warn'); pvpRenderLobby(room.game_type); return; }
                 pvpStopHeartbeat(); currentRoom = data; pvpSubRoom(data.id);
                 playSound('bet'); showToast('⚔️ Матч начался!', 'success'); vibrate(50);
-                pvpStartGame(data);
+                _pvpGameStarted = true; pvpStartGame(data);
             }).catch((e) => {
                 balance += room.bet; updateBalance(); showToast('❌ Ошибка сети при входе: ' + (e?.message || ''), 'error'); pvpRenderLobby(room.game_type);
             });
