@@ -699,13 +699,13 @@ function pvpRenderLobby(gameType) {
         if (currentRoom && currentRoom.game_type === gameType && currentRoom.status === 'waiting') {
             myRoomHtml = '<div class="pvp-room" style="border-color:rgba(251,191,36,0.3);background:rgba(251,191,36,0.05);"><span class="pv-avatar searching-pulse">😎</span><div class="pv-info"><div class="pv-name" style="color:#fbbf24;">Твоя комната</div><div class="pv-desc">⏳ Ждём соперника <span class="searching-dots"><span></span><span></span><span></span></span></div></div><span class="pv-bet">' + currentRoom.bet + ' ⭐</span><button class="pvp-join cancel" onclick="pvpCancelRoom()">✕</button></div>';
         }
-        let list = rooms.filter(r => r.creator_id !== me.id);
+        let list = rooms;
         if (!list.length && !myRoomHtml) list.push({ id:'_none', creator_avatar:'🕐', creator_name:'Нет активных комнат', bet:'' });
         let html = '<div class="pvp-title"><span class="live"></span> Комнаты <span style="color:rgba(255,255,255,0.2);font-weight:400;text-transform:none;letter-spacing:0;">— играй на ⭐</span></div>';
         html += '<div class="pvp-create"><span class="pvc-label">💵 Ставка:</span><input type="number" id="pvpCreateBet" value="' + MIN_BET + '" min="' + MIN_BET + '"><button class="pvp-join" onclick="pvpCreateRoom(\'' + gameType + '\')">➕ Создать</button></div>';
         html += myRoomHtml;
         html += '<div class="pvp-list">';
-        list.forEach(r => { if (r.id==='_none') html += '<div style="text-align:center;padding:12px 0;font-size:12px;color:rgba(255,255,255,0.2);">🕐 Нет активных комнат</div>'; else html += '<div class="pvp-room"><span class="pv-avatar">' + _a(r.creator_avatar) + '</span><div class="pv-info"><div class="pv-name">' + _d(r.creator_name || 'Player') + '</div></div><span class="pv-bet">' + r.bet + ' ⭐</span><button class="pvp-join" onclick="pvpJoinRoom(\'' + r.id + '\')">⚔️</button></div>'; });
+        list.forEach(r => { if (r.id==='_none') html += '<div style="text-align:center;padding:12px 0;font-size:12px;color:rgba(255,255,255,0.2);">🕐 Нет активных комнат</div>'; else { const isOwn = r.creator_id === me.id; html += '<div class="pvp-room"><span class="pv-avatar">' + _a(r.creator_avatar) + '</span><div class="pv-info"><div class="pv-name">' + _d(r.creator_name || 'Player') + '</div></div><span class="pv-bet">' + r.bet + ' ⭐</span>' + (isOwn ? '<span style="font-size:11px;color:rgba(255,255,255,0.3);padding:6px 10px;">⏳</span>' : '<button class="pvp-join" onclick="pvpJoinRoom(\'' + r.id + '\')">⚔️</button>') + '</div>'; } });
         html += '</div>'; container.innerHTML = html;
     }).catch(() => { container.innerHTML = '<div class="pvp-title" style="color:#ef4444;font-size:12px;">❌ Ошибка загрузки комнат</div>'; });
 }
