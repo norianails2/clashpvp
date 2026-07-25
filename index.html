@@ -595,17 +595,14 @@ function pvpCreateRoom(gameType) {
     const me = pvpMe();
     balance -= bet; updateBalance(); try { if (_supaSyncBalance) _supaSyncBalance(); } catch(e) {}
     _supa.from('rooms').insert({ game_type: gameType, creator_id: me.id, creator_name: me.name, creator_avatar: me.avatar, bet, updated_at: new Date().toISOString() }).select().single().then(({ data, error }) => {
-        if (error) { balance += bet; updateBalance(); showToast('❌ ' + error.message, 'error'); return; }
-        if (!data || !data.id) { balance += bet; updateBalance(); showToast('❌ Ошибка создания комнаты', 'error'); return; }
+        if (error || !data || !data.id) {
+            balance += bet; updateBalance(); showToast('❌ ' + (error?.message || 'Ошибка создания комнаты'), 'error'); return;
+        }
         data.game_type = data.game_type || gameType; currentRoom = data; pvpSubRoom(data.id); pvpStartHeartbeat();
         playSound('bet'); showToast('✅ Комната создана! Жди соперника...', 'success'); vibrate(30);
         pvpRenderLobby(gameType);
-        setTimeout(() => {
-            _supa.from('rooms').select('id,status,game_type,updated_at').eq('id', data.id).single().then(({ data: chk }) => {
-                if (!chk) showToast('⚠️ Комната исчезла из БД!', 'error');
-                else if (chk.status !== 'waiting') showToast('⚠️ Комната отменена (статус: ' + chk.status + ')', 'warn');
-            });
-        }, 2000);
+    }).catch((e) => {
+        balance += bet; updateBalance(); showToast('❌ Ошибка сети: ' + (e?.message || 'неизвестная'), 'error');
     });
 }
 function pvpJoinRoom(roomId) {
@@ -621,6 +618,8 @@ function pvpJoinRoom(roomId) {
             pvpStopHeartbeat(); currentRoom = data; pvpSubRoom(data.id);
             playSound('bet'); showToast('⚔️ Матч начался!', 'success'); vibrate(50);
             pvpStartGame(data);
+        }).catch((e) => {
+            balance += room.bet; updateBalance(); showToast('❌ Ошибка сети при входе: ' + (e?.message || ''), 'error'); pvpRenderLobby(room.game_type);
         });
     });
 }
@@ -687,7 +686,12 @@ function pvpRenderLobby(gameType) {
     if (!container) { setTimeout(() => pvpRenderLobby(gameType), 50); return; }
     if (!window._supa) { container.innerHTML = '<div class="pvp-title"><span class="live"></span> Комнаты</div><div style="color:rgba(255,255,255,0.2);text-align:center;padding:12px;">⚠️ Подключение к серверу...</div>'; return; }
     const staleAgo = new Date(Date.now() - 30 * 1000).toISOString();
-    _supa.from('rooms').update({ status: 'cancelled' }).eq('game_type', gameType).eq('status', 'waiting').lt('updated_at', staleAgo).then().catch(()=>{});
+    const me = pvpMe();
+    if (window._supa) {
+        _supa.from('rooms').select('*').eq('game_type', gameType).eq('status', 'waiting').neq('creator_id', me.id).lt('updated_at', staleAgo).then(({ data: stale }) => {
+            if (stale && stale.length) _supa.from('rooms').update({ status: 'cancelled' }).eq('game_type', gameType).eq('status', 'waiting').lt('updated_at', staleAgo).then().catch(()=>{});
+        }).catch(()=>{});
+    }
     _supa.from('rooms').select('*').eq('game_type', gameType).eq('status', 'waiting').order('created_at', { ascending: false }).limit(20).then(({ data }) => {
         const rooms = data || []; const me = pvpMe();
         let myRoomHtml = '';
@@ -710,8 +714,9 @@ function pvpStartGlobalClean() {
     _pvpCleanInterval = setInterval(() => {
         if (!window._supa) return;
         const stale = new Date(Date.now() - 30 * 1000).toISOString();
+        const uid = _supaUser?.id || 'none';
         ['rps','dice','coin','mines','blackjack'].forEach(gt => {
-            _supa.from('rooms').update({ status: 'cancelled' }).eq('game_type', gt).eq('status', 'waiting').lt('updated_at', stale).then();
+            _supa.from('rooms').update({ status: 'cancelled' }).eq('game_type', gt).eq('status', 'waiting').neq('creator_id', uid).lt('updated_at', stale).then();
         });
     }, 15000);
 }
