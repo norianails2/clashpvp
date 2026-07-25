@@ -842,11 +842,13 @@ function pvpStartGame(r) {
     const oppName = isCreator ? _d(r.opponent_name || 'Player') : _d(r.creator_name || 'Player');
     const oppAvatar = isCreator ? (r.opponent_avatar || '😎') : (r.creator_avatar || '😎');
     const gt = r.game_type;
-    if (gt === 'rps') pvpShowRPS(area, r);
-    else if (gt === 'dice') pvpShowDice(area, r);
-    else if (gt === 'coin') pvpShowCoin(area, r);
-    else if (gt === 'mines') pvpShowMines(area, r);
-    else if (gt === 'blackjack') pvpShowBlackjack(area, r);
+    area.innerHTML = '<div style="font-size:9px;color:rgba(255,255,255,0.15);text-align:center;padding:1px 0;">gt=' + gt + ' cid=' + (r.creator_id||'').slice(0,6) + '</div><div id="pvpGameInner"></div>';
+    const inner = document.getElementById('pvpGameInner');
+    if (gt === 'rps') pvpShowRPS(inner, r);
+    else if (gt === 'dice') pvpShowDice(inner, r);
+    else if (gt === 'coin') pvpShowCoin(inner, r);
+    else if (gt === 'mines') pvpShowMines(inner, r);
+    else if (gt === 'blackjack') pvpShowBlackjack(inner, r);
     pvpStartTimer();
 }
 function pvpShowRPS(area, r) {
