@@ -686,8 +686,9 @@ function pvpSubRoom(roomId) {
             .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms', filter: 'id=eq.' + roomId }, (payload) => {
                 const r = payload.new; if (!r || !r.opponent_id) return;
                 if (currentRoom) Object.assign(currentRoom, r);
-                if (r.creator_move && r.opponent_move) { pvpCompareAndFinish(r); return; }
-                if (!r.winner_id && !_pvpGameStarted) { _pvpGameStarted = true; pvpStartGame(r); }
+                const merged = currentRoom || r;
+                if (merged.creator_move && merged.opponent_move) { pvpCompareAndFinish(merged); return; }
+                if (!merged.winner_id && !_pvpGameStarted) { _pvpGameStarted = true; pvpStartGame(merged); }
             }).subscribe();
     } catch(e) {}
 }
