@@ -10,12 +10,10 @@ async function main() {
   const server = http.createServer(app);
 
   // Run migrations on startup
-  if (config.isDev) {
-    try {
-      await runMigrations();
-    } catch (err) {
-      console.warn('[server] Migration skipped:', err.message);
-    }
+  try {
+    await runMigrations();
+  } catch (err) {
+    console.warn('[server] Migration skipped:', err.message);
   }
 
   initSocket(server);
