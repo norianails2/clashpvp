@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Clash PVP — Test Client</title>
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: monospace; background: #111; color: #0f0; padding: 20px; }
+    h1 { color: #fff; margin-bottom: 10px; }
+    .row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+    input, select, button { padding: 8px 12px; border: 1px solid #333; background: #222; color: #0f0; border-radius: 4px; }
+    button { cursor: pointer; background: #0a3; }
+    button:hover { background: #0c5; }
+    button.danger { background: #a33; }
+    button.danger:hover { background: #c55; }
+    #log { background: #000; border: 1px solid #333; padding: 10px; height: 300px; overflow-y: auto; font-size: 12px; margin-top: 10px; }
+    .log-entry { border-bottom: 1px solid #222; padding: 2px 0; }
+    .connected { color: #0f0; }
+    .disconnected { color: #f00; }
+    .error { color: #f44; }
+    .event { color: #ff0; }
+    .info { color: #0ff; }
+    .game-panel { background: #1a1a2e; border: 1px solid #333; padding: 15px; margin-bottom: 10px; border-radius: 6px; }
+    .game-panel h3 { color: #fff; margin-bottom: 8px; }
+    .flex { display: flex; gap: 8px; align-items: center; }
+  </style>
+</head>
+<body>
+  <h1>🎲 Clash PVP — Test Client</h1>
+  <div class="row">
+    <input id="playerId" value="dev_user_1" placeholder="Player ID" />
+    <button id="connectBtn">Connect</button>
+    <button id="disconnectBtn" disabled>Disconnect</button>
+    <span id="status">Disconnected</span>
+  </div>
+
+  <div class="game-panel">
+    <h3>💰 Balance</h3>
+    <div class="flex">
+      <span id="balanceDisplay">—</span>
+      <button id="addFundsBtn">+1000 Stars</button>
+    </div>
+  </div>
+
+  <div class="game-panel">
+    <h3>🪨 RPS</h3>
+    <div class="flex">
+      <select id="rpsMove"><option>rock</option><option>paper</option><option>scissors</option></select>
+      <input id="rpsBet" type="number" value="10" min="1" style="width:80px" />
+      <button id="rpsCreate">Create Room</button>
+      <button id="rpsJoin">Join Random</button>
+    </div>
+  </div>
+
+  <div class="game-panel">
+    <h3>🎲 Dice</h3>
+    <div class="flex">
+      <select id="dicePred">
+        <option value="over">Over (8-12)</option>
+        <option value="under">Under (2-6)</option>
+        <option value="exact">Exact (7)</option>
+      </select>
+      <input id="diceBet" type="number" value="10" min="1" style="width:80px" />
+      <button id="diceCreate">Create Room</button>
+      <button id="diceJoin">Join Random</button>
+    </div>
+  </div>
+
+  <div class="game-panel">
+    <h3>🪙 Coin</h3>
+    <div class="flex">
+      <select id="coinChoice"><option value="heads">Heads</option><option value="tails">Tails</option></select>
+      <input id="coinBet" type="number" value="10" min="1" style="width:80px" />
+      <button id="coinCreate">Create Room</button>
+      <button id="coinJoin">Join Random</button>
+    </div>
+  </div>
+
+  <div class="game-panel">
+    <h3>💣 Mines</h3>
+    <div class="flex">
+      <input id="minesBet" type="number" value="10" min="1" style="width:80px" />
+      <input id="minesCount" type="number" value="3" min="1" max="24" style="width:60px" placeholder="Mines" />
+      <button id="minesCreate">Create Room</button>
+      <button id="minesJoin">Join Random</button>
+    </div>
+    <div id="minesGrid" style="display:grid;grid-template-columns:repeat(5,40px);gap:4px;margin-top:8px"></div>
+    <div id="minesInfo"></div>
+  </div>
+
+  <div class="game-panel">
+    <h3>🃏 Blackjack</h3>
+    <div class="flex">
+      <input id="bjBet" type="number" value="10" min="1" style="width:80px" />
+      <button id="bjCreate">Create Room</button>
+      <button id="bjJoin">Join Random</button>
+    </div>
+    <div id="bjInfo"></div>
+  </div>
+
+  <div id="log"></div>
+
+  <script>
+    let socket;
+    let currentRoomId = null;
+    let currentRoomType = null;
+    let minesPlayerId = null;
+
+    const log = document.getElementById('log');
+    const statusEl = document.getElementById('status');
+    const balanceEl = document.getElementById('balanceDisplay');
+    const connectBtn = document.getElementById('connectBtn');
+    const disconnectBtn = document.getElementById('disconnectBtn');
+
+    function addLog(msg, type = 'info') {
+      const div = document.createElement('div');
+      div.className = `log-entry ${type}`;
+      div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function updateStatus(text, cls) {
+      statusEl.textContent = text;
+      statusEl.className = cls || '';
+    }
+
+    function updateBalance(balance) {
+      balanceEl.textContent = balance ?? '—';
+    }
+
+    connectBtn.onclick = () => {
+      const playerId = document.getElementById('playerId').value;
+      socket = io('http://localhost:3001', {
+        transports: ['websocket', 'polling'],
+        forceNew: true,
+        query: { testUser: playerId }
+      });
+
+      socket.on('connect', () => {
+        updateStatus('Connected', 'connected');
+        connectBtn.disabled = true;
+        disconnectBtn.disabled = false;
+        socket._userId = playerId;
+        addLog(`Connected as ${playerId} (sid: ${socket.id})`, 'connected');
+        // Get initial balance
+        socket.emit('balance:get', {}, (res) => {
+          if (res && res.balance !== undefined) updateBalance(res.balance);
+        });
+      });
+
+      socket.on('disconnect', (reason) => {
+        updateStatus('Disconnected', 'disconnected');
+        connectBtn.disabled = false;
+        disconnectBtn.disabled = true;
+        addLog(`Disconnected: ${reason}`, 'disconnected');
+      });
+
+      socket.on('connect_error', (err) => {
+        addLog(`Connection error: ${err.message}`, 'error');
+      });
+
+      socket.on('balance:update', (data) => {
+        if (data.balance !== undefined) updateBalance(data.balance);
+      });
+
+      // --- RPS ---
+      socket.on('rps:player_moved', (data) => {
+        addLog(`RPS: opponent moved — ${data.opponentStatus}`, 'event');
+      });
+      socket.on('rps:game_over', (data) => {
+        addLog(`RPS: Game over! Winner: ${data.winnerId || 'draw'}`, data.winnerId ? 'event' : 'info');
+        currentRoomId = null;
+      });
+
+      // --- Dice ---
+      socket.on('dice:result', (data) => {
+        addLog(`Dice: roll=[${data.roll}] total=${data.total} winner=${data.winnerId || 'draw'}`, 'event');
+        currentRoomId = null;
+      });
+
+      // --- Coin ---
+      socket.on('coin:result', (data) => {
+        addLog(`Coin: side=${data.winnerSide} winner=${data.winnerId}`, 'event');
+        currentRoomId = null;
+      });
+
+      // --- Mines ---
+      socket.on('mines:cell_opened', (data) => {
+        addLog(`Mines: cell ${data.cellIndex} safe, next turn: ${data.nextTurn}`, 'event');
+        renderMinesCell(data.cellIndex, '💎');
+      });
+      socket.on('mines:game_over', (data) => {
+        addLog(`Mines: Game over! Loser=${data.loserId} Winner=${data.winnerId}`, 'event');
+        data.board.forEach(idx => renderMinesCell(idx, '💥'));
+        currentRoomId = null;
+      });
+
+      // --- Blackjack ---
+      socket.on('blackjack:game_started', (data) => {
+        addLog(`BJ: Game started. Your cards: ${data.opponentCards?.join(',') || data.creatorCards?.join(',')}`, 'event');
+        renderBJ(data);
+      });
+      socket.on('blackjack:card_dealt', (data) => {
+        addLog(`BJ: ${data.playerId} drew ${data.card} (${data.score})${data.bust ? ' BUST!' : ''}`, 'event');
+      });
+      socket.on('blackjack:turn_switched', (data) => {
+        addLog(`BJ: Turn switched to ${data.currentTurn}`, 'event');
+      });
+      socket.on('blackjack:game_over', (data) => {
+        addLog(`BJ: Game over! Winner=${data.winnerId || 'draw'}`, 'event');
+        renderBJ(data);
+        currentRoomId = null;
+      });
+    };
+
+    disconnectBtn.onclick = () => {
+      if (socket) socket.close();
+    };
+
+    // --- RPS ---
+    document.getElementById('rpsCreate').onclick = () => {
+      if (!socket?.connected) return addLog('Not connected', 'error');
+      const move = document.getElementById('rpsMove').value;
+      const bet = parseInt(document.getElementById('rpsBet').value);
+      socket.emit('rps:create_room', { betAmount: bet }, (res) => {
+        if (res.error) return addLog(`RPS create error: ${res.error}`, 'error');
+        currentRoomId = res.roomId;
+        currentRoomType = 'rps';
+        addLog(`RPS room created: ${res.roomId}`, 'info');
+      });
+    };
+
+    document.getElementById('rpsJoin').onclick = () => {
+      if (!socket?.connected) return addLog('Not connected', 'error');
+      const move = document.getElementById('rpsMove').value;
+      socket.emit('lobby:list', { gameType: 'rps' }, (rooms) => {
+        const waiting = (rooms || []).filter(r => r.status === 'WAITING' && r.creator_id !== socket?._userId);
+        if (waiting.length === 0) return addLog('No waiting RPS rooms', 'error');
+        const room = waiting[0];
+        socket.emit('rps:join_room', { roomId: room.id }, (res) => {
+          if (res.error) return addLog(`RPS join error: ${res.error}`, 'error');
+          addLog(`Joined RPS room: ${room.id}`, 'info');
+          // Make a move
+          const move = document.getElementById('rpsMove').value;
+          socket.emit('rps:make_move', { roomId: room.id, move }, (res2) => {
+            if (res2.error) return addLog(`RPS move error: ${res2.error}`, 'error');
+            addLog(`RPS move sent: ${move}`, 'info');
+          });
+        });
+      });
+    };
+
+    // --- Dice ---
+    document.getElementById('diceCreate').onclick = () => {
+      if (!socket?.connected) return addLog('Not connected', 'error');
+      const pred = document.getElementById('dicePred').value;
+      const bet = parseInt(document.getElementById('diceBet').value);
+      socket.emit('dice:create_room', { betAmount: bet, prediction: pred }, (res) => {
+        if (res.error) return addLog(`Dice create error: ${res.error}`, 'error');
+        currentRoomId = res.roomId;
+        addLog(`Dice room created: ${res.roomId} (prediction: ${pred})`, 'info');
+      });
+    };
+
+    document.getElementById('diceJoin').onclick = () => {
+      if (!socket?.connected) return addLog('Not connected', 'error');
+      const pred = document.getElementById('dicePred').value;
+      socket.emit('lobby:list', { gameType: 'dice' }, (rooms) => {
+        const waiting = (rooms || []).filter(r => r.status === 'WAITING' && r.creator_id !== socket?._userId);
+        if (waiting.length === 0) return addLog('No waiting Dice rooms', 'error');
+        const room = waiting[0];
+        socket.emit('dice:join_room', { roomId: room.id, prediction: pred }, (res) => {
+          if (res.error) return addLog(`Dice join error: ${res.error}`, 'error');
+          addLog(`Dice result: roll=${res.roll} total=${res.total}`, 'event');
+        });
+      });
+    };
+
+    // --- Coin ---
+    document.getElementById('coinCreate').onclick = () => {
+      if (!socket?.connected) return addLog('Not connected', 'error');
+      const choice = document.getElementById('coinChoice').value;
+      const bet = parseInt(document.getElementById('coinBet').value);
+      socket.emit('coin:create_room', { betAmount: bet, choice }, (res) => {
+        if (res.error) return addLog(`Coin create error: ${res.error}`, 'error');
+        currentRoomId = res.roomId;
+        addLog(`Coin room created: ${res.roomId} (choice: ${choice})`, 'info');
+      });
+    };
+
+    document.getElementById('coinJoin').onclick = () => {
+      if (!socket?.connected) return addLog('Not connected', 'error');
+      socket.emit('lobby:list', { gameType: 'coin' }, (rooms) => {
+        const waiting = (rooms || []).filter(r => r.status === 'WAITING' && r.creator_id !== socket?._userId);
+        if (waiting.length === 0) return addLog('No waiting Coin rooms', 'error');
+        const room = waiting[0];
+        socket.emit('coin:join_room', { roomId: room.id }, (res) => {
+          if (res.error) return addLog(`Coin join error: ${res.error}`, 'error');
+          addLog(`Coin result: side=${res.winnerSide} winner=${res.winnerId}`, 'event');
+        });
+      });
+    };
+
+    // --- Mines ---
+    const gridEl = document.getElementById('minesGrid');
+    const minesInfo = document.getElementById('minesInfo');
+
+    function renderMinesCell(idx, content) {
+      const cells = gridEl.children;
+      if (cells[idx]) cells[idx].textContent = content;
+    }
+
+    function resetMinesGrid() {
+      gridEl.innerHTML = '';
+      for (let i = 0; i < 25; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'mine-cell';
+        cell.textContent = '⬜';
+        cell.style.cssText = 'width:40px;height:40px;background:#222;border:1px solid #444;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;border-radius:4px';
+        cell.dataset.index = i;
+        cell.onclick = () => {
+          if (!currentRoomId || currentRoomType !== 'mines') return;
+          socket.emit('mines:click_cell', { roomId: currentRoomId, cellIndex: i }, (res) => {
+            if (res.error) return addLog(`Mines click error: ${res.error}`, 'error');
+            if (res.isMine) {
+              cell.textContent = '💥';
+              addLog('Mines: You hit a mine!', 'error');
+            } else {
+              addLog(`Mines: Safe cell, multiplier: ${res.multiplier}`, 'info');
+            }
+          });
+        };
+        gridEl.appendChild(cell);
+      }
+    }
+    resetMinesGrid();
+
+    document.getElementById('minesCreate').onclick = () => {
+      if (!socket?.connected) return addLog('Not connected', 'error');
+      const bet = parseInt(document.getElementById('minesBet').value);
+      const count = parseInt(document.getElementById('minesCount').value);
+      socket.emit('mines:create_room', { betAmount: bet, minesCount: count }, (res) => {
+        if (res.error) return addLog(`Mines create error: ${res.error}`, 'error');
+        currentRoomId = res.roomId;
+        currentRoomType = 'mines';
+        addLog(`Mines room created: ${res.roomId}`, 'info');
+      });
+    };
+
+    document.getElementById('minesJoin').onclick = () => {
+      if (!socket?.connected) return addLog('Not connected', 'error');
+      socket.emit('lobby:list', { gameType: 'mines' }, (rooms) => {
+        const waiting = (rooms || []).filter(r => r.status === 'WAITING' && r.creator_id !== socket?._userId);
+        if (waiting.length === 0) return addLog('No waiting Mines rooms', 'error');
+        const room = waiting[0];
+        socket.emit('mines:join_room', { roomId: room.id }, (res) => {
+          if (res.error) return addLog(`Mines join error: ${res.error}`, 'error');
+          currentRoomId = room.id;
+          currentRoomType = 'mines';
+          resetMinesGrid();
+          addLog(`Joined Mines room: ${room.id}. Your turn!`, 'info');
+        });
+      });
+    };
+
+    // --- Blackjack ---
+    const bjInfo = document.getElementById('bjInfo');
+
+    function renderBJ(data) {
+      let html = '';
+      if (data.creatorCards) html += `<b>P1:</b> ${data.creatorCards.join(', ')} (${data.creatorScore}) ${data.creatorStatus || ''}<br>`;
+      if (data.opponentCards) html += `<b>P2:</b> ${data.opponentCards.join(', ')} (${data.opponentScore}) ${data.opponentStatus || ''}<br>`;
+      if (data.winnerId) html += `<b>Winner:</b> ${data.winnerId}<br>`;
+      if (data.draw) html += `<b>Draw!</b><br>`;
+      bjInfo.innerHTML = html;
+    }
+
+    document.getElementById('bjCreate').onclick = () => {
+      if (!socket?.connected) return addLog('Not connected', 'error');
+      const bet = parseInt(document.getElementById('bjBet').value);
+      socket.emit('blackjack:create_room', { betAmount: bet }, (res) => {
+        if (res.error) return addLog(`BJ create error: ${res.error}`, 'error');
+        currentRoomId = res.roomId;
+        currentRoomType = 'blackjack';
+        addLog(`BJ room created: ${res.roomId}. Your cards: ${res.cards?.join(',')} (${res.score})`, 'info');
+      });
+    };
+
+    document.getElementById('bjJoin').onclick = () => {
+      if (!socket?.connected) return addLog('Not connected', 'error');
+      socket.emit('lobby:list', { gameType: 'blackjack' }, (rooms) => {
+        const waiting = (rooms || []).filter(r => r.status === 'WAITING' && r.creator_id !== socket?._userId);
+        if (waiting.length === 0) return addLog('No waiting BJ rooms', 'error');
+        const room = waiting[0];
+        socket.emit('blackjack:join_room', { roomId: room.id }, (res) => {
+          if (res.error) return addLog(`BJ join error: ${res.error}`, 'error');
+          currentRoomId = room.id;
+          currentRoomType = 'blackjack';
+          addLog(`Joined BJ room: ${room.id}. Your cards: ${res.cards?.join(',')} (${res.score})`, 'info');
+        });
+      });
+    });
+
+    // Add funds
+    document.getElementById('addFundsBtn').onclick = async () => {
+      if (!socket?.connected) return addLog('Not connected', 'error');
+      socket.emit('balance:add', { amount: 1000 }, (res) => {
+        if (res.error) return addLog(`Add funds error: ${res.error}`, 'error');
+        updateBalance(res.balance);
+        addLog(`Added 1000 Stars. Balance: ${res.balance}`, 'info');
+      });
+    };
+
+    // BJ Hit/Stand — quick actions via prompt or buttons
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'h' && currentRoomType === 'blackjack' && currentRoomId) {
+        socket.emit('blackjack:hit', { roomId: currentRoomId }, (res) => {
+          if (res.error) addLog(`BJ hit error: ${res.error}`, 'error');
+          else addLog(`BJ hit → ${res.score}${res.bust ? ' BUST!' : ''}`, 'info');
+        });
+      }
+      if (e.key === 's' && currentRoomType === 'blackjack' && currentRoomId) {
+        socket.emit('blackjack:stand', { roomId: currentRoomId }, (res) => {
+          if (res.error) addLog(`BJ stand error: ${res.error}`, 'error');
+          else addLog(`BJ stood`, 'info');
+        });
+      }
+    });
+
+    addLog('Tip: Press H=hit, S=stand in Blackjack', 'info');
+  </script>
+</body>
+</html>
