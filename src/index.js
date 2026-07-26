@@ -6,6 +6,8 @@ import { initBot } from './services/telegramBot.js';
 import { runMigrations } from './db/migrate.js';
 
 async function main() {
+  process.stdout.write('[boot] starting...\n');
+  try { {
   const app = createApp();
   const server = http.createServer(app);
 
@@ -25,6 +27,7 @@ async function main() {
   });
 }
 
+} catch(e) { process.stdout.write('[boot] ERROR: '+e.message+'\n'); throw e; }
 main().catch((err) => {
   console.error('[server] Fatal error:', err);
   process.exit(1);
