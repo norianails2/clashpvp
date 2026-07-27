@@ -26,8 +26,8 @@ export async function verifyConnection(socket, next) {
         socket.data.user = rows[0];
         return next();
       } catch (dbErr) {
-        console.error('[auth] DB error:', dbErr.message, dbErr.stack?.slice(0, 200));
-        return next(new Error('DB: ' + dbErr.message));
+        console.error('[auth] DB error:', dbErr.message, dbErr.code, dbErr.stack?.slice(0, 300));
+        return next(new Error('DB: ' + (dbErr.message || dbErr.code || 'unknown')));
       }
     }
 
