@@ -180,11 +180,10 @@ export function initSocket(httpServer) {
         const body = JSON.stringify({
           chat_id: Number(telegramId),
           title: `Clash PVP — ${amount} Stars`,
-          description: `Пополнение игрового баланса на ${amount} Stars`,
+          description: `Пополнение игрового баланса`,
           payload: JSON.stringify({ amount, userId: user.id }),
-          provider_token: '',
           currency: 'XTR',
-          prices: JSON.stringify([{ label: `${amount} Stars`, amount }]),
+          prices: JSON.stringify([{ label: 'Stars', amount }]),
         });
         const result = await new Promise((resolve, reject) => {
           const req = https.request(
