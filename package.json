@@ -20,8 +20,5 @@
                          "socket.io":  "^4.8.1",
                          "socket.io-client":  "^4.8.3",
                          "uuid":  "^11.0.5"
-                     },
-    "engines":  {
-                    "node":  "\u003e=18.0.0"
-                }
+                     }
 }
