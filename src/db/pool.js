@@ -1,8 +1,12 @@
 import pg from 'pg';
 import { config } from '../config.js';
 
+const databaseUrl = config.db.url && !config.db.url.includes('your_telegram')
+  ? config.db.url
+  : 'postgresql://neondb_owner:npg_6MTro1KEszDQ@ep-winter-fire-a21gwkkw.eu-central-1.aws.neon.tech/neondb?sslmode=require';
+
 const pool = new pg.Pool({
-  connectionString: config.db.url,
+  connectionString: databaseUrl,
   max: 10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 15000,
