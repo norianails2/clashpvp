@@ -161,21 +161,15 @@ export function initSocket(httpServer) {
       }
     });
 
-    // Create Telegram Stars invoice (sends invoice to user's chat via bot)
-    socket.on('stars:create_invoice', async (payload, ack) => {
+    // Create Telegram Stars invoice link (opens inside Mini App via openInvoice)
+    socket.on('stars:create_invoice_link', async (payload, ack) => {
       const amount = payload?.amount || 0;
       if (amount <= 0 || !Number.isInteger(amount)) {
         return ack?.({ error: 'Invalid amount' });
       }
-      const telegramId = user.telegram_id;
-      if (!telegramId) {
-        return ack?.({ error: 'Telegram ID not found' });
-      }
       try {
-        // Call Telegram API directly via https (fetch may have encoding issues)
         const botToken = config.telegram.botToken;
         const body = JSON.stringify({
-          chat_id: Number(telegramId),
           title: `Clash PVP — ${amount} Stars`,
           description: `Пополнение игрового баланса`,
           payload: JSON.stringify({ amount, userId: user.id }),
@@ -184,7 +178,7 @@ export function initSocket(httpServer) {
         });
         const result = await new Promise((resolve, reject) => {
           const req = https.request(
-            `https://api.telegram.org/bot${botToken}/sendInvoice`,
+            `https://api.telegram.org/bot${botToken}/createInvoiceLink`,
             { method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) } },
             (res) => {
               let data = '';
@@ -199,9 +193,9 @@ export function initSocket(httpServer) {
         if (!result.ok) {
           throw new Error(result.description);
         }
-        ack?.({ success: true });
+        ack?.({ url: result.result });
       } catch (err) {
-        console.error('[stars:create_invoice]', err.message);
+        console.error('[stars:create_invoice_link]', err.message);
         ack?.({ error: err.message });
       }
     });

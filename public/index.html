@@ -491,7 +491,7 @@
                     <span class="chip" onclick="buyStars(1500)">⭐ 1,500</span>
                     <span class="chip" onclick="buyStars(5000)">⭐ 5,000</span>
                 </div>
-                <p style="font-size:10px;color:rgba(255,255,255,0.15);text-align:center;">Инвойс придёт в чат с ботом @clashpvpbot — оплати там</p>
+                <p style="font-size:10px;color:rgba(255,255,255,0.15);text-align:center;">Оплата через Telegram Stars внутри приложения</p>
                 <div class="modal-error" id="starsError"></div>
             </div>
             <div class="modal-error" id="depositError"></div>
@@ -1539,18 +1539,27 @@ window.buyStars = function(amount) {
         });
         return;
     }
-    // Real Telegram Stars purchase via invoice
+    // Real Telegram Stars: create invoice link and open in Mini App
     if (!socket?.connected) {
         showToast('❌ Нет соединения с сервером', 'error');
         return;
     }
-    showToast('⏳ Отправляем инвойс в Telegram...', 'info');
-    socket.emit('stars:create_invoice', { amount }, (res) => {
+    showToast('⏳ Создание платёжной ссылки...', 'info');
+    socket.emit('stars:create_invoice_link', { amount }, async (res) => {
         if (res?.error) {
             showToast('❌ ' + res.error, 'error');
             return;
         }
-        showToast('✅ Инвойс отправлен! Открой чат с ботом и оплати', 'success');
+        if (res?.url && tg?.openInvoice) {
+            try {
+                await tg.openInvoice(res.url);
+                showToast('✅ Оплата прошла! Ожидаем зачисления...', 'info');
+            } catch (e) {
+                showToast('❌ Платёж отменён', 'error');
+            }
+        } else {
+            showToast('✅ Инвойс: ' + (res.url || 'готов'), 'info');
+        }
     });
 };
 window.simulateWithdraw = function() {
