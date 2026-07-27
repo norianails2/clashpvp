@@ -72,17 +72,11 @@ export async function createRoom(userId, gameType, betAmount, gameData = null) {
   try {
     await client.query('BEGIN');
 
-    // Check if user already has an active room
-    const { rows: existing } = await client.query(
-      `SELECT id FROM rooms WHERE creator_id = $1 AND status = 'WAITING' LIMIT 1`,
+    // Auto-cancel any existing waiting rooms for this user
+    await client.query(
+      `UPDATE rooms SET status = 'CANCELLED' WHERE creator_id = $1 AND status = 'WAITING'`,
       [userId]
     );
-    if (existing.length > 0) {
-      throw Object.assign(
-        new Error('У вас уже есть активная комната'),
-        { status: 400 }
-      );
-    }
 
     // 1. Списать ставку (внутри SELECT ... FOR UPDATE)
     await holdBet(userId, betAmount, gameType, null, client);
