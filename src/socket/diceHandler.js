@@ -53,6 +53,10 @@ export function registerDiceHandlers(io, socket) {
         await client.query('COMMIT');
         socket.join(`room:${room.id}`);
 
+        io.to(`room:${room.id}`).emit('dice:game_started', {
+          roomId: room.id, currentTurn: room.creator_id,
+        });
+
         ack?.({ roomId: room.id, currentTurn: room.creator_id });
         broadcastLobbyUpdate(io, 'dice');
       } catch (err) {

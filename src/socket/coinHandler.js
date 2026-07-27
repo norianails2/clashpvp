@@ -47,6 +47,11 @@ export function registerCoinHandlers(io, socket) {
         );
         await client.query('COMMIT');
         socket.join(`room:${room.id}`);
+
+        io.to(`room:${room.id}`).emit('coin:game_started', {
+          roomId: room.id, currentTurn: room.creator_id,
+        });
+
         ack?.({ roomId: room.id, currentTurn: room.creator_id });
         broadcastLobbyUpdate(io, 'coin');
       } catch (err) {

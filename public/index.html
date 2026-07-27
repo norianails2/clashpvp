@@ -1699,6 +1699,12 @@ function connectSocket(initData) {
     socket.on('rps:game_over', handleGameOver);
 
     // --- Dice ---
+    socket.on('dice:game_started', (data) => {
+        currentRoom = { id: data.roomId, status: 'IN_PROGRESS', game_type: 'dice' };
+        showToast('🤝 Соперник найден!', 'info');
+        _pvpGameStarted = true;
+        pvpStartGame(currentRoom);
+    });
     socket.on('dice:result', (data) => {
         if (window._resultHandled) { window._resultHandled = false; return; }
         const isDraw = data.draw;
@@ -1708,6 +1714,12 @@ function connectSocket(initData) {
     });
 
     // --- Coin ---
+    socket.on('coin:game_started', (data) => {
+        currentRoom = { id: data.roomId, status: 'IN_PROGRESS', game_type: 'coin' };
+        showToast('🤝 Соперник найден!', 'info');
+        _pvpGameStarted = true;
+        pvpStartGame(currentRoom);
+    });
     socket.on('coin:result', (data) => {
         if (window._resultHandled) { window._resultHandled = false; return; }
         const isWin = data.winnerId === myUserId;
