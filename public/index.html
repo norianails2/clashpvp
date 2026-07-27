@@ -1515,7 +1515,15 @@ window.buyStars = function(amount) {
     const tg = window.Telegram?.WebApp;
     const confirmPurchase = () => {
         showToast('⏳ Подтверждение на сервере...', 'info');
+        if (!socket?.connected) {
+            showToast('❌ Нет соединения с сервером', 'error');
+            return;
+        }
+        const timeout = setTimeout(() => {
+            showToast('❌ Сервер не ответил. Попробуй ещё раз', 'error');
+        }, 8000);
         socket.emit('stars:purchase', { amount, method: tg && tg.purchaseStars ? 'telegram' : 'dev' }, (res) => {
+            clearTimeout(timeout);
             if (res?.error) {
                 showToast('❌ Ошибка: ' + res.error, 'error');
                 return;
