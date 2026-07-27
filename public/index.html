@@ -1513,24 +1513,9 @@ window.buyStars = function(amount) {
     playSound('click');
     closeModal('depositModal');
     const tg = window.Telegram?.WebApp;
-    const requestInvoice = () => {
-        if (!socket?.connected) {
-            showToast('❌ Нет соединения с сервером', 'error');
-            return;
-        }
-        showToast('⏳ Отправляем инвойс в Telegram...', 'info');
-        socket.emit('stars:create_invoice', { amount }, (res) => {
-            if (res?.error) {
-                showToast('❌ ' + res.error, 'error');
-                return;
-            }
-            showToast('✅ Инвойс отправлен! Открой чат с ботом и оплати', 'success');
-        });
-    };
-    if (tg) {
-        requestInvoice();
-    } else {
-        // Dev mode: simulate
+    const hasRealTelegram = tg && tg.initData;
+    if (!hasRealTelegram) {
+        // Dev mode: simulate purchase
         showToast('⏳ Подтверждение на сервере...', 'info');
         if (!socket?.connected) {
             showToast('❌ Нет соединения с сервером', 'error');
@@ -1552,7 +1537,21 @@ window.buyStars = function(amount) {
             addHistory('deposit', amount);
             playSound('win');
         });
+        return;
     }
+    // Real Telegram Stars purchase via invoice
+    if (!socket?.connected) {
+        showToast('❌ Нет соединения с сервером', 'error');
+        return;
+    }
+    showToast('⏳ Отправляем инвойс в Telegram...', 'info');
+    socket.emit('stars:create_invoice', { amount }, (res) => {
+        if (res?.error) {
+            showToast('❌ ' + res.error, 'error');
+            return;
+        }
+        showToast('✅ Инвойс отправлен! Открой чат с ботом и оплати', 'success');
+    });
 };
 window.simulateWithdraw = function() {
     const amt = parseFloat(document.getElementById('withdrawAmount').value) || 0, err = document.getElementById('withdrawError');
