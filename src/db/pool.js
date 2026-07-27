@@ -3,9 +3,9 @@ import { config } from '../config.js';
 
 const pool = new pg.Pool({
   connectionString: config.db.url,
-  max: 20,
+  max: 10,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 5000,
+  connectionTimeoutMillis: 15000,
 });
 
 pool.on('error', (err) => {
