@@ -41,15 +41,17 @@ export function initBot(server) {
       const miniAppUrl = process.env.MINI_APP_URL || `https://clashpvp-production.up.railway.app`;
 
       await bot.sendMessage(chatId,
-        `🎲 Welcome to *Clash PVP Casino!*\n\n` +
-        `💰 *Games:* RPS, Dice, Coin, Mines, Blackjack, Crash\n` +
-        `🎯 *House edge:* 10%\n\n` +
-        `Click below to open:`,
+        `🔥 *Clash PVP — битва на ставках!*\n\n` +
+        `🎮 *6 игр:* RPS 🪨 | Dice 🎲 | Coin 🪙 | Mines 💣 | Blackjack 🃏 | Crash 🚀\n` +
+        `⚔️ *PvP-формат* — играй против реальных соперников\n` +
+        `🔐 *Provably Fair* — каждый раунд можно проверить\n` +
+        `💰 *Комиссия:* всего 10%\n\n` +
+        `👇 *Нажми, чтобы открыть:*`,
         {
           parse_mode: 'Markdown',
           reply_markup: {
             inline_keyboard: [
-              [{ text: '🎰 Open Mini App', web_app: { url: miniAppUrl } }],
+              [{ text: '🎰 ИГРАТЬ', web_app: { url: miniAppUrl } }],
             ],
           },
         }
