@@ -1175,24 +1175,37 @@ function crUpdateGraph(state) {
     if (!svg) return;
     const W = 340, H = 200, pad = 14;
 
-    // Dark gradient background
+    // Space background defs
     const bgDefs = '<defs>' +
-        '<linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">' +
-        '<stop offset="0" stop-color="#151528"/><stop offset="1" stop-color="#0d0d14"/></linearGradient>' +
-        '<radialGradient id="glowGrad" cx="50%" cy="50%" r="50%">' +
-        '<stop offset="0" stop-color="rgba(251,191,36,0.06)"/><stop offset="1" stop-color="rgba(251,191,36,0)"/></radialGradient>' +
+        '<linearGradient id="spaceGrad" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0" stop-color="#12121f"/><stop offset="0.5" stop-color="#0d0d18"/><stop offset="1" stop-color="#0a0a12"/></linearGradient>' +
+        '<linearGradient id="cloudGrad" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0" stop-color="rgba(139,92,246,0.08)"/><stop offset="1" stop-color="rgba(139,92,246,0.03)"/></linearGradient>' +
         '<linearGradient id="fillG" x1="0" y1="0" x2="0" y2="1">' +
-        '<stop offset="0" stop-color="var(--lc)" stop-opacity="0.1"/><stop offset="1" stop-color="var(--lc)" stop-opacity="0"/></linearGradient>' +
-        '<linearGradient id="rBody" x1="0" y1="0" x2="0" y2="1">' +
-        '<stop offset="0" stop-color="rgba(255,255,255,0.95)"/><stop offset="0.5" stop-color="rgba(255,255,255,0.88)"/><stop offset="1" stop-color="rgba(255,255,255,0.8)"/></linearGradient>' +
-        '<filter id="gGlow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>' +
+        '<stop offset="0" stop-color="var(--lc)" stop-opacity="0.12"/><stop offset="1" stop-color="var(--lc)" stop-opacity="0"/></linearGradient>' +
+        '<linearGradient id="multGrad" x1="0" y1="0" x2="1" y2="0">' +
+        '<stop offset="0" stop-color="#a78bfa"/><stop offset="0.5" stop-color="#8b5cf6"/><stop offset="1" stop-color="#7c3aed"/></linearGradient>' +
+        '<filter id="gGlow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>' +
         '<filter id="gGlowSoft"><feGaussianBlur stdDeviation="5"/></filter>' +
         '</defs>';
 
     if (state.phase === 'betting' || state.phase === 'idle') {
         svg.innerHTML = bgDefs +
-            '<rect x="0" y="0" width="340" height="200" fill="url(#bgGrad)" rx="14"/>' +
-            '<ellipse cx="' + (W/2) + '" cy="' + (H/2) + '" rx="' + (W/2.5) + '" ry="' + (H/2.5) + '" fill="url(#glowGrad)"/>';
+            '<rect x="0" y="0" width="340" height="200" fill="url(#spaceGrad)" rx="14"/>' +
+            // Stars
+            '<g fill="rgba(255,255,255,0.3)">' +
+            '<circle cx="30" cy="25" r="0.8" opacity="0.6"/><circle cx="80" cy="40" r="0.5" opacity="0.4"/><circle cx="150" cy="15" r="0.7" opacity="0.5"/>' +
+            '<circle cx="200" cy="35" r="0.4" opacity="0.3"/><circle cx="280" cy="20" r="0.6" opacity="0.5"/><circle cx="320" cy="45" r="0.5" opacity="0.4"/>' +
+            '<circle cx="60" cy="70" r="0.4" opacity="0.3"/><circle cx="120" cy="85" r="0.5" opacity="0.4"/><circle cx="240" cy="60" r="0.4" opacity="0.3"/>' +
+            '<circle cx="310" cy="75" r="0.5" opacity="0.35"/><circle cx="40" cy="120" r="0.4" opacity="0.3"/><circle cx="180" cy="110" r="0.5" opacity="0.4"/>' +
+            '<circle cx="290" cy="100" r="0.4" opacity="0.3"/><circle cx="100" cy="140" r="0.4" opacity="0.3"/><circle cx="260" cy="130" r="0.5" opacity="0.35"/>' +
+            '</g>' +
+            // Clouds
+            '<ellipse cx="60" cy="185" rx="50" ry="14" fill="url(#cloudGrad)"/>' +
+            '<ellipse cx="180" cy="190" rx="60" ry="16" fill="url(#cloudGrad)"/>' +
+            '<ellipse cx="300" cy="186" rx="55" ry="15" fill="url(#cloudGrad)"/>' +
+            '<ellipse cx="130" cy="188" rx="45" ry="13" fill="url(#cloudGrad)"/>' +
+            '<ellipse cx="250" cy="192" rx="48" ry="14" fill="url(#cloudGrad)"/>';
         return;
     }
 
@@ -1217,8 +1230,7 @@ function crUpdateGraph(state) {
     const livePts = pts.slice(0, idx + 1);
 
     const isCrashed = state.phase === 'crashed';
-    const hue = isCrashed ? 0 : (mult < 1.5 ? 142 : mult < 2.5 ? 48 : mult < 5 ? 30 : 0);
-    const lineCol = isCrashed ? '#ef4444' : 'hsl(' + hue + ',85%,' + (60 - Math.min(mult * 2, 15)) + '%)';
+    const lineCol = isCrashed ? '#ef4444' : '#a78bfa';
     const fillD = 'M' + livePts.join(' L') + ' L' + rx.toFixed(1) + ',' + (H - pad) + ' L' + pad + ',' + (H - pad) + ' Z';
 
     // Crash line
@@ -1232,13 +1244,13 @@ function crUpdateGraph(state) {
         if (gm < maxMult) {
             const gy = pad + (H - pad * 2) - (Math.log2(gm) / maxLog) * (H - pad * 2);
             if (gy > pad + 10 && gy < H - pad - 10) {
-                gridHtml += '<line x1="' + pad + '" y1="' + gy.toFixed(1) + '" x2="' + (W - pad) + '" y2="' + gy.toFixed(1) + '" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>';
-                gridHtml += '<text x="' + (W - pad - 2) + '" y="' + (gy - 4).toFixed(1) + '" text-anchor="end" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.12)">' + gm + 'x</text>';
+                gridHtml += '<line x1="' + pad + '" y1="' + gy.toFixed(1) + '" x2="' + (W - pad) + '" y2="' + gy.toFixed(1) + '" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>';
+                gridHtml += '<text x="' + (W - pad - 2) + '" y="' + (gy - 4).toFixed(1) + '" text-anchor="end" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.1)">' + gm + 'x</text>';
             }
         }
     });
 
-    // Rocket
+    // Character (flying phase)
     let angle = -35;
     if (idx > 2) {
         const p1 = pts[idx - 2].split(',').map(Number);
@@ -1246,29 +1258,52 @@ function crUpdateGraph(state) {
         angle = Math.atan2(-(p2[1] - p1[1]), p2[0] - p1[0]) * 180 / Math.PI;
     }
 
-    const rocket = isCrashed ? '' :
+    // Character SVG (masked pilot)
+    const character = isCrashed ? '' :
         '<g transform="translate(' + rx.toFixed(1) + ',' + ry.toFixed(1) + ') rotate(' + angle.toFixed(1) + ')">' +
-        '<ellipse cx="-7" cy="0" rx="6" ry="3" fill="none" stroke="rgba(255,180,40,0.1)" stroke-width="4"/>' +
-        '<ellipse cx="-6" cy="0" rx="4.5" ry="1.8" fill="rgba(255,220,60,0.2)"/>' +
-        '<ellipse cx="-8" cy="0" rx="3.5" ry="1.2" fill="rgba(255,140,20,0.35)"/>' +
-        '<ellipse cx="-10" cy="0" rx="2" ry="0.7" fill="rgba(255,60,30,0.45)"/>' +
-        '<path d="M-1,-3 L3.5,-7.5 L3.5,-3 Z" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.15)" stroke-width="0.4"/>' +
-        '<path d="M-1,3 L3.5,7.5 L3.5,3 Z" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.15)" stroke-width="0.4"/>' +
-        '<rect x="-5" y="-3" width="13" height="6.5" rx="2" fill="url(#rBody)"/>' +
-        '<rect x="-5" y="-3" width="13" height="6.5" rx="2" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.4"/>' +
-        '<rect x="-1.5" y="-3" width="3" height="6.5" rx="1.5" fill="rgba(0,0,0,0.05)"/>' +
-        '<path d="M7,-3 L13,0 L7,3 Z" fill="' + lineCol + '" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>' +
-        '<path d="M7,-1 L11,0 L7,1 Z" fill="rgba(255,255,255,0.12)"/>' +
-        '<circle cx="0" cy="0" r="1.6" fill="rgba(0,0,0,0.2)" stroke="rgba(255,255,255,0.08)" stroke-width="0.4"/>' +
-        '<circle cx="-0.2" cy="-0.3" r="0.5" fill="rgba(255,255,255,0.35)"/>' +
-        '<path d="M-3.5,-2 L-3.5,2" stroke="rgba(255,255,255,0.05)" stroke-width="0.4"/>' +
+        // Glow trail
+        '<ellipse cx="-10" cy="0" rx="12" ry="6" fill="rgba(251,191,36,0.08)"/>' +
+        '<ellipse cx="-8" cy="0" rx="9" ry="4.5" fill="rgba(251,191,36,0.12)"/>' +
+        '<ellipse cx="-7" cy="0" rx="7" ry="3.5" fill="rgba(251,191,36,0.15)"/>' +
+        // Jet flame
+        '<path d="M-6,-1 L-10,-2 L-10,2 Z" fill="rgba(255,200,60,0.6)"/>' +
+        '<path d="M-6,1 L-9,2 L-9,3 Z" fill="rgba(255,180,40,0.5)"/>' +
+        '<path d="M-6,0 L-11,0 L-11,1 Z" fill="rgba(255,220,80,0.4)"/>' +
+        // Body
+        '<path d="M-5,-4 L4,-4 L6,0 L4,4 L-5,4 Z" fill="#f59e0b" stroke="#d97706" stroke-width="0.5"/>' +
+        // Backpack
+        '<rect x="-3" y="-3" width="4" height="6" rx="1" fill="rgba(0,0,0,0.2)"/>' +
+        // Legs
+        '<rect x="-2" y="2" width="2" height="2" rx="0.5" fill="rgba(0,0,0,0.25)"/>' +
+        '<rect x="1" y="2" width="2" height="2" rx="0.5" fill="rgba(0,0,0,0.25)"/>' +
+        // Head
+        '<circle cx="5" cy="0" r="3" fill="#d97706" stroke="#b45309" stroke-width="0.5"/>' +
+        // Mask/goggles
+        '<rect x="3" y="-1.5" width="4" height="3" rx="0.5" fill="#1a1a2e" stroke="#0d0d14" stroke-width="0.4"/>' +
+        '<circle cx="4.5" cy="0" r="1" fill="rgba(0,0,0,0.4)"/>' +
+        // Helmet
+        '<path d="M2,-1 Q3,-3.5 5,-3.5 Q8,-3.5 9,-1 Q9,0.5 8,0.5 Q7,1.5 5,1.5 Q3,1.5 2,-0.5 Q2,-1 2,-1 Z" fill="#fbbf24" stroke="#f59e0b" stroke-width="0.4"/>' +
+        // Visor reflection
+        '<ellipse cx="5" cy="-1.5" rx="2" ry="1" fill="rgba(255,255,255,0.1)"/>' +
         '</g>';
 
     svg.innerHTML = bgDefs +
-        // Dark gradient background
-        '<rect x="0" y="0" width="340" height="200" fill="url(#bgGrad)" rx="14"/>' +
-        // Subtle glow in center
-        '<ellipse cx="' + (W/2) + '" cy="' + (H/2) + '" rx="' + (W/2.2) + '" ry="' + (H/2.2) + '" fill="url(#glowGrad)"/>' +
+        // Space background
+        '<rect x="0" y="0" width="340" height="200" fill="url(#spaceGrad)" rx="14"/>' +
+        // Stars
+        '<g fill="rgba(255,255,255,0.3)">' +
+        '<circle cx="30" cy="25" r="0.8" opacity="0.6"/><circle cx="80" cy="40" r="0.5" opacity="0.4"/><circle cx="150" cy="15" r="0.7" opacity="0.5"/>' +
+        '<circle cx="200" cy="35" r="0.4" opacity="0.3"/><circle cx="280" cy="20" r="0.6" opacity="0.5"/><circle cx="320" cy="45" r="0.5" opacity="0.4"/>' +
+        '<circle cx="60" cy="70" r="0.4" opacity="0.3"/><circle cx="120" cy="85" r="0.5" opacity="0.4"/><circle cx="240" cy="60" r="0.4" opacity="0.3"/>' +
+        '<circle cx="310" cy="75" r="0.5" opacity="0.35"/><circle cx="40" cy="120" r="0.4" opacity="0.3"/><circle cx="180" cy="110" r="0.5" opacity="0.4"/>' +
+        '<circle cx="290" cy="100" r="0.4" opacity="0.3"/><circle cx="100" cy="140" r="0.4" opacity="0.3"/><circle cx="260" cy="130" r="0.5" opacity="0.35"/>' +
+        '</g>' +
+        // Clouds
+        '<ellipse cx="60" cy="185" rx="50" ry="14" fill="url(#cloudGrad)"/>' +
+        '<ellipse cx="180" cy="190" rx="60" ry="16" fill="url(#cloudGrad)"/>' +
+        '<ellipse cx="300" cy="186" rx="55" ry="15" fill="url(#cloudGrad)"/>' +
+        '<ellipse cx="130" cy="188" rx="45" ry="13" fill="url(#cloudGrad)"/>' +
+        '<ellipse cx="250" cy="192" rx="48" ry="14" fill="url(#cloudGrad)"/>' +
         // Grid lines
         gridHtml +
         // Fill area
@@ -1276,20 +1311,19 @@ function crUpdateGraph(state) {
         // Dotted projection
         '<path d="M' + pts.join(' L') + '" fill="none" stroke="rgba(255,255,255,0.02)" stroke-width="1" stroke-dasharray="3,6"/>' +
         // Soft glow under line
-        '<path d="M' + livePts.join(' L') + '" fill="none" stroke="' + lineCol + '" stroke-width="6" stroke-linecap="round" opacity="0.12" filter="url(#gGlowSoft)"/>' +
+        '<path d="M' + livePts.join(' L') + '" fill="none" stroke="' + lineCol + '" stroke-width="5" stroke-linecap="round" opacity="0.1" filter="url(#gGlowSoft)"/>' +
         // Main line
         '<path d="M' + livePts.join(' L') + '" fill="none" stroke="' + lineCol + '" stroke-width="2.5" stroke-linecap="round" filter="url(#gGlow)"/>' +
-        // Rocket dot
-        (!isCrashed ? '<circle cx="' + rx.toFixed(1) + '" cy="' + ry.toFixed(1) + '" r="2.5" fill="' + lineCol + '" opacity="0.9"/>' : '') +
-        (!isCrashed ? '<circle cx="' + rx.toFixed(1) + '" cy="' + ry.toFixed(1) + '" r="5.5" fill="none" stroke="' + lineCol + '" stroke-width="1.5" opacity="0.25"/>' : '') +
         // Crash line
         (isCrashed ? '<line x1="' + pad + '" y1="' + crashY + '" x2="' + (W - pad) + '" y2="' + crashY + '" stroke="rgba(239,68,68,0.3)" stroke-width="2" stroke-dasharray="6,4"/>' : '') +
         (isCrashed ? '<text x="' + (W - pad) + '" y="' + (crashY - 6) + '" text-anchor="end" font-family="monospace" font-size="11" font-weight="700" fill="rgba(239,68,68,0.6)">' + cp.toFixed(2) + 'x</text>' : '') +
         // Axis
         '<line x1="' + pad + '" y1="' + (H - pad) + '" x2="' + (W - pad) + '" y2="' + (H - pad) + '" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>' +
         '<text x="' + pad + '" y="' + (H - 4) + '" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.1)">1.00x</text>' +
-        // Rocket
-        rocket;
+        // Character
+        character +
+        // Multiplier text (flying only)
+        (!isCrashed ? '<text x="24" y="' + (ry - 8).toFixed(1) + '" font-family="Fredoka,sans-serif" font-size="28" font-weight="800" fill="url(#multGrad)" filter="url(#gGlow)">' + mult.toFixed(2) + 'x</text>' : '');
 }
 
 function crUpdateRound(state) {
