@@ -175,17 +175,28 @@ export function initSocket(httpServer) {
         return ack?.({ error: 'Telegram ID not found' });
       }
       try {
-        // sendInvoice signature: (chatId, title, description, payload, providerToken, currency, prices, form)
-        // No startParameter in this library version!
-        await bot.sendInvoice(
-          Number(telegramId),
-          `Clash PVP — ${amount} ⭐ Stars`,
-          `Пополнение игрового баланса на ${amount} Stars`,
-          JSON.stringify({ amount, userId: user.id }),
-          '',
-          'XTR',
-          [ { label: `${amount} ⭐ Stars`, amount } ]
+        // Direct Telegram API call (library's sendInvoice uses form-urlencoded which breaks prices JSON)
+        const botToken = config.telegram.botToken;
+        const response = await fetch(
+          `https://api.telegram.org/bot${botToken}/sendInvoice`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: Number(telegramId),
+              title: `Clash PVP — ${amount} ⭐ Stars`,
+              description: `Пополнение игрового баланса на ${amount} Stars`,
+              payload: JSON.stringify({ amount, userId: user.id }),
+              provider_token: '',
+              currency: 'XTR',
+              prices: [{ label: `${amount} ⭐ Stars`, amount }],
+            }),
+          }
         );
+        const result = await response.json();
+        if (!result.ok) {
+          throw new Error(result.description);
+        }
         ack?.({ success: true });
       } catch (err) {
         console.error('[stars:create_invoice]', err.message);
