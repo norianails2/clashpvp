@@ -2,7 +2,7 @@ import pg from 'pg';
 import { config } from '../config.js';
 
 const pool = new pg.Pool({
-  connectionString: config.db.url || 'postgresql://neondb_owner:npg_6MTro1KEszDQ@ep-winter-fire-a21gwkkw.eu-central-1.aws.neon.tech/neondb?sslmode=require',
+  connectionString: config.db.url,
   max: 10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 15000,
