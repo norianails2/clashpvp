@@ -33,15 +33,20 @@ export async function verifyConnection(socket, next) {
 
     if (!raw) return next(new Error('Missing initData'));
 
-    const params = new URLSearchParams(raw);
-    const hash = params.get('hash');
-    if (!hash) return next(new Error('Missing hash in initData'));
+    // Parse initData manually to preserve URL-encoding (URLSearchParams auto-decodes)
+    const pairs = raw.split('&').map(p => {
+      const eq = p.indexOf('=');
+      return { key: p.slice(0, eq), value: p.slice(eq + 1) };
+    });
 
-    params.delete('hash');
+    const hashPair = pairs.find(p => p.key === 'hash');
+    if (!hashPair) return next(new Error('Missing hash in initData'));
+    const hash = hashPair.value;
 
-    const dataCheckString = Array.from(params.entries())
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([k, v]) => `${k}=${v}`)
+    const dataCheckString = pairs
+      .filter(p => p.key !== 'hash')
+      .sort((a, b) => a.key.localeCompare(b.key))
+      .map(p => `${p.key}=${p.value}`)
       .join('\n');
 
     const secretKey = crypto
@@ -58,8 +63,10 @@ export async function verifyConnection(socket, next) {
       return next(new Error('Invalid initData signature'));
     }
 
-    const userJson = params.get('user');
-    if (!userJson) return next(new Error('Missing user in initData'));
+    // Get user data from raw (still URL-encoded)
+    const userPair = pairs.find(p => p.key === 'user');
+    if (!userPair) return next(new Error('Missing user in initData'));
+    const userJson = decodeURIComponent(userPair.value);
 
     let tgUser;
     try {
