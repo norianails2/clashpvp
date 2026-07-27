@@ -183,7 +183,7 @@ export function initSocket(httpServer) {
           '',
           'stars_topup',
           'XTR',
-          [ { label: `${amount} ⭐ Stars`, amount } ]
+          JSON.stringify([ { label: `${amount} ⭐ Stars`, amount } ])
         );
         ack?.({ success: true });
       } catch (err) {
