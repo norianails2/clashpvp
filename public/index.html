@@ -1175,7 +1175,7 @@ function crUpdateGraph(state) {
     if (!svg) return;
     const W = 340, H = 200, pad = 14;
 
-    // Space background defs
+    // Defs
     const bgDefs = '<defs>' +
         '<linearGradient id="spaceGrad" x1="0" y1="0" x2="0" y2="1">' +
         '<stop offset="0" stop-color="#12121f"/><stop offset="0.5" stop-color="#0d0d18"/><stop offset="1" stop-color="#0a0a12"/></linearGradient>' +
@@ -1183,6 +1183,8 @@ function crUpdateGraph(state) {
         '<stop offset="0" stop-color="rgba(139,92,246,0.08)"/><stop offset="1" stop-color="rgba(139,92,246,0.03)"/></linearGradient>' +
         '<linearGradient id="fillG" x1="0" y1="0" x2="0" y2="1">' +
         '<stop offset="0" stop-color="var(--lc)" stop-opacity="0.12"/><stop offset="1" stop-color="var(--lc)" stop-opacity="0"/></linearGradient>' +
+        '<linearGradient id="rocketBody" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0" stop-color="rgba(255,255,255,0.95)"/><stop offset="0.5" stop-color="rgba(255,255,255,0.85)"/><stop offset="1" stop-color="rgba(255,255,255,0.75)"/></linearGradient>' +
         '<linearGradient id="multGrad" x1="0" y1="0" x2="1" y2="0">' +
         '<stop offset="0" stop-color="#a78bfa"/><stop offset="0.5" stop-color="#8b5cf6"/><stop offset="1" stop-color="#7c3aed"/></linearGradient>' +
         '<filter id="gGlow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>' +
@@ -1193,12 +1195,12 @@ function crUpdateGraph(state) {
         svg.innerHTML = bgDefs +
             '<rect x="0" y="0" width="340" height="200" fill="url(#spaceGrad)" rx="14"/>' +
             // Stars
-            '<g fill="rgba(255,255,255,0.3)">' +
-            '<circle cx="30" cy="25" r="0.8" opacity="0.6"/><circle cx="80" cy="40" r="0.5" opacity="0.4"/><circle cx="150" cy="15" r="0.7" opacity="0.5"/>' +
-            '<circle cx="200" cy="35" r="0.4" opacity="0.3"/><circle cx="280" cy="20" r="0.6" opacity="0.5"/><circle cx="320" cy="45" r="0.5" opacity="0.4"/>' +
-            '<circle cx="60" cy="70" r="0.4" opacity="0.3"/><circle cx="120" cy="85" r="0.5" opacity="0.4"/><circle cx="240" cy="60" r="0.4" opacity="0.3"/>' +
-            '<circle cx="310" cy="75" r="0.5" opacity="0.35"/><circle cx="40" cy="120" r="0.4" opacity="0.3"/><circle cx="180" cy="110" r="0.5" opacity="0.4"/>' +
-            '<circle cx="290" cy="100" r="0.4" opacity="0.3"/><circle cx="100" cy="140" r="0.4" opacity="0.3"/><circle cx="260" cy="130" r="0.5" opacity="0.35"/>' +
+            '<g fill="rgba(255,255,255,0.25)">' +
+            '<circle cx="30" cy="25" r="0.8" opacity="0.5"/><circle cx="80" cy="40" r="0.5" opacity="0.3"/><circle cx="150" cy="15" r="0.7" opacity="0.4"/>' +
+            '<circle cx="200" cy="35" r="0.4" opacity="0.2"/><circle cx="280" cy="20" r="0.6" opacity="0.4"/><circle cx="320" cy="45" r="0.5" opacity="0.3"/>' +
+            '<circle cx="60" cy="70" r="0.4" opacity="0.2"/><circle cx="120" cy="85" r="0.5" opacity="0.3"/><circle cx="240" cy="60" r="0.4" opacity="0.2"/>' +
+            '<circle cx="310" cy="75" r="0.5" opacity="0.25"/><circle cx="40" cy="120" r="0.4" opacity="0.2"/><circle cx="180" cy="110" r="0.5" opacity="0.3"/>' +
+            '<circle cx="290" cy="100" r="0.4" opacity="0.2"/><circle cx="100" cy="140" r="0.4" opacity="0.2"/><circle cx="260" cy="130" r="0.5" opacity="0.25"/>' +
             '</g>' +
             // Clouds
             '<ellipse cx="60" cy="185" rx="50" ry="14" fill="url(#cloudGrad)"/>' +
@@ -1237,7 +1239,7 @@ function crUpdateGraph(state) {
     const crashLy = Math.log2(cp);
     const crashY = pad + (H - pad * 2) - (crashLy / maxLog) * (H - pad * 2);
 
-    // Grid lines with labels
+    // Grid lines
     let gridHtml = '';
     const gridMults = [1.5, 2, 3, 5, 10, 25, 50, 100];
     gridMults.forEach(gm => {
@@ -1250,7 +1252,7 @@ function crUpdateGraph(state) {
         }
     });
 
-    // Character (flying phase)
+    // Rocket (flying phase) - prettier design
     let angle = -35;
     if (idx > 2) {
         const p1 = pts[idx - 2].split(',').map(Number);
@@ -1258,45 +1260,45 @@ function crUpdateGraph(state) {
         angle = Math.atan2(-(p2[1] - p1[1]), p2[0] - p1[0]) * 180 / Math.PI;
     }
 
-    // Character SVG (masked pilot)
-    const character = isCrashed ? '' :
+    const rocket = isCrashed ? '' :
         '<g transform="translate(' + rx.toFixed(1) + ',' + ry.toFixed(1) + ') rotate(' + angle.toFixed(1) + ')">' +
         // Glow trail
-        '<ellipse cx="-10" cy="0" rx="12" ry="6" fill="rgba(251,191,36,0.08)"/>' +
-        '<ellipse cx="-8" cy="0" rx="9" ry="4.5" fill="rgba(251,191,36,0.12)"/>' +
-        '<ellipse cx="-7" cy="0" rx="7" ry="3.5" fill="rgba(251,191,36,0.15)"/>' +
-        // Jet flame
-        '<path d="M-6,-1 L-10,-2 L-10,2 Z" fill="rgba(255,200,60,0.6)"/>' +
-        '<path d="M-6,1 L-9,2 L-9,3 Z" fill="rgba(255,180,40,0.5)"/>' +
-        '<path d="M-6,0 L-11,0 L-11,1 Z" fill="rgba(255,220,80,0.4)"/>' +
+        '<ellipse cx="-10" cy="0" rx="12" ry="6" fill="rgba(251,191,36,0.06)"/>' +
+        '<ellipse cx="-8" cy="0" rx="9" ry="4.5" fill="rgba(251,191,36,0.1)"/>' +
+        '<ellipse cx="-7" cy="0" rx="7" ry="3.5" fill="rgba(251,191,36,0.14)"/>' +
+        // Flame trail
+        '<ellipse cx="-6" cy="0" rx="5" ry="2" fill="rgba(255,200,50,0.5)"/>' +
+        '<ellipse cx="-8" cy="0" rx="4" ry="1.5" fill="rgba(255,140,20,0.6)"/>' +
+        '<ellipse cx="-10" cy="0" rx="3" ry="1" fill="rgba(255,80,30,0.7)"/>' +
+        '<ellipse cx="-12" cy="0" rx="2" ry="0.7" fill="rgba(255,60,30,0.5)"/>' +
+        // Fins
+        '<path d="M-1,-3.5 L4,-8 L4,-3.5 Z" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/>' +
+        '<path d="M-1,3.5 L4,8 L4,3.5 Z" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/>' +
         // Body
-        '<path d="M-5,-4 L4,-4 L6,0 L4,4 L-5,4 Z" fill="#f59e0b" stroke="#d97706" stroke-width="0.5"/>' +
-        // Backpack
-        '<rect x="-3" y="-3" width="4" height="6" rx="1" fill="rgba(0,0,0,0.2)"/>' +
-        // Legs
-        '<rect x="-2" y="2" width="2" height="2" rx="0.5" fill="rgba(0,0,0,0.25)"/>' +
-        '<rect x="1" y="2" width="2" height="2" rx="0.5" fill="rgba(0,0,0,0.25)"/>' +
-        // Head
-        '<circle cx="5" cy="0" r="3" fill="#d97706" stroke="#b45309" stroke-width="0.5"/>' +
-        // Mask/goggles
-        '<rect x="3" y="-1.5" width="4" height="3" rx="0.5" fill="#1a1a2e" stroke="#0d0d14" stroke-width="0.4"/>' +
-        '<circle cx="4.5" cy="0" r="1" fill="rgba(0,0,0,0.4)"/>' +
-        // Helmet
-        '<path d="M2,-1 Q3,-3.5 5,-3.5 Q8,-3.5 9,-1 Q9,0.5 8,0.5 Q7,1.5 5,1.5 Q3,1.5 2,-0.5 Q2,-1 2,-1 Z" fill="#fbbf24" stroke="#f59e0b" stroke-width="0.4"/>' +
-        // Visor reflection
-        '<ellipse cx="5" cy="-1.5" rx="2" ry="1" fill="rgba(255,255,255,0.1)"/>' +
+        '<rect x="-5" y="-3" width="13" height="7" rx="2.5" fill="url(#rocketBody)"/>' +
+        '<rect x="-5" y="-3" width="13" height="7" rx="2.5" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/>' +
+        // Body stripe
+        '<rect x="-2" y="-3" width="3.5" height="7" rx="1.5" fill="rgba(0,0,0,0.08)"/>' +
+        // Nose cone
+        '<path d="M7,-3 L13,0 L7,3 Z" fill="' + lineCol + '" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/>' +
+        '<path d="M7,-1 L11,0 L7,1 Z" fill="rgba(255,255,255,0.15)"/>' +
+        // Window
+        '<circle cx="1" cy="0" r="1.8" fill="rgba(0,0,0,0.2)" stroke="rgba(255,255,255,0.1)" stroke-width="0.4"/>' +
+        '<circle cx="0.7" cy="-0.5" r="0.6" fill="rgba(255,255,255,0.4)"/>' +
+        // Body highlight
+        '<path d="M-4,-2 L-4,2" stroke="rgba(255,255,255,0.06)" stroke-width="0.4"/>' +
         '</g>';
 
     svg.innerHTML = bgDefs +
         // Space background
         '<rect x="0" y="0" width="340" height="200" fill="url(#spaceGrad)" rx="14"/>' +
         // Stars
-        '<g fill="rgba(255,255,255,0.3)">' +
-        '<circle cx="30" cy="25" r="0.8" opacity="0.6"/><circle cx="80" cy="40" r="0.5" opacity="0.4"/><circle cx="150" cy="15" r="0.7" opacity="0.5"/>' +
-        '<circle cx="200" cy="35" r="0.4" opacity="0.3"/><circle cx="280" cy="20" r="0.6" opacity="0.5"/><circle cx="320" cy="45" r="0.5" opacity="0.4"/>' +
-        '<circle cx="60" cy="70" r="0.4" opacity="0.3"/><circle cx="120" cy="85" r="0.5" opacity="0.4"/><circle cx="240" cy="60" r="0.4" opacity="0.3"/>' +
-        '<circle cx="310" cy="75" r="0.5" opacity="0.35"/><circle cx="40" cy="120" r="0.4" opacity="0.3"/><circle cx="180" cy="110" r="0.5" opacity="0.4"/>' +
-        '<circle cx="290" cy="100" r="0.4" opacity="0.3"/><circle cx="100" cy="140" r="0.4" opacity="0.3"/><circle cx="260" cy="130" r="0.5" opacity="0.35"/>' +
+        '<g fill="rgba(255,255,255,0.25)">' +
+        '<circle cx="30" cy="25" r="0.8" opacity="0.5"/><circle cx="80" cy="40" r="0.5" opacity="0.3"/><circle cx="150" cy="15" r="0.7" opacity="0.4"/>' +
+        '<circle cx="200" cy="35" r="0.4" opacity="0.2"/><circle cx="280" cy="20" r="0.6" opacity="0.4"/><circle cx="320" cy="45" r="0.5" opacity="0.3"/>' +
+        '<circle cx="60" cy="70" r="0.4" opacity="0.2"/><circle cx="120" cy="85" r="0.5" opacity="0.3"/><circle cx="240" cy="60" r="0.4" opacity="0.2"/>' +
+        '<circle cx="310" cy="75" r="0.5" opacity="0.25"/><circle cx="40" cy="120" r="0.4" opacity="0.2"/><circle cx="180" cy="110" r="0.5" opacity="0.3"/>' +
+        '<circle cx="290" cy="100" r="0.4" opacity="0.2"/><circle cx="100" cy="140" r="0.4" opacity="0.2"/><circle cx="260" cy="130" r="0.5" opacity="0.25"/>' +
         '</g>' +
         // Clouds
         '<ellipse cx="60" cy="185" rx="50" ry="14" fill="url(#cloudGrad)"/>' +
@@ -1304,14 +1306,14 @@ function crUpdateGraph(state) {
         '<ellipse cx="300" cy="186" rx="55" ry="15" fill="url(#cloudGrad)"/>' +
         '<ellipse cx="130" cy="188" rx="45" ry="13" fill="url(#cloudGrad)"/>' +
         '<ellipse cx="250" cy="192" rx="48" ry="14" fill="url(#cloudGrad)"/>' +
-        // Grid lines
+        // Grid
         gridHtml +
         // Fill area
         '<path d="' + fillD + '" fill="url(#fillG)" style="--lc:' + lineCol + '"/>' +
         // Dotted projection
         '<path d="M' + pts.join(' L') + '" fill="none" stroke="rgba(255,255,255,0.02)" stroke-width="1" stroke-dasharray="3,6"/>' +
         // Soft glow under line
-        '<path d="M' + livePts.join(' L') + '" fill="none" stroke="' + lineCol + '" stroke-width="5" stroke-linecap="round" opacity="0.1" filter="url(#gGlowSoft)"/>' +
+        '<path d="M' + livePts.join(' L') + '" fill="none" stroke="' + lineCol + '" stroke-width="5" stroke-linecap="round" opacity="0.08" filter="url(#gGlowSoft)"/>' +
         // Main line
         '<path d="M' + livePts.join(' L') + '" fill="none" stroke="' + lineCol + '" stroke-width="2.5" stroke-linecap="round" filter="url(#gGlow)"/>' +
         // Crash line
@@ -1320,8 +1322,8 @@ function crUpdateGraph(state) {
         // Axis
         '<line x1="' + pad + '" y1="' + (H - pad) + '" x2="' + (W - pad) + '" y2="' + (H - pad) + '" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>' +
         '<text x="' + pad + '" y="' + (H - 4) + '" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.1)">1.00x</text>' +
-        // Character
-        character +
+        // Rocket
+        rocket +
         // Multiplier text (flying only)
         (!isCrashed ? '<text x="24" y="' + (ry - 8).toFixed(1) + '" font-family="Fredoka,sans-serif" font-size="28" font-weight="800" fill="url(#multGrad)" filter="url(#gGlow)">' + mult.toFixed(2) + 'x</text>' : '');
 }
