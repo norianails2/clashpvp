@@ -8,7 +8,6 @@ async function main() {
   const app = createApp();
   const server = http.createServer(app);
 
-  // Run migrations on startup
   try {
     await runMigrations();
   } catch (err) {
@@ -16,14 +15,6 @@ async function main() {
   }
 
   initSocket(server);
-
-  // Lazy-init bot (skip if file not found)
-  try {
-    const { initBot } = await import('./services/telegramBot.js');
-    initBot(server);
-  } catch (e) {
-    console.warn('[server] Bot not available:', e.message);
-  }
 
   server.listen(config.port, () => {
     console.log(`[server] Clash PVP backend running on port ${config.port}`);
