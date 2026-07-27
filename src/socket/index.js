@@ -45,8 +45,8 @@ export function initSocket(httpServer) {
       origin: config.cors.origin,
       credentials: true,
     },
-    pingInterval: 2000,
-    pingTimeout: 1000,
+    pingInterval: 3000,
+    pingTimeout: 5000,
   });
 
   crashEngine.setIO(io);
