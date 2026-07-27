@@ -14,7 +14,7 @@ export const config = {
   },
 
   telegram: {
-    botToken: process.env.BOT_TOKEN,
+    botToken: process.env.BOT_TOKEN || '8920598038:AAFdndgLQLxj_swUkfRGClMjQ_ynZNOXHEw',
   },
 
   jwt: {
