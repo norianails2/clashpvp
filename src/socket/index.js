@@ -175,15 +175,16 @@ export function initSocket(httpServer) {
         return ack?.({ error: 'Telegram ID not found' });
       }
       try {
+        // sendInvoice signature: (chatId, title, description, payload, providerToken, currency, prices, form)
+        // No startParameter in this library version!
         await bot.sendInvoice(
           Number(telegramId),
           `Clash PVP — ${amount} ⭐ Stars`,
           `Пополнение игрового баланса на ${amount} Stars`,
           JSON.stringify({ amount, userId: user.id }),
           '',
-          'stars_topup',
           'XTR',
-          JSON.stringify([ { label: `${amount} ⭐ Stars`, amount } ])
+          [ { label: `${amount} ⭐ Stars`, amount } ]
         );
         ack?.({ success: true });
       } catch (err) {
