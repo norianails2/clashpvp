@@ -32,9 +32,9 @@ import { registerCoinHandlers } from './coinHandler.js';
 import { registerMinesHandlers } from './minesHandler.js';
 import { registerBlackjackHandlers } from './blackjackHandler.js';
 import { registerCrashHandlers, startCrashEngine } from './crashHandler.js';
+import https from 'https';
 import { query } from '../db/pool.js';
 import crashEngine from '../games/crash.js';
-import { getBot } from '../services/telegramBot.js';
 
 let io;
 
@@ -175,23 +175,34 @@ export function initSocket(httpServer) {
         return ack?.({ error: 'Telegram ID not found' });
       }
       try {
-        // Direct Telegram API call (library's sendInvoice uses form-urlencoded which breaks prices JSON)
+        // Call Telegram API directly via https (fetch may have encoding issues)
         const botToken = config.telegram.botToken;
-        const response = await fetch(
-          `https://api.telegram.org/bot${botToken}/sendInvoice`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              chat_id: Number(telegramId),
-              title: `Clash PVP — ${amount} ⭐ Stars`,
-              description: `Пополнение игрового баланса на ${amount} Stars`,
-              payload: JSON.stringify({ amount, userId: user.id }),
-              provider_token: '',
-              currency: 'XTR',
-              prices: JSON.stringify([{ label: `${amount} Stars`, amount }]),
-            }),
-          }
+        const body = JSON.stringify({
+          chat_id: Number(telegramId),
+          title: `Clash PVP — ${amount} Stars`,
+          description: `Пополнение игрового баланса на ${amount} Stars`,
+          payload: JSON.stringify({ amount, userId: user.id }),
+          provider_token: '',
+          currency: 'XTR',
+          prices: JSON.stringify([{ label: `${amount} Stars`, amount }]),
+        });
+        const result = await new Promise((resolve, reject) => {
+          const req = https.request(
+            `https://api.telegram.org/bot${botToken}/sendInvoice`,
+            { method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) } },
+            (res) => {
+              let data = '';
+              res.on('data', c => data += c);
+              res.on('end', () => { try { resolve(JSON.parse(data)); } catch { resolve({ ok: false, description: data }); } });
+            }
+          );
+          req.on('error', reject);
+          req.write(body);
+          req.end();
+        });
+        if (!result.ok) {
+          throw new Error(result.description);
+        }
         );
         const result = await response.json();
         if (!result.ok) {
