@@ -84,15 +84,13 @@ export function initBot(server) {
       `Only Telegram Stars (XTR) are accepted for deposits. Withdrawals are not available at this time. All deposits are final — no refunds on spent Stars.\n\n` +
       `*4. Age Restriction*\n` +
       `You must be 18+ (or the legal age in your country). By playing you confirm you meet this requirement.\n\n` +
-      `*5. Restricted Countries*\n` +
-      `Users from the following countries may not use this app: USA, UK, France, Netherlands, Australia, Singapore, and any jurisdiction where online gambling is prohibited.\n\n` +
-      `*6. Responsible Gaming*\n` +
+      `*5. Responsible Gaming*\n` +
       `Clash PVP is entertainment. Do not chase losses. Set limits for yourself. The platform is not responsible for financial losses. If you feel you have a gambling problem — seek professional help.\n\n` +
-      `*7. Account & Security*\n` +
+      `*6. Account & Security*\n` +
       `We reserve the right to block users who exploit bugs, use automated scripts, or abuse the system. Accounts found violating the rules may be permanently suspended without refund.\n\n` +
-      `*8. Privacy*\n` +
+      `*7. Privacy*\n` +
       `We collect: Telegram user ID, username, and game history. This data is used only for platform operation. We do not share personal data with third parties. We use Supabase (PostgreSQL) for data storage.\n\n` +
-      `*9. Contact*\n` +
+      `*8. Contact*\n` +
       `Support: @ama833\n` +
       `Report bugs or appeals via the same contact.\n\n` +
       `_Last updated: July 2026_`,
