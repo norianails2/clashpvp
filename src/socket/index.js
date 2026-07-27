@@ -82,7 +82,20 @@ export function initSocket(httpServer) {
           }
           return;
         }
-        return handler.apply(this, args);
+        try {
+          const result = handler.apply(this, args);
+          if (result && typeof result.catch === 'function') {
+            result.catch(err => {
+              console.error(`[socket] ${event} error:`, err);
+              const ack = args[args.length - 1];
+              if (typeof ack === 'function') ack({ error: err.message });
+            });
+          }
+        } catch (err) {
+          console.error(`[socket] ${event} error:`, err);
+          const ack = args[args.length - 1];
+          if (typeof ack === 'function') ack({ error: err.message });
+        }
       });
     };
 
@@ -95,9 +108,8 @@ export function initSocket(httpServer) {
     registerBlackjackHandlers(io, socket);
     registerCrashHandlers(io, socket);
 
-    // Dev: add balance
+    // Add balance (dev & test)
     socket.on('balance:add', async (payload, ack) => {
-      if (config.nodeEnv !== 'development') return;
       const amount = payload?.amount || 1000;
       try {
         const { rows } = await query(
