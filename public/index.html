@@ -308,6 +308,10 @@
         @keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-8px); } }
         @keyframes slideIn { from { opacity:0;transform:translateX(-20px); } to { opacity:1;transform:translateX(0); } }
         .bottom-nav { position:absolute;bottom:0;left:0;right:0;height:85px;background:#0d0d14;border-top:2px solid rgba(255,255,255,0.08);display:flex;justify-content:space-around;align-items:center;padding:8px 8px 14px;z-index:10;padding-bottom:max(14px, env(safe-area-inset-bottom,14px)); }
+        .compliance-footer { position:absolute;bottom:85px;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:12px;padding:6px 16px;background:rgba(255,255,255,0.02);border-top:1px solid rgba(255,255,255,0.03); }
+        .compliance-footer span { font-size:9px;color:rgba(255,255,255,0.15);font-family:'Nunito',sans-serif;font-weight:700;letter-spacing:0.5px;cursor:pointer;transition:color 0.15s; }
+        .compliance-footer span:hover { color:rgba(255,255,255,0.3); }
+        .compliance-footer span:first-child { color:rgba(255,255,255,0.08);cursor:default; }
         .nav-item { text-align:center;cursor:pointer;transition:all 0.15s;padding:6px 10px;border-radius:16px;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:52px; }
         .nav-item:active { transform:scale(0.92); }
         .nav-item .icon { font-size:24px;display:block;filter:grayscale(1) brightness(0.5);transition:all 0.15s; }
@@ -551,7 +555,55 @@
         <div class="nav-item" onclick="navTo(this,3)"><span class="icon">👑</span><span class="label">Лидеры</span></div>
         <div class="nav-item" onclick="navTo(this,4)"><span class="icon">👤</span><span class="label">Профиль</span></div>
     </div>
+
+    <div class="compliance-footer">
+        <span>18+</span>
+        <span onclick="openModal('responsibleModal')">🎲 Ответственная игра</span>
+        <span onclick="openModal('supportModal')">📞 Поддержка</span>
+    </div>
 </div>
+
+<div class="modal-overlay" id="ageModal">
+    <div class="modal-box" style="text-align:center;">
+        <h2>🔞 Подтверждение возраста</h2>
+        <p style="font-size:13px;color:rgba(255,255,255,0.6);margin:12px 0;line-height:1.5;">
+            Вам есть 18 лет?<br>
+            Clash PVP содержит азартные игры на Telegram Stars.<br>
+            Играйте ответственно.
+        </p>
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;">
+            <button class="modal-cancel" onclick="rejectAge()" style="background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.4);padding:12px 24px;border-radius:12px;border:none;font-size:13px;font-weight:700;cursor:pointer;">Мне нет 18</button>
+            <button class="modal-confirm" onclick="confirmAge()" style="background:#fbbf24;color:#1a0a2e;padding:12px 24px;border-radius:12px;border:none;font-size:13px;font-weight:800;cursor:pointer;">Мне есть 18</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="responsibleModal">
+    <div class="modal-box" style="text-align:center;">
+        <h2>🎲 Ответственная игра</h2>
+        <p style="font-size:12px;color:rgba(255,255,255,0.5);margin:12px 0;line-height:1.6;text-align:left;">
+            • Устанавливай лимиты на депозиты и время игры<br>
+            • Не пытайся отыграться — это приводит к большим потерям<br>
+            • Играй ради развлечения, не как способ заработка<br>
+            • Если чувствуешь, что теряешь контроль — сделай паузу<br><br>
+            <span style="color:rgba(255,255,255,0.3);font-size:10px;">Нужна помощь? @ama833</span>
+        </p>
+        <button class="modal-cancel" onclick="closeModal('responsibleModal')">Понятно</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="supportModal">
+    <div class="modal-box" style="text-align:center;">
+        <h2>📞 Поддержка</h2>
+        <p style="font-size:13px;color:rgba(255,255,255,0.6);margin:12px 0;">
+            По всем вопросам пиши:
+        </p>
+        <a href="https://t.me/ama833" target="_blank" style="display:inline-block;background:#2a9df4;color:#fff;border-radius:12px;padding:12px 24px;font-size:15px;text-decoration:none;font-weight:600;">💬 @ama833</a>
+        <p style="font-size:10px;color:rgba(255,255,255,0.15);margin-top:12px;">Обычно отвечаю в течение дня</p>
+        <button class="modal-cancel" onclick="closeModal('supportModal')" style="margin-top:12px;">Закрыть</button>
+    </div>
+</div>
+
 <script>
 const MIN_BET = 5;
 var balance = 0;
@@ -624,12 +676,12 @@ function showToast(msg, type) {
 document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); }));
 
 const rulesData = {
-    rps: {title:'✊ Камень-Ножницы-Бумага',body:'Выбери ход (✊✋✌️), соперник выбирает случайно. Камень бьёт ножницы, ножницы бьют бумагу, бумага бьёт камень. Победитель забирает ставку x2. Ничья — возврат.'},
-    dice: {title:'🎲 Кости',body:'Брось кубик (1-6). Кто выбросил больше — тот победил. Совпадение — ничья. Ставка x2.'},
-    coin: {title:'🪙 Монетка',body:'Выбери Орла 🦅 или Решку 🪙. Угадал — забираешь ставку x2. Не угадал — проигрыш.'},
-    mines: {title:'💣 Мины',body:'На поле 3×3 спрятаны 1 бомба и 8 алмазов. Открывай клетки, собирай алмазы. Наткнёшься на бомбу — стоп. У кого больше алмазов — победил.'},
-    blackjack: {title:'🃏 Блекджек',body:'Собери 21 или ближе к 21, чем соперник. Карты: 2-10 по номиналу, J/Q/K = 10, A = 11. Hit — ещё карта, Stand — хватит. Перебор >21 — проигрыш.'},
-    crash: {title:'🚀 Ракетка',body:'Каждый раунд длится для всех одновременно. За 6 секунд сделай ставку. Множитель растёт с 1.00x — забери деньги ДО взрыва. Не успел — ставка сгорает. RTP 97%. Алгоритм Provably Fair (HMAC-SHA256).'},
+    rps: {title:'✊ Камень-Ножницы-Бумага',body:'Выбери ход (✊✋✌️), соперник выбирает случайно. Камень бьёт ножницы, ножницы бьют бумагу, бумага бьёт камень. Победитель забирает ставку x2 минус 10% комиссия. Ничья — возврат.'},
+    dice: {title:'🎲 Кости',body:'Брось кубик (1-6). Кто выбросил больше — тот победил. Совпадение — ничья. Комиссия платформы: 10%.'},
+    coin: {title:'🪙 Монетка',body:'Выбери Орла 🦅 или Решку 🪙. Угадал — забираешь ставку x2 минус 10% комиссия. Не угадал — проигрыш.'},
+    mines: {title:'💣 Мины',body:'На поле 3×3 спрятаны 1 бомба и 8 алмазов. Открывай клетки, собирай алмазы. Наткнёшься на бомбу — стоп. У кого больше алмазов — победил. Комиссия: 10%.'},
+    blackjack: {title:'🃏 Блекджек',body:'Собери 21 или ближе к 21, чем соперник. Карты: 2-10 по номиналу, J/Q/K = 10, A = 11. Hit — ещё карта, Stand — хватит. Перебор >21 — проигрыш. Комиссия: 10%.'},
+    crash: {title:'🚀 Ракетка',body:'Каждый раунд длится для всех одновременно. За 6 секунд сделай ставку. Множитель растёт с 1.00x — забери деньги ДО взрыва. Не успел — ставка сгорает. Комиссия платформы: 10%. Алгоритм Provably Fair (HMAC-SHA256).'},
 };
 function showRules() { const d = rulesData[currentGameId] || rulesData.rps; document.getElementById('rulesTitle').textContent = d.title; document.getElementById('rulesBody').innerHTML = d.body; document.getElementById('rulesPopup').classList.add('show'); }
 function closeRules() { document.getElementById('rulesPopup').classList.remove('show'); }
@@ -1716,6 +1768,20 @@ function updateUI() {
         badge.onclick = () => openModal('authModal');
     }
 }
+
+// Age confirmation
+if (!localStorage.getItem('age_confirmed')) {
+    setTimeout(() => document.getElementById('ageModal')?.classList.add('show'), 500);
+}
+window.confirmAge = function() {
+    localStorage.setItem('age_confirmed', '1');
+    closeModal('ageModal');
+    playSound('click');
+};
+window.rejectAge = function() {
+    closeModal('ageModal');
+    showToast('🔞 Доступ запрещён лицам младше 18 лет', 'error');
+};
 
 function startConnection() {
     const tg = window.Telegram?.WebApp;

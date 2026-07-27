@@ -56,7 +56,7 @@ export function initBot(server) {
       await bot.sendMessage(chatId,
         `🎲 Welcome to *Clash PVP Casino!*\n\n` +
         `💰 *Games:* RPS, Dice, Coin, Mines, Blackjack, Crash\n` +
-        `🎯 *House edge:* only 2%\n\n` +
+        `🎯 *House edge:* 10%\n\n` +
         `Click below to open:`,
         {
           parse_mode: 'Markdown',
@@ -76,12 +76,25 @@ export function initBot(server) {
     const chatId = msg.chat.id;
     await bot.sendMessage(chatId,
       `📋 *Terms of Service — Clash PVP*\n\n` +
-      `1. All games use PvP format. The platform takes a 10% commission from each win.\n` +
-      `2. Crash game uses Provably Fair (HMAC-SHA256). You can verify each round.\n` +
-      `3. Only Telegram Stars (XTR) are accepted for deposits. No refunds on spent Stars.\n` +
-      `4. You must be 18+ to use this app. By playing you confirm you are of legal age.\n` +
-      `5. The platform is not responsible for losses. Play responsibly.\n` +
-      `6. We reserve the right to block users who exploit bugs or abuse the system.\n\n` +
+      `*1. General*\n` +
+      `By using Clash PVP you agree to these terms. If you disagree, do not use the app.\n\n` +
+      `*2. Games & Commission*\n` +
+      `All games are PvP (player vs player). The platform takes 10% commission from each win (house edge). Crash game uses Provably Fair (HMAC-SHA256) — each round can be verified independently.\n\n` +
+      `*3. Payments*\n` +
+      `Only Telegram Stars (XTR) are accepted for deposits. Withdrawals are not available at this time. All deposits are final — no refunds on spent Stars.\n\n` +
+      `*4. Age Restriction*\n` +
+      `You must be 18+ (or the legal age in your country). By playing you confirm you meet this requirement.\n\n` +
+      `*5. Restricted Countries*\n` +
+      `Users from the following countries may not use this app: USA, UK, France, Netherlands, Australia, Singapore, and any jurisdiction where online gambling is prohibited.\n\n` +
+      `*6. Responsible Gaming*\n` +
+      `Clash PVP is entertainment. Do not chase losses. Set limits for yourself. The platform is not responsible for financial losses. If you feel you have a gambling problem — seek professional help.\n\n` +
+      `*7. Account & Security*\n` +
+      `We reserve the right to block users who exploit bugs, use automated scripts, or abuse the system. Accounts found violating the rules may be permanently suspended without refund.\n\n` +
+      `*8. Privacy*\n` +
+      `We collect: Telegram user ID, username, and game history. This data is used only for platform operation. We do not share personal data with third parties. We use Supabase (PostgreSQL) for data storage.\n\n` +
+      `*9. Contact*\n` +
+      `Support: @ama833\n` +
+      `Report bugs or appeals via the same contact.\n\n` +
       `_Last updated: July 2026_`,
       { parse_mode: 'Markdown' }
     );
