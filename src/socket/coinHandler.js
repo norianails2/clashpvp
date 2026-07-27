@@ -83,8 +83,10 @@ export function registerCoinHandlers(io, socket) {
 
         if (pickedCount === 2) {
           const crypto = await import('crypto');
-          const flip = crypto.randomInt(0, 2);
-          const { winnerId } = resolveCoin(flip, newPicks[room.creator_id], newPicks[room.opponent_id], room.creator_id, room.opponent_id);
+          const flip = crypto.randomInt(0, 2); // 0=heads, 1=tails
+          const winnerSide = flip === 0 ? 'heads' : 'tails';
+          const creatorPick = newPicks[room.creator_id]; // 'heads' or 'tails'
+          const { winnerId } = resolveCoin(winnerSide, creatorPick, room.creator_id, room.opponent_id);
           const pot = room.bet_amount * 2;
 
           await payout(winnerId, pot, 'coin', room.id, client, HOUSE_EDGE);
