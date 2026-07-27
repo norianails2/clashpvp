@@ -1508,7 +1508,7 @@ function renderSoloMines(area) {
         '<div class="mines-solo" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;padding:0 16px;">' +
         '<div class="pvp-mines-grid" id="minesGrid" style="margin-top:12px;"></div>' +
         '<div class="c-auto-row"><span class="c-auto-label">💣 МИНЫ</span>' +
-        '<input class="c-auto-input" id="minesCountInput" type="number" value="3" min="1" max="8" style="width:50px;"></div>' +
+        '<input class="c-auto-input" id="minesCountInput" type="number" value="3" min="1" max="24" style="width:50px;"></div>' +
         '<div class="c-bet-label" style="margin-top:4px;">✦ СТАВКА</div>' +
         '<div class="c-bet-row"><div class="c-bet-input-wrap"><span class="c-cr-sm">⭐</span>' +
         '<input type="number" id="minesBetInput" value="10" min="1"><span class="c-usd">★</span></div>' +
@@ -1520,7 +1520,8 @@ function renderSoloMines(area) {
         '</div>';
 
     const g = document.getElementById('minesGrid');
-    for (let i = 0; i < 9; i++) {
+    g.style.gridTemplateColumns = 'repeat(5,1fr)';
+    for (let i = 0; i < 25; i++) {
         const c = document.createElement('div'); c.className = 'pvp-mine-cell';
         c.dataset.idx = i;
         c.onclick = function() {

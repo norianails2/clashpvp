@@ -1,11 +1,11 @@
 import crypto from 'crypto';
 
-export const GRID_ROWS = 3;
-export const GRID_COLS = 3;
-export const TOTAL_CELLS = 9;
+export const GRID_ROWS = 5;
+export const GRID_COLS = 5;
+export const TOTAL_CELLS = 25;
 
 const MIN_MINES = 1;
-const MAX_MINES = 8;
+const MAX_MINES = 24;
 const MIN_BET = 1;
 const MAX_BET = 100000;
 
