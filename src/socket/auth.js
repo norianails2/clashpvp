@@ -15,15 +15,20 @@ export async function verifyConnection(socket, next) {
     if (!raw) {
       const testUser = socket.handshake.query?.testUser;
       const telegramId = testUser || 'dev_user_1';
-      const { rows } = await query(
-        `INSERT INTO users (telegram_id, username)
-         VALUES ($1, $2)
-         ON CONFLICT (telegram_id) DO UPDATE SET username = EXCLUDED.username
-         RETURNING id, telegram_id, username, balance`,
-        [telegramId, telegramId]
-      );
-      socket.data.user = rows[0];
-      return next();
+      try {
+        const { rows } = await query(
+          `INSERT INTO users (telegram_id, username)
+           VALUES ($1, $2)
+           ON CONFLICT (telegram_id) DO UPDATE SET username = EXCLUDED.username
+           RETURNING id, telegram_id, username, balance`,
+          [telegramId, telegramId]
+        );
+        socket.data.user = rows[0];
+        return next();
+      } catch (dbErr) {
+        console.error('[auth] DB error:', dbErr.message, dbErr.stack?.slice(0, 200));
+        return next(new Error('DB: ' + dbErr.message));
+      }
     }
 
     if (!raw) return next(new Error('Missing initData'));
