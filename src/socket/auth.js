@@ -9,6 +9,7 @@ import { query } from '../db/pool.js';
 export async function verifyConnection(socket, next) {
   try {
     const raw = socket.handshake.query?.initData;
+    console.log('[auth] raw:', typeof raw, raw ? raw.slice(0, 30) + '...' : 'empty');
 
     // Dev bypass — allow test users when no initData
     if (!raw) {
