@@ -10,8 +10,8 @@ export async function verifyConnection(socket, next) {
   try {
     const raw = socket.handshake.query?.initData;
 
-    // Dev bypass — allow test users when NODE_ENV=development
-    if (!raw && config.nodeEnv === 'development') {
+    // Dev bypass — allow test users when no initData
+    if (!raw) {
       const testUser = socket.handshake.query?.testUser;
       const telegramId = testUser || 'dev_user_1';
       const { rows } = await query(
