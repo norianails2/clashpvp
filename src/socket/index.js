@@ -34,6 +34,7 @@ import { registerBlackjackHandlers } from './blackjackHandler.js';
 import { registerCrashHandlers, startCrashEngine } from './crashHandler.js';
 import { query } from '../db/pool.js';
 import crashEngine from '../games/crash.js';
+import { getBot } from '../services/telegramBot.js';
 
 let io;
 
@@ -155,6 +156,38 @@ export function initSocket(httpServer) {
         socket.emit('balance:update', { balance });
         ack?.({ balance });
       } catch (err) {
+        ack?.({ error: err.message });
+      }
+    });
+
+    // Create Telegram Stars invoice (sends invoice to user's chat via bot)
+    socket.on('stars:create_invoice', async (payload, ack) => {
+      const amount = payload?.amount || 0;
+      if (amount <= 0 || !Number.isInteger(amount)) {
+        return ack?.({ error: 'Invalid amount' });
+      }
+      const bot = getBot();
+      if (!bot) {
+        return ack?.({ error: 'Bot not available' });
+      }
+      const telegramId = user.telegram_id;
+      if (!telegramId) {
+        return ack?.({ error: 'Telegram ID not found' });
+      }
+      try {
+        await bot.sendInvoice(
+          Number(telegramId),
+          `Clash PVP — ${amount} ⭐ Stars`,
+          `Пополнение игрового баланса на ${amount} Stars`,
+          JSON.stringify({ amount, userId: user.id }),
+          '',
+          'stars_topup',
+          'XTR',
+          [ { label: `${amount} ⭐ Stars`, amount } ]
+        );
+        ack?.({ success: true });
+      } catch (err) {
+        console.error('[stars:create_invoice]', err.message);
         ack?.({ error: err.message });
       }
     });

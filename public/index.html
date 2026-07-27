@@ -483,7 +483,7 @@
         <div class="modal-box">
             <h2>💰 Пополнение</h2>
             <div id="depositStars">
-                <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px;">Купи ⭐ Telegram Stars для игры</p>
+                <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px;">Выбери сумму для пополнения</p>
                 <div class="modal-btns" style="margin-bottom:10px;">
                     <span class="chip" onclick="buyStars(50)">⭐ 50</span>
                     <span class="chip" onclick="buyStars(150)">⭐ 150</span>
@@ -491,7 +491,7 @@
                     <span class="chip" onclick="buyStars(1500)">⭐ 1,500</span>
                     <span class="chip" onclick="buyStars(5000)">⭐ 5,000</span>
                 </div>
-                <p style="font-size:10px;color:rgba(255,255,255,0.15);text-align:center;">После оплаты Stars зачисляются автоматически</p>
+                <p style="font-size:10px;color:rgba(255,255,255,0.15);text-align:center;">Инвойс придёт в чат с ботом @clashpvpbot — оплати там</p>
                 <div class="modal-error" id="starsError"></div>
             </div>
             <div class="modal-error" id="depositError"></div>
@@ -1513,7 +1513,24 @@ window.buyStars = function(amount) {
     playSound('click');
     closeModal('depositModal');
     const tg = window.Telegram?.WebApp;
-    const confirmPurchase = () => {
+    const requestInvoice = () => {
+        if (!socket?.connected) {
+            showToast('❌ Нет соединения с сервером', 'error');
+            return;
+        }
+        showToast('⏳ Отправляем инвойс в Telegram...', 'info');
+        socket.emit('stars:create_invoice', { amount }, (res) => {
+            if (res?.error) {
+                showToast('❌ ' + res.error, 'error');
+                return;
+            }
+            showToast('✅ Инвойс отправлен! Открой чат с ботом и оплати', 'success');
+        });
+    };
+    if (tg) {
+        requestInvoice();
+    } else {
+        // Dev mode: simulate
         showToast('⏳ Подтверждение на сервере...', 'info');
         if (!socket?.connected) {
             showToast('❌ Нет соединения с сервером', 'error');
@@ -1522,7 +1539,7 @@ window.buyStars = function(amount) {
         const timeout = setTimeout(() => {
             showToast('❌ Сервер не ответил. Попробуй ещё раз', 'error');
         }, 8000);
-        socket.emit('stars:purchase', { amount, method: tg && tg.purchaseStars ? 'telegram' : 'dev' }, (res) => {
+        socket.emit('stars:purchase', { amount, method: 'dev' }, (res) => {
             clearTimeout(timeout);
             if (res?.error) {
                 showToast('❌ Ошибка: ' + res.error, 'error');
@@ -1535,14 +1552,6 @@ window.buyStars = function(amount) {
             addHistory('deposit', amount);
             playSound('win');
         });
-    };
-    if (tg && tg.purchaseStars) {
-        showToast('⭐ Открываю покупку в Telegram...', 'info');
-        tg.purchaseStars(amount).then(confirmPurchase).catch((err) => {
-            showToast('❌ Покупка отменена', 'error');
-        });
-    } else {
-        confirmPurchase();
     }
 };
 window.simulateWithdraw = function() {
