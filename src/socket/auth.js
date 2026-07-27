@@ -94,7 +94,7 @@ export async function verifyConnection(socket, next) {
     socket.data.user = rows[0];
     next();
   } catch (err) {
-    console.error('[socket:auth]', err);
-    next(new Error('Authentication failed'));
+    console.error('[socket:auth] FULL ERROR:', err.message, err.stack?.slice(0, 500));
+    next(new Error('Auth: ' + (err.message || 'unknown')));
   }
 }
