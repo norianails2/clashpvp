@@ -736,8 +736,6 @@ function pvpCreateRoom(gameType) {
     if (!event) return showToast('❌ Неизвестная игра', 'error');
 
     let payload = { betAmount: bet };
-    if (gameType === 'coin') payload.choice = 'heads';
-    if (gameType === 'dice') payload.prediction = 'over';
 
     socket.emit(event, payload, (res) => {
         if (res?.error) { balance += bet; updateBalance(); return showToast('❌ ' + res.error, 'error'); }
@@ -929,10 +927,17 @@ function pvpShowDice(area, r) {
 }
 function pvpDiceRoll() {
     document.getElementById('diceBtn').disabled = true;
-    const box = document.getElementById('diceBox');
-    const f = ['⚀','⚁','⚂','⚃','⚄','⚅']; let t = 0;
-    const ri = setInterval(() => { box.textContent = f[Math.floor(Math.random() * 6)]; t++; if (t > 6) { clearInterval(ri); const v = Math.floor(Math.random() * 6) + 1; box.textContent = f[v - 1]; box.classList.remove('rolling'); document.getElementById('diceStatus').textContent = 'Бросок сделан. Результат на сервере...'; } }, 100);
-    box.classList.add('rolling');
+    document.getElementById('diceStatus').textContent = '⏳ Бросок...';
+    socket?.emit('dice:roll', { roomId: currentRoom?.id }, (res) => {
+        if (res?.error) return showToast('❌ ' + res.error, 'error');
+        const f = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+        document.getElementById('diceBox').textContent = f[res.roll - 1];
+        if (res.gameOver) {
+            document.getElementById('diceStatus').textContent = '🎲 Результат на сервере...';
+        } else {
+            document.getElementById('diceStatus').textContent = '⏳ Ждём бросок соперника...';
+        }
+    });
 }
 
 function pvpShowCoin(area, r) {
@@ -941,6 +946,12 @@ function pvpShowCoin(area, r) {
 function pvpCoinPick(side) {
     document.querySelectorAll('.pvp-coin-btn').forEach(b => b.disabled = true);
     document.getElementById('coinStatus').textContent = '⏳ Ждём соперника...';
+    socket?.emit('coin:pick', { roomId: currentRoom?.id, choice: side === 0 ? 'heads' : 'tails' }, (res) => {
+        if (res?.error) return showToast('❌ ' + res.error, 'error');
+        if (res.gameOver) {
+            document.getElementById('coinStatus').textContent = '🪙 Результат на сервере...';
+        }
+    });
 }
 
 function pvpShowMines(area, r) {

@@ -1,35 +1,15 @@
 import crypto from 'crypto';
 
-export const VALID_PREDICTIONS = ['over', 'under', 'exact'];
-
 const MIN_BET = 1;
 const MAX_BET = 100000;
 
-export function generateRoll() {
-  const die1 = crypto.randomInt(1, 7);
-  const die2 = crypto.randomInt(1, 7);
-  return { dice: [die1, die2], total: die1 + die2 };
+export function rollDie() {
+  return crypto.randomInt(1, 7);
 }
 
-export function isValidPrediction(p) {
-  return VALID_PREDICTIONS.includes(p);
-}
-
-export function getPredictionForTotal(total) {
-  if (total < 7) return 'under';
-  if (total === 7) return 'exact';
-  return 'over';
-}
-
-export function resolveDice(total, pred1, pred2, creatorId, opponentId) {
-  const actual = getPredictionForTotal(total);
-
-  if (actual === pred1 && actual === pred2) {
-    return { winnerId: null, draw: true };
-  }
-  if (actual === pred1) return { winnerId: creatorId, draw: false };
-  if (actual === pred2) return { winnerId: opponentId, draw: false };
-
+export function resolveDice(roll1, roll2, player1Id, player2Id) {
+  if (roll1 > roll2) return { winnerId: player1Id, draw: false };
+  if (roll2 > roll1) return { winnerId: player2Id, draw: false };
   return { winnerId: null, draw: true };
 }
 
