@@ -189,7 +189,7 @@ export function initSocket(httpServer) {
               payload: JSON.stringify({ amount, userId: user.id }),
               provider_token: '',
               currency: 'XTR',
-              prices: JSON.stringify([{ label: `${amount} ⭐ Stars`, amount }]),
+              prices: JSON.stringify([{ label: `${amount} Stars`, amount }]),
             }),
           }
         );
