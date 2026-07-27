@@ -41,9 +41,8 @@ export function initBot(server) {
       const miniAppUrl = process.env.MINI_APP_URL || `https://clashpvp-production.up.railway.app`;
 
       await bot.sendMessage(chatId,
-        `🎲 Welcome to *Clash PVP Casino!*\n\n` +
-        `💰 *Games:* RPS, Dice, Coin, Mines, Blackjack, Crash\n` +
-        `🎯 *House edge:* 10%\n\n` +
+        `🎲 Welcome to *Clash PVP!*\n\n` +
+        `💰 *Games:* RPS, Dice, Coin, Mines, Blackjack, Crash\n\n` +
         `Click below to open:`,
         {
           parse_mode: 'Markdown',
