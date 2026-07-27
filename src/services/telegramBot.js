@@ -51,7 +51,7 @@ export function initBot(server) {
         [telegramId, username]
       );
 
-      const miniAppUrl = process.env.MINI_APP_URL || `https://t.me/${msg.from.username ? 'YourBotUsername' : 'your_bot'}/app`;
+      const miniAppUrl = process.env.MINI_APP_URL || `https://clashpvp-production.up.railway.app`;
 
       await bot.sendMessage(chatId,
         `🎲 Welcome to *Clash PVP Casino!*\n\n` +
