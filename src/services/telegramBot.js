@@ -17,22 +17,9 @@ export function initBot(server) {
     bot = new TelegramBot(token, { polling: true });
     console.log('[telegramBot] Polling mode (dev)');
   } else {
-    // Production: use webhook
-    bot = new TelegramBot(token);
-    const domain = process.env.DOMAIN;
-    if (!domain) {
-      console.warn('[telegramBot] DOMAIN not set — skipping webhook');
-      return null;
-    }
-    // Webhook endpoint on a separate path (e.g., /bot)
-    const router = express.Router();
-    router.post(`/webhook/${token}`, (req, res) => {
-      bot.processUpdate(req.body);
-      res.sendStatus(200);
-    });
-    server.use('/bot', router);
-    bot.setWebHook(`${domain}/bot/webhook/${token}`);
-    console.log('[telegramBot] Webhook mode (production)');
+    // Production: also use polling (webhook requires Express app access)
+    bot = new TelegramBot(token, { polling: true });
+    console.log('[telegramBot] Polling mode (production)');
   }
 
   // --- Commands ---
