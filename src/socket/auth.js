@@ -33,16 +33,19 @@ export async function verifyConnection(socket, next) {
 
     if (!raw) return next(new Error('Missing initData'));
 
-    // Parse with URLSearchParams (auto-decodes URL-encoded values)
-    const sp = new URLSearchParams(raw);
-    const hash = sp.get('hash');
-    if (!hash) return next(new Error('Missing hash'));
+    // Parse manually to preserve URL-encoding (Telegram signs the raw data)
+    const pairs = raw.split('&').map(p => {
+      const eq = p.indexOf('=');
+      return { key: p.slice(0, eq), value: p.slice(eq + 1) };
+    });
 
-    sp.delete('hash');
+    const hashPair = pairs.find(p => p.key === 'hash');
+    if (!hashPair) return next(new Error('Missing hash'));
 
-    const dataCheckString = Array.from(sp.entries())
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([k, v]) => `${k}=${v}`)
+    const dataCheckString = pairs
+      .filter(p => p.key !== 'hash')
+      .sort((a, b) => a.key.localeCompare(b.key))
+      .map(p => `${p.key}=${p.value}`)
       .join('\n');
 
     const secretKey = crypto
@@ -55,12 +58,14 @@ export async function verifyConnection(socket, next) {
       .update(dataCheckString)
       .digest('hex');
 
-    if (computedHash !== hash) {
+    if (computedHash !== hashPair.value) {
       return next(new Error('Invalid initData signature'));
     }
 
-    const userJson = sp.get('user');
-    if (!userJson) return next(new Error('Missing user'));
+    // Decode user data separately
+    const userPair = pairs.find(p => p.key === 'user');
+    if (!userPair) return next(new Error('Missing user'));
+    const userJson = decodeURIComponent(userPair.value);
 
     let tgUser;
     try {
