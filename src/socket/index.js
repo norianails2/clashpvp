@@ -199,11 +199,6 @@ export function initSocket(httpServer) {
         if (!result.ok) {
           throw new Error(result.description);
         }
-        );
-        const result = await response.json();
-        if (!result.ok) {
-          throw new Error(result.description);
-        }
         ack?.({ success: true });
       } catch (err) {
         console.error('[stars:create_invoice]', err.message);
