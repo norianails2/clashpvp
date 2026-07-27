@@ -72,6 +72,21 @@ export function initBot(server) {
     }
   });
 
+  bot.onText(/\/terms/, async (msg) => {
+    const chatId = msg.chat.id;
+    await bot.sendMessage(chatId,
+      `📋 *Terms of Service — Clash PVP*\n\n` +
+      `1. All games use PvP format. The platform takes a 10% commission from each win.\n` +
+      `2. Crash game uses Provably Fair (HMAC-SHA256). You can verify each round.\n` +
+      `3. Only Telegram Stars (XTR) are accepted for deposits. No refunds on spent Stars.\n` +
+      `4. You must be 18+ to use this app. By playing you confirm you are of legal age.\n` +
+      `5. The platform is not responsible for losses. Play responsibly.\n` +
+      `6. We reserve the right to block users who exploit bugs or abuse the system.\n\n` +
+      `_Last updated: July 2026_`,
+      { parse_mode: 'Markdown' }
+    );
+  });
+
   // Handle Telegram Stars payments via invoice
   bot.on('pre_checkout_query', async (query_) => {
     try {
