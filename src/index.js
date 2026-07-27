@@ -20,7 +20,7 @@ async function main() {
   initBot(server);
 
   // Keep Neon database alive (prevent cold starts on free tier)
-  setInterval(() => { query('SELECT 1').catch(() => {}); }, 60000);
+  setInterval(() => { query('SELECT 1').catch(() => {}); }, 15000);
 
   server.listen(config.port, () => {
     console.log(`[server] Clash PVP backend running on port ${config.port}`);
