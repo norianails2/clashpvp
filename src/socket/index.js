@@ -35,6 +35,7 @@ import { registerCrashHandlers, startCrashEngine } from './crashHandler.js';
 import https from 'https';
 import { query } from '../db/pool.js';
 import crashEngine from '../games/crash.js';
+import { getBot } from '../services/telegramBot.js';
 
 let io;
 
@@ -165,10 +166,6 @@ export function initSocket(httpServer) {
       const amount = payload?.amount || 0;
       if (amount <= 0 || !Number.isInteger(amount)) {
         return ack?.({ error: 'Invalid amount' });
-      }
-      const bot = getBot();
-      if (!bot) {
-        return ack?.({ error: 'Bot not available' });
       }
       const telegramId = user.telegram_id;
       if (!telegramId) {
