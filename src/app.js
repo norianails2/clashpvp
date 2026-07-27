@@ -16,10 +16,13 @@ const testHtml = fs.readFileSync(path.join(__dirname, 'test-client.html'), 'utf-
 export function createApp() {
   const app = express();
 
-  // Security headers
+  // Security headers (relaxed for Telegram WebView)
   app.use(helmet({
     contentSecurityPolicy: false,
     crossOriginEmbedderPolicy: false,
+    crossOriginOpenerPolicy: false,
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    originAgentCluster: false,
   }));
 
   // CORS — allow configured origin only in production
