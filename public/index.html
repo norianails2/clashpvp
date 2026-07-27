@@ -1173,10 +1173,26 @@ function crUpdateMult(state) {
 function crUpdateGraph(state) {
     const svg = document.getElementById('crGraphSvg');
     if (!svg) return;
-    const W = 340, H = 200, pad = 12;
+    const W = 340, H = 200, pad = 14;
+
+    // Dark gradient background
+    const bgDefs = '<defs>' +
+        '<linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0" stop-color="#151528"/><stop offset="1" stop-color="#0d0d14"/></linearGradient>' +
+        '<radialGradient id="glowGrad" cx="50%" cy="50%" r="50%">' +
+        '<stop offset="0" stop-color="rgba(251,191,36,0.06)"/><stop offset="1" stop-color="rgba(251,191,36,0)"/></radialGradient>' +
+        '<linearGradient id="fillG" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0" stop-color="var(--lc)" stop-opacity="0.1"/><stop offset="1" stop-color="var(--lc)" stop-opacity="0"/></linearGradient>' +
+        '<linearGradient id="rBody" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0" stop-color="rgba(255,255,255,0.95)"/><stop offset="0.5" stop-color="rgba(255,255,255,0.88)"/><stop offset="1" stop-color="rgba(255,255,255,0.8)"/></linearGradient>' +
+        '<filter id="gGlow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>' +
+        '<filter id="gGlowSoft"><feGaussianBlur stdDeviation="5"/></filter>' +
+        '</defs>';
 
     if (state.phase === 'betting' || state.phase === 'idle') {
-        svg.innerHTML = '<rect x="0" y="0" width="340" height="200" fill="#0d0d14" rx="14"/>';
+        svg.innerHTML = bgDefs +
+            '<rect x="0" y="0" width="340" height="200" fill="url(#bgGrad)" rx="14"/>' +
+            '<ellipse cx="' + (W/2) + '" cy="' + (H/2) + '" rx="' + (W/2.5) + '" ry="' + (H/2.5) + '" fill="url(#glowGrad)"/>';
         return;
     }
 
@@ -1200,31 +1216,29 @@ function crUpdateGraph(state) {
     const [rx, ry] = pts[idx].split(',').map(Number);
     const livePts = pts.slice(0, idx + 1);
 
-    // Dynamic color
     const isCrashed = state.phase === 'crashed';
     const hue = isCrashed ? 0 : (mult < 1.5 ? 142 : mult < 2.5 ? 48 : mult < 5 ? 30 : 0);
-    const lineCol = isCrashed ? '#ef4444' : 'hsl(' + hue + ',80%,' + (60 - Math.min(mult * 3, 20)) + '%)';
-    const fillCol = isCrashed ? 'rgba(239,68,68,' : 'hsla(' + hue + ',90%,50%,';
+    const lineCol = isCrashed ? '#ef4444' : 'hsl(' + hue + ',85%,' + (60 - Math.min(mult * 2, 15)) + '%)';
     const fillD = 'M' + livePts.join(' L') + ' L' + rx.toFixed(1) + ',' + (H - pad) + ' L' + pad + ',' + (H - pad) + ' Z';
 
     // Crash line
     const crashLy = Math.log2(cp);
     const crashY = pad + (H - pad * 2) - (crashLy / maxLog) * (H - pad * 2);
 
-    // Grid lines
+    // Grid lines with labels
     let gridHtml = '';
     const gridMults = [1.5, 2, 3, 5, 10, 25, 50, 100];
     gridMults.forEach(gm => {
         if (gm < maxMult) {
             const gy = pad + (H - pad * 2) - (Math.log2(gm) / maxLog) * (H - pad * 2);
             if (gy > pad + 10 && gy < H - pad - 10) {
-                gridHtml += '<line x1="' + pad + '" y1="' + gy.toFixed(1) + '" x2="' + (W - pad) + '" y2="' + gy.toFixed(1) + '" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>';
-                gridHtml += '<text x="' + (W - pad - 2) + '" y="' + (gy - 4).toFixed(1) + '" text-anchor="end" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.1)">' + gm + 'x</text>';
+                gridHtml += '<line x1="' + pad + '" y1="' + gy.toFixed(1) + '" x2="' + (W - pad) + '" y2="' + gy.toFixed(1) + '" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>';
+                gridHtml += '<text x="' + (W - pad - 2) + '" y="' + (gy - 4).toFixed(1) + '" text-anchor="end" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.12)">' + gm + 'x</text>';
             }
         }
     });
 
-    // Rocket (flying phase only)
+    // Rocket
     let angle = -35;
     if (idx > 2) {
         const p1 = pts[idx - 2].split(',').map(Number);
@@ -1234,49 +1248,46 @@ function crUpdateGraph(state) {
 
     const rocket = isCrashed ? '' :
         '<g transform="translate(' + rx.toFixed(1) + ',' + ry.toFixed(1) + ') rotate(' + angle.toFixed(1) + ')">' +
-        '<ellipse cx="-8" cy="0" rx="7" ry="3.5" fill="none" stroke="rgba(255,180,40,0.12)" stroke-width="5"/>' +
-        '<ellipse cx="-7" cy="0" rx="5" ry="2" fill="rgba(255,220,60,0.25)"/>' +
-        '<ellipse cx="-9" cy="0" rx="4" ry="1.5" fill="rgba(255,140,20,0.4)"/>' +
-        '<ellipse cx="-11" cy="0" rx="2.5" ry="0.8" fill="rgba(255,60,30,0.5)"/>' +
-        '<path d="M-1,-3.5 L4,-8 L4,-3.5 Z" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.18)" stroke-width="0.4"/>' +
-        '<path d="M-1,3.5 L4,8 L4,3.5 Z" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.18)" stroke-width="0.4"/>' +
-        '<rect x="-6" y="-3.5" width="14" height="7" rx="2" fill="url(#rBody)"/>' +
-        '<rect x="-6" y="-3.5" width="14" height="7" rx="2" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="0.4"/>' +
-        '<rect x="-2" y="-3.5" width="3.5" height="7" rx="1.5" fill="rgba(0,0,0,0.06)"/>' +
-        '<path d="M8,-3.5 L14,0 L8,3.5 Z" fill="' + lineCol + '" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>' +
-        '<path d="M8,-1.5 L12,0 L8,1.5 Z" fill="rgba(255,255,255,0.1)"/>' +
-        '<circle cx="0" cy="0" r="1.8" fill="rgba(0,0,0,0.25)" stroke="rgba(255,255,255,0.1)" stroke-width="0.4"/>' +
-        '<circle cx="-0.3" cy="-0.4" r="0.6" fill="rgba(255,255,255,0.4)"/>' +
-        '<path d="M-4,-2.5 L-4,2.5" stroke="rgba(255,255,255,0.06)" stroke-width="0.4"/>' +
+        '<ellipse cx="-7" cy="0" rx="6" ry="3" fill="none" stroke="rgba(255,180,40,0.1)" stroke-width="4"/>' +
+        '<ellipse cx="-6" cy="0" rx="4.5" ry="1.8" fill="rgba(255,220,60,0.2)"/>' +
+        '<ellipse cx="-8" cy="0" rx="3.5" ry="1.2" fill="rgba(255,140,20,0.35)"/>' +
+        '<ellipse cx="-10" cy="0" rx="2" ry="0.7" fill="rgba(255,60,30,0.45)"/>' +
+        '<path d="M-1,-3 L3.5,-7.5 L3.5,-3 Z" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.15)" stroke-width="0.4"/>' +
+        '<path d="M-1,3 L3.5,7.5 L3.5,3 Z" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.15)" stroke-width="0.4"/>' +
+        '<rect x="-5" y="-3" width="13" height="6.5" rx="2" fill="url(#rBody)"/>' +
+        '<rect x="-5" y="-3" width="13" height="6.5" rx="2" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.4"/>' +
+        '<rect x="-1.5" y="-3" width="3" height="6.5" rx="1.5" fill="rgba(0,0,0,0.05)"/>' +
+        '<path d="M7,-3 L13,0 L7,3 Z" fill="' + lineCol + '" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>' +
+        '<path d="M7,-1 L11,0 L7,1 Z" fill="rgba(255,255,255,0.12)"/>' +
+        '<circle cx="0" cy="0" r="1.6" fill="rgba(0,0,0,0.2)" stroke="rgba(255,255,255,0.08)" stroke-width="0.4"/>' +
+        '<circle cx="-0.2" cy="-0.3" r="0.5" fill="rgba(255,255,255,0.35)"/>' +
+        '<path d="M-3.5,-2 L-3.5,2" stroke="rgba(255,255,255,0.05)" stroke-width="0.4"/>' +
         '</g>';
 
-    const dotColor = isCrashed ? '#ef4444' : lineCol;
-    svg.innerHTML =
-        '<defs><linearGradient id="fillG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + lineCol + '" stop-opacity="0.08"/><stop offset="0.5" stop-color="' + lineCol + '" stop-opacity="0.02"/><stop offset="1" stop-color="' + lineCol + '" stop-opacity="0"/></linearGradient>' +
-        '<linearGradient id="rBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgba(255,255,255,0.95)"/><stop offset="0.5" stop-color="rgba(255,255,255,0.88)"/><stop offset="1" stop-color="rgba(255,255,255,0.8)"/></linearGradient>' +
-        '<filter id="gGlow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>' +
-        '<filter id="gGlowSoft"><feGaussianBlur stdDeviation="5"/></filter></defs>' +
-        // Background
-        '<rect x="0" y="0" width="340" height="200" fill="#0d0d14" rx="14"/>' +
-        // Grid
+    svg.innerHTML = bgDefs +
+        // Dark gradient background
+        '<rect x="0" y="0" width="340" height="200" fill="url(#bgGrad)" rx="14"/>' +
+        // Subtle glow in center
+        '<ellipse cx="' + (W/2) + '" cy="' + (H/2) + '" rx="' + (W/2.2) + '" ry="' + (H/2.2) + '" fill="url(#glowGrad)"/>' +
+        // Grid lines
         gridHtml +
         // Fill area
-        '<path d="' + fillD + '" fill="url(#fillG)"/>' +
+        '<path d="' + fillD + '" fill="url(#fillG)" style="--lc:' + lineCol + '"/>' +
         // Dotted projection
-        '<path d="M' + livePts.join(' L') + '" fill="none" stroke="rgba(255,255,255,0.015)" stroke-width="1" stroke-dasharray="3,6"/>' +
+        '<path d="M' + pts.join(' L') + '" fill="none" stroke="rgba(255,255,255,0.02)" stroke-width="1" stroke-dasharray="3,6"/>' +
         // Soft glow under line
-        '<path d="M' + livePts.join(' L') + '" fill="none" stroke="' + lineCol + '" stroke-width="6" stroke-linecap="round" opacity="0.15" filter="url(#gGlowSoft)"/>' +
+        '<path d="M' + livePts.join(' L') + '" fill="none" stroke="' + lineCol + '" stroke-width="6" stroke-linecap="round" opacity="0.12" filter="url(#gGlowSoft)"/>' +
         // Main line
         '<path d="M' + livePts.join(' L') + '" fill="none" stroke="' + lineCol + '" stroke-width="2.5" stroke-linecap="round" filter="url(#gGlow)"/>' +
         // Rocket dot
-        (!isCrashed ? '<circle cx="' + rx.toFixed(1) + '" cy="' + ry.toFixed(1) + '" r="2.5" fill="' + dotColor + '" opacity="0.8"/>' : '') +
-        (!isCrashed ? '<circle cx="' + rx.toFixed(1) + '" cy="' + ry.toFixed(1) + '" r="5" fill="none" stroke="' + dotColor + '" stroke-width="1.5" opacity="0.2"/>' : '') +
+        (!isCrashed ? '<circle cx="' + rx.toFixed(1) + '" cy="' + ry.toFixed(1) + '" r="2.5" fill="' + lineCol + '" opacity="0.9"/>' : '') +
+        (!isCrashed ? '<circle cx="' + rx.toFixed(1) + '" cy="' + ry.toFixed(1) + '" r="5.5" fill="none" stroke="' + lineCol + '" stroke-width="1.5" opacity="0.25"/>' : '') +
         // Crash line
-        (isCrashed ? '<line x1="' + pad + '" y1="' + crashY + '" x2="' + (W - pad) + '" y2="' + crashY + '" stroke="rgba(239,68,68,0.25)" stroke-width="2" stroke-dasharray="6,4"/>' : '') +
-        (isCrashed ? '<text x="' + (W - pad) + '" y="' + (crashY - 6) + '" text-anchor="end" font-family="monospace" font-size="11" font-weight="700" fill="rgba(239,68,68,0.5)">' + cp.toFixed(2) + 'x</text>' : '') +
+        (isCrashed ? '<line x1="' + pad + '" y1="' + crashY + '" x2="' + (W - pad) + '" y2="' + crashY + '" stroke="rgba(239,68,68,0.3)" stroke-width="2" stroke-dasharray="6,4"/>' : '') +
+        (isCrashed ? '<text x="' + (W - pad) + '" y="' + (crashY - 6) + '" text-anchor="end" font-family="monospace" font-size="11" font-weight="700" fill="rgba(239,68,68,0.6)">' + cp.toFixed(2) + 'x</text>' : '') +
         // Axis
-        '<line x1="' + pad + '" y1="' + (H - pad) + '" x2="' + (W - pad) + '" y2="' + (H - pad) + '" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>' +
-        '<text x="' + pad + '" y="' + (H - 4) + '" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.08)">1.00x</text>' +
+        '<line x1="' + pad + '" y1="' + (H - pad) + '" x2="' + (W - pad) + '" y2="' + (H - pad) + '" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>' +
+        '<text x="' + pad + '" y="' + (H - 4) + '" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.1)">1.00x</text>' +
         // Rocket
         rocket;
 }
