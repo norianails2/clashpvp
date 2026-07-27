@@ -1585,7 +1585,7 @@ let isConnected = false;
 
 function connectSocket(initData) {
     if (socket?.connected) return;
-    const opts = { transports: ['polling'], forceNew: true };
+    const opts = { transports: ['websocket', 'polling'], forceNew: true };
     if (initData) opts.query = { initData };
     else opts.query = { testUser: localStorage.getItem('devUser') || 'dev_user_' + Date.now() };
     socket = io(SOCKET_URL, opts);
