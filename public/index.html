@@ -1036,6 +1036,7 @@ function openGame(game) {
     updateBalance();
     const area = document.getElementById('gameArea');
     if (game === 'crash') { renderCrash(area); return; }
+    if (game === 'mines') { renderSoloMines(area); return; }
 
     const titles = { rps:'✊ Камень-Ножницы-Бумага', dice:'🎲 Кости', coin:'🪙 Монетка', mines:'💣 Мины', blackjack:'🃏 Блекджек' };
     document.getElementById('gameTitle').textContent = titles[game] || 'Игра';
@@ -1498,6 +1499,119 @@ window.crVerifyHash = async function(serverSeed, expectedHash, clientSeed, nonce
     }
     window.crShowResult('✅ ХЕШ СЕРВЕРНОГО СИДА ПОДТВЕРЖДЁН', 'rgba(34,197,94,0.15)', '#22c55e');
 };
+
+let _minesGame = null;
+function renderSoloMines(area) {
+    document.getElementById('gameTitle').textContent = '💣 Мины';
+    _minesGame = null;
+    area.innerHTML =
+        '<div class="mines-solo" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;padding:0 16px;">' +
+        '<div class="c-bet-label" style="margin-top:4px;">✦ СТАВКА</div>' +
+        '<div class="c-bet-row"><div class="c-bet-input-wrap"><span class="c-cr-sm">⭐</span>' +
+        '<input type="number" id="minesBetInput" value="10" min="1"><span class="c-usd">★</span></div>' +
+        '<div class="c-bet-adj"><button onclick="minesAdjBet(\'min\')">MIN</button><button onclick="minesAdjBet(\'half\')">½</button><button onclick="minesAdjBet(\'double\')">2×</button><button onclick="minesAdjBet(\'max\')">MAX</button></div></div>' +
+        '<div class="c-auto-row"><span class="c-auto-label">💣 МИНЫ</span>' +
+        '<input class="c-auto-input" id="minesCountInput" type="number" value="3" min="1" max="8" style="width:50px;"></div>' +
+        '<div class="pvp-mines-grid" id="minesGrid" style="margin-top:4px;"></div>' +
+        '<div style="display:flex;gap:8px;align-items:center;min-height:40px;" id="minesActions">' +
+        '<button class="c-main-btn" id="minesStartBtn" onclick="minesStart()">💣 СТАРТ</button>' +
+        '<button class="c-main-btn cashout" id="minesCashoutBtn" onclick="minesCashout()" style="display:none;">◆ ЗАБРАТЬ <span id="minesMult">1.00</span>x</button></div>' +
+        '<div style="font-size:12px;color:rgba(255,255,255,0.4);font-weight:600;min-height:20px;" id="minesStatus">Установи ставку и нажми СТАРТ</div>' +
+        '</div>';
+
+    const g = document.getElementById('minesGrid');
+    for (let i = 0; i < 9; i++) {
+        const c = document.createElement('div'); c.className = 'pvp-mine-cell';
+        c.dataset.idx = i;
+        c.onclick = function() {
+            minesReveal(parseInt(this.dataset.idx));
+        };
+        g.appendChild(c);
+    }
+}
+function minesAdjBet(type) {
+    const inp = document.getElementById('minesBetInput');
+    if (!inp) return;
+    let val = parseInt(inp.value) || 10;
+    const balanceAmt = balance || 0;
+    switch (type) {
+        case 'min': val = 1; break;
+        case 'half': val = Math.max(1, Math.floor(val / 2)); break;
+        case 'double': val = Math.min(balanceAmt, val * 2); break;
+        case 'max': val = Math.max(1, balanceAmt); break;
+    }
+    inp.value = val;
+}
+function minesStart() {
+    const bet = parseInt(document.getElementById('minesBetInput')?.value) || 10;
+    if (bet < 1) return showToast('❌ Минимум 1 ★', 'error');
+    if (bet > balance) return showToast('❌ Недостаточно ★', 'error');
+    const count = parseInt(document.getElementById('minesCountInput')?.value) || 3;
+    document.getElementById('minesStartBtn').disabled = true;
+    document.getElementById('minesStartBtn').textContent = '⏳ СТАРТ...';
+    document.getElementById('minesStatus').textContent = '⏳ Генерация поля...';
+    socket?.emit('mines:start', { betAmount: bet, minesCount: count }, (res) => {
+        if (res?.error) { document.getElementById('minesStartBtn').disabled = false; document.getElementById('minesStartBtn').textContent = '💣 СТАРТ'; return showToast('❌ ' + res.error, 'error'); }
+        _minesGame = { bet };
+        document.getElementById('minesStartBtn').style.display = 'none';
+        document.getElementById('minesStatus').textContent = '💎 Открывай клетки!';
+        document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => c.style.cursor = 'pointer');
+    });
+}
+function minesReveal(idx) {
+    if (!_minesGame) return;
+    const cell = document.querySelector('#minesGrid .pvp-mine-cell[data-idx="' + idx + '"]');
+    if (!cell || cell.classList.length > 1) return;
+    cell.style.cursor = 'default';
+    document.getElementById('minesStatus').textContent = '⏳ Открываем...';
+    socket?.emit('mines:reveal', { cellIndex: idx }, (res) => {
+        if (res?.error) { document.getElementById('minesStatus').textContent = '💎 Открывай клетки!'; return showToast('❌ ' + res.error, 'error'); }
+        if (res.isMine) {
+            cell.classList.add('bomb'); cell.textContent = '💣';
+            document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => c.style.pointerEvents = 'none');
+            document.getElementById('minesStatus').textContent = '💥 Бомба! Ты проиграл';
+            document.getElementById('minesCashoutBtn').style.display = 'none';
+            _minesGame = null;
+            setTimeout(() => {
+                const btn = document.getElementById('minesStartBtn');
+                if (btn) { btn.style.display = ''; btn.disabled = false; btn.textContent = '💣 СТАРТ'; }
+            }, 2000);
+            return;
+        }
+        cell.classList.add('diamond'); cell.textContent = '💎';
+        document.getElementById('minesMult').textContent = res.multiplier.toFixed(2);
+        document.getElementById('minesCashoutBtn').style.display = '';
+        document.getElementById('minesStatus').textContent = '💎 ' + res.safeOpenedCount + ' алмазов • x' + res.multiplier.toFixed(2);
+        if (res.gameOver) {
+            document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => c.style.pointerEvents = 'none');
+            document.getElementById('minesCashoutBtn').style.display = 'none';
+            document.getElementById('minesStatus').textContent = '🏆 Все алмазы! +' + res.payout + ' ⭐';
+            _minesGame = null;
+            setTimeout(() => {
+                const btn = document.getElementById('minesStartBtn');
+                if (btn) { btn.style.display = ''; btn.disabled = false; btn.textContent = '💣 СТАРТ'; }
+            }, 2000);
+        }
+    });
+}
+function minesCashout() {
+    if (!_minesGame) return;
+    document.getElementById('minesCashoutBtn').disabled = true;
+    document.getElementById('minesStatus').textContent = '⏳ Забираем...';
+    socket?.emit('mines:cashout', {}, (res) => {
+        if (res?.error) { document.getElementById('minesCashoutBtn').disabled = false; return showToast('❌ ' + res.error, 'error'); }
+        document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => c.style.pointerEvents = 'none');
+        document.getElementById('minesCashoutBtn').style.display = 'none';
+        document.getElementById('minesStatus').textContent = '✅ ВЫИГРЫШ ' + res.payout + ' ⭐ (x' + res.multiplier.toFixed(2) + ')';
+        _minesGame = null;
+        balance += res.payout;
+        updateBalance();
+        setTimeout(() => {
+            const btn = document.getElementById('minesStartBtn');
+            if (btn) { btn.style.display = ''; btn.disabled = false; btn.textContent = '💣 СТАРТ'; }
+        }, 2000);
+    });
+}
 
 
 
