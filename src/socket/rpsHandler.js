@@ -1,6 +1,7 @@
 import { getRoomById, setGameMove, finishGame } from '../services/roomService.js';
 import { getClient } from '../db/pool.js';
 import { holdBet } from '../services/balanceService.js';
+import { query } from '../db/pool.js';
 import { createRoom } from '../services/roomService.js';
 import { isValidMove, resolve } from '../games/rps.js';
 import { broadcastLobbyUpdate } from './lobbyHandler.js';
@@ -109,6 +110,14 @@ export function registerRPSHandlers(io, socket) {
         const finished = await finishGame(roomId, winnerId, {
           moves: { [room.creator_id]: move1, [room.opponent_id]: move2 }, draw,
         }, draw);
+
+        // Send updated balance to winner
+        if (winnerId) {
+          const { rows } = await query(`SELECT balance FROM users WHERE id = $1`, [winnerId]);
+          if (rows.length > 0) {
+            io.to(`user:${winnerId}`).emit('balance:update', { balance: Number(rows[0].balance) });
+          }
+        }
 
         io.to(`room:${roomId}`).emit('rps:game_over', {
           moves: { [room.creator_id]: move1, [room.opponent_id]: move2 },
