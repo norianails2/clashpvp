@@ -459,12 +459,12 @@
 
         <div class="section-title">🎮 Все игры <span style="margin-left:auto;font-size:11px;color:rgba(255,255,255,0.25);font-family:'Nunito',sans-serif;font-weight:700;letter-spacing:1px;">6 ИГР</span></div>
 
-        <div class="game-card c1" onclick="openGame('rps')"><div class="glow"></div><div class="game-icon">✊</div><div class="game-info"><div class="name">Камень-Ножницы-Бумага</div><div class="sub">Дуэль на ставки</div></div><span class="game-arrow">›</span></div>
-        <div class="game-card c2" onclick="openGame('dice')"><div class="glow"></div><div class="game-icon">🎲</div><div class="game-info"><div class="name">Кости</div><div class="sub">Больше/меньше/ровно</div></div><span class="game-arrow">›</span></div>
-        <div class="game-card c3" onclick="openGame('coin')"><div class="glow"></div><div class="game-icon">🪙</div><div class="game-info"><div class="name">Монетка</div><div class="sub">Орёл или Решка</div></div><span class="game-arrow">›</span></div>
-        <div class="game-card c4" onclick="openGame('mines')"><div class="glow"></div><div class="game-icon">💣</div><div class="game-info"><div class="name">Мины</div><div class="sub">Найди алмазы, избегай бомб</div></div><div class="game-badge new">🔥 НОВОЕ</div><span class="game-arrow">›</span></div>
-        <div class="game-card c5" onclick="openGame('blackjack')"><div class="glow"></div><div class="game-icon">🃏</div><div class="game-info"><div class="name">Блекджек</div><div class="sub">Собери 21</div></div><span class="game-arrow">›</span></div>
-        <div class="game-card c6" onclick="openGame('crash')"><div class="glow"></div><div class="game-icon">🚀</div><div class="game-info"><div class="name">Ракетка</div><div class="sub">Забери до взрыва</div></div><div class="game-badge updated">⚡ ОБНОВЛЕНО</div><span class="game-arrow">›</span></div>
+        <div class="game-card c1" data-game="rps"><div class="glow"></div><div class="game-icon">✊</div><div class="game-info"><div class="name">Камень-Ножницы-Бумага</div><div class="sub">Дуэль на ставки</div></div><span class="game-arrow">›</span></div>
+        <div class="game-card c2" data-game="dice"><div class="glow"></div><div class="game-icon">🎲</div><div class="game-info"><div class="name">Кости</div><div class="sub">Больше/меньше/ровно</div></div><span class="game-arrow">›</span></div>
+        <div class="game-card c3" data-game="coin"><div class="glow"></div><div class="game-icon">🪙</div><div class="game-info"><div class="name">Монетка</div><div class="sub">Орёл или Решка</div></div><span class="game-arrow">›</span></div>
+        <div class="game-card c4" data-game="mines"><div class="glow"></div><div class="game-icon">💣</div><div class="game-info"><div class="name">Мины</div><div class="sub">Найди алмазы, избегай бомб</div></div><div class="game-badge new">🔥 НОВОЕ</div><span class="game-arrow">›</span></div>
+        <div class="game-card c5" data-game="blackjack"><div class="glow"></div><div class="game-icon">🃏</div><div class="game-info"><div class="name">Блекджек</div><div class="sub">Собери 21</div></div><span class="game-arrow">›</span></div>
+        <div class="game-card c6" data-game="crash"><div class="glow"></div><div class="game-icon">🚀</div><div class="game-info"><div class="name">Ракетка</div><div class="sub">Забери до взрыва</div></div><div class="game-badge updated">⚡ ОБНОВЛЕНО</div><span class="game-arrow">›</span></div>
     </div>
 
     <div class="modal-overlay" id="authModal">
@@ -1906,6 +1906,13 @@ window.addEventListener('unhandledrejection', function(e) {
 document.addEventListener('DOMContentLoaded', function() {
     const el = document.getElementById('errDisplay');
     if (el) el.style.display = 'none';
+    // Wire game cards (avoid inline onclick issues in some environments)
+    document.querySelectorAll('.game-card[data-game]').forEach(card => {
+        card.addEventListener('click', function() {
+            const game = this.dataset.game;
+            if (typeof openGame === 'function') openGame(game);
+        });
+    });
 });
 
 // === SOCKET.IO CONNECTION ===
