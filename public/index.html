@@ -1252,12 +1252,20 @@ function crUpdateGraph(state) {
         }
     });
 
-    // Rocket (flying phase) - clean modern design
+    // Rocket angle - more accurate using larger segment
     let angle = -35;
-    if (idx > 2) {
-        const p1 = pts[idx - 2].split(',').map(Number);
-        const p2 = pts[Math.min(idx + 2, steps)].split(',').map(Number);
-        angle = Math.atan2(-(p2[1] - p1[1]), p2[0] - p1[0]) * 180 / Math.PI;
+    if (idx > 5) {
+        const back = Math.max(idx - 5, 1);
+        const fwd = Math.min(idx + 2, steps);
+        const p1 = pts[back].split(',').map(Number);
+        const p2 = pts[fwd].split(',').map(Number);
+        const dx = p2[0] - p1[0];
+        const dy = p2[1] - p1[1];
+        angle = Math.atan2(dy, dx) * 180 / Math.PI;
+        // Clamp to reasonable range
+        angle = Math.max(-45, Math.min(45, angle));
+    } else {
+        angle = -35;
     }
 
     const rocket = isCrashed ? '' :
