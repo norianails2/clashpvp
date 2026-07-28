@@ -1813,6 +1813,7 @@ function updateBJHands(res) {
     if (dealerScore) dealerScore.textContent = res.dealerScore ?? '?';
 }
 
+window.addDevStars = function(amount) {
     playSound('click');
     socket.emit('balance:add', { amount }, (res) => {
         if (res?.error) return showToast('❌ ' + res.error, 'error');
