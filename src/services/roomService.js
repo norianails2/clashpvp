@@ -72,7 +72,13 @@ export async function createRoom(userId, gameType, betAmount, gameData = null) {
   try {
     await client.query('BEGIN');
 
-    // Auto-cancel any existing waiting rooms for this user
+    // Auto-cancel any existing waiting rooms for this user and refund bets
+    await client.query(
+      `UPDATE users u SET balance = balance + r.bet_amount
+       FROM rooms r
+       WHERE r.creator_id = $1 AND r.status = 'WAITING' AND u.id = r.creator_id`,
+      [userId]
+    );
     await client.query(
       `UPDATE rooms SET status = 'CANCELLED' WHERE creator_id = $1 AND status = 'WAITING'`,
       [userId]
