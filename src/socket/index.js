@@ -31,6 +31,7 @@ import { registerDiceHandlers } from './diceHandler.js';
 import { registerCoinHandlers } from './coinHandler.js';
 import { registerMinesHandlers } from './minesHandler.js';
 import { registerBlackjackHandlers } from './blackjackHandler.js';
+import { registerSoloBlackjackHandlers } from './soloBlackjackHandler.js';
 import { registerCrashHandlers, startCrashEngine } from './crashHandler.js';
 import https from 'https';
 import { query } from '../db/pool.js';
@@ -108,6 +109,7 @@ export function initSocket(httpServer) {
     registerCoinHandlers(io, socket);
     registerMinesHandlers(io, socket);
     registerBlackjackHandlers(io, socket);
+    registerSoloBlackjackHandlers(io, socket);
     registerCrashHandlers(io, socket);
 
     // Add balance (dev & test)

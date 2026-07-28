@@ -243,6 +243,15 @@
         .pvp-bj-btn:active { transform:scale(0.95); }
         .pvp-bj-btn.hit { background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.12); }
         .pvp-bj-btn.stand { background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1a0a2e;box-shadow:0 4px 15px rgba(251,191,36,0.2); }
+        .bj-solo-table { width:100%;background:rgba(0,0,0,0.2);border-radius:16px;padding:12px 16px;border:1px solid rgba(255,255,255,0.05); }
+        .bj-row { display:flex;flex-direction:column;gap:4px;padding:4px 0; }
+        .bj-label { font-size:9px;color:rgba(255,255,255,0.3);font-weight:700;text-transform:uppercase;letter-spacing:1px; }
+        .bj-score { font-family:'Fredoka',sans-serif;font-size:18px;font-weight:700;color:#fbbf24; }
+        .bj-hand { display:flex;gap:6px;flex-wrap:wrap;min-height:40px; }
+        .bj-hand .bjc { width:36px;height:50px;border-radius:8px;background:linear-gradient(180deg,#fff,#f5f5f5);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#1a0a2e;border:1px solid #ddd;animation:dealCard 0.3s ease backwards;box-shadow:0 2px 8px rgba(0,0,0,0.15); }
+        .bj-hand .bjc.red { color:#ef4444; }
+        .bj-hand .bjc.hidden { background:linear-gradient(145deg,#6c5ce7,#a29bfe);color:#fff;border-color:#6c5ce7;font-size:20px; }
+        .bj-hand .bjc.hidden::after { content:'?'; }
         .pvp-bj-btn:disabled { opacity:0.25;cursor:not-allowed;transform:none!important;box-shadow:none!important; }
 
 
@@ -1037,6 +1046,7 @@ function openGame(game) {
     const area = document.getElementById('gameArea');
     if (game === 'crash') { renderCrash(area); return; }
     if (game === 'mines') { renderSoloMines(area); return; }
+    if (game === 'blackjack') { renderSoloBJ(area); return; }
 
     const titles = { rps:'✊ Камень-Ножницы-Бумага', dice:'🎲 Кости', coin:'🪙 Монетка', mines:'💣 Мины', blackjack:'🃏 Блекджек' };
     document.getElementById('gameTitle').textContent = titles[game] || 'Игра';
@@ -1692,9 +1702,117 @@ function minesCashout() {
 
 
 
-</script>
-<script>
-window.addDevStars = function(amount) {
+
+// Solo Blackjack
+function renderSoloBJ(area) {
+    document.getElementById('gameTitle').textContent = '🃏 Блекджек';
+    area.innerHTML =
+        '<div class="bj-solo" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;padding:0 16px;">' +
+        '<div class="bj-solo-table" style="width:100%;">' +
+        '<div class="bj-row"><div class="bj-label">Дилер</div><div class="bj-score" id="bjDealerScore">?</div><div class="bj-hand" id="bjDealerHand"></div></div>' +
+        '<div style="height:4px;border-top:1px solid rgba(255,255,255,0.06);margin:6px 0;"></div>' +
+        '<div class="bj-row"><div class="bj-label">Ты</div><div class="bj-score" id="bjPlayerScore">0</div><div class="bj-hand" id="bjPlayerHand"></div></div>' +
+        '</div>' +
+        '<div class="c-bet-label" style="margin-top:4px;">✦ СТАВКА</div>' +
+        '<div class="c-bet-row"><div class="c-bet-input-wrap"><span class="c-cr-sm">⭐</span>' +
+        '<input type="number" id="bjBetInput" value="10" min="1"><span class="c-usd">★</span></div>' +
+        '<div class="c-bet-adj"><button onclick="bjAdjBet(\'min\')">MIN</button><button onclick="bjAdjBet(\'half\')">½</button><button onclick="bjAdjBet(\'double\')">2×</button><button onclick="bjAdjBet(\'max\')">MAX</button></div></div>' +
+        '<div style="display:flex;gap:8px;align-items:center;min-height:40px;" id="bjActions">' +
+        '<button class="c-main-btn" id="bjStartBtn" onclick="bjStart()">🃏 СТАРТ</button>' +
+        '<button class="pvp-bj-btn hit" id="bjHitBtn" onclick="bjHit()" style="display:none;">➕ Ещё</button>' +
+        '<button class="pvp-bj-btn stand" id="bjStandBtn" onclick="bjStand()" style="display:none;">✋ Хватит</button></div>' +
+        '<div style="font-size:12px;color:rgba(255,255,255,0.4);font-weight:600;min-height:20px;" id="bjStatus">Установи ставку и нажми СТАРТ</div>' +
+        '</div>';
+}
+function bjAdjBet(type) {
+    const inp = document.getElementById('bjBetInput');
+    if (!inp) return;
+    let val = parseInt(inp.value) || 10;
+    switch (type) {
+        case 'min': val = 1; break;
+        case 'half': val = Math.max(1, Math.floor(val / 2)); break;
+        case 'double': val = Math.min(balance || 0, val * 2); break;
+        case 'max': val = Math.max(1, balance || 0); break;
+    }
+    inp.value = val;
+}
+function bjStart() {
+    const bet = parseInt(document.getElementById('bjBetInput')?.value) || 10;
+    if (bet < 1) return showToast('❌ Минимум 1 ★', 'error');
+    if (bet > balance) return showToast('❌ Недостаточно ★', 'error');
+    document.getElementById('bjStartBtn').disabled = true;
+    document.getElementById('bjStartBtn').textContent = '⏳...';
+    document.getElementById('bjStatus').textContent = '⏳ Раздача...';
+    socket?.emit('bj:start', { betAmount: bet }, (res) => {
+        if (res?.error) { document.getElementById('bjStartBtn').disabled = false; document.getElementById('bjStartBtn').textContent = '🃏 СТАРТ'; return showToast('❌ ' + res.error, 'error'); }
+        document.getElementById('bjStartBtn').style.display = 'none';
+        document.getElementById('bjHitBtn').style.display = '';
+        document.getElementById('bjStandBtn').style.display = '';
+        document.getElementById('bjStatus').textContent = 'Твой ход';
+        updateBJHands(res);
+        if (res.gameOver) {
+            bjGameOver(res);
+        }
+    });
+}
+function bjHit() {
+    document.getElementById('bjHitBtn').disabled = true;
+    document.getElementById('bjStatus').textContent = '⏳...';
+    socket?.emit('bj:hit', {}, (res) => {
+        if (res?.error) { document.getElementById('bjHitBtn').disabled = false; return showToast('❌ ' + res.error, 'error'); }
+        updateBJHands(res);
+        if (res.gameOver) {
+            bjGameOver(res);
+        } else {
+            document.getElementById('bjHitBtn').disabled = false;
+            document.getElementById('bjStatus').textContent = 'Твой ход';
+        }
+    });
+}
+function bjStand() {
+    document.getElementById('bjHitBtn').style.display = 'none';
+    document.getElementById('bjStandBtn').style.display = 'none';
+    document.getElementById('bjStatus').textContent = '⏳ Ход дилера...';
+    socket?.emit('bj:stand', {}, (res) => {
+        if (res?.error) return showToast('❌ ' + res.error, 'error');
+        updateBJHands(res);
+        bjGameOver(res);
+    });
+}
+function bjGameOver(res) {
+    document.getElementById('bjHitBtn').style.display = 'none';
+    document.getElementById('bjStandBtn').style.display = 'none';
+    if (res.draw) {
+        document.getElementById('bjStatus').textContent = '🤝 Ничья!';
+    } else if (res.winnerId === 'dealer') {
+        document.getElementById('bjStatus').textContent = '💥 Проигрыш!';
+    } else {
+        document.getElementById('bjStatus').textContent = '🏆 Победа! +' + (res.payout || 0) + ' ⭐';
+        if (res.payout) { balance += res.payout; updateBalance(); }
+    }
+    setTimeout(() => {
+        document.getElementById('bjStartBtn').style.display = ''; document.getElementById('bjStartBtn').disabled = false; document.getElementById('bjStartBtn').textContent = '🃏 СТАРТ';
+    }, 2000);
+}
+function updateBJHands(res) {
+    const playerHand = document.getElementById('bjPlayerHand');
+    const dealerHand = document.getElementById('bjDealerHand');
+    const playerScore = document.getElementById('bjPlayerScore');
+    const dealerScore = document.getElementById('bjDealerScore');
+    if (playerHand && res.playerCards) {
+        playerHand.innerHTML = res.playerCards.map(c => '<div class="bjc' + (c[0] === '1' || ['J','Q','K','A'].includes(c[0]) ? ' red' : '') + '">' + c.slice(0,-1) + c.slice(-1).replace('h','♥').replace('d','♦').replace('c','♣').replace('s','♠') + '</div>').join('');
+    }
+    if (dealerHand) {
+        if (res.dealerCards) {
+            dealerHand.innerHTML = res.dealerCards.map(c => '<div class="bjc' + (c[0] === '1' || ['J','Q','K','A'].includes(c[0]) ? ' red' : '') + '">' + c.slice(0,-1) + c.slice(-1).replace('h','♥').replace('d','♦').replace('c','♣').replace('s','♠') + '</div>').join('');
+        } else if (res.dealerCard) {
+            dealerHand.innerHTML = '<div class="bjc' + (res.dealerCard[0] === '1' || ['J','Q','K','A'].includes(res.dealerCard[0]) ? ' red' : '') + '">' + res.dealerCard.slice(0,-1) + res.dealerCard.slice(-1).replace('h','♥').replace('d','♦').replace('c','♣').replace('s','♠') + '</div><div class="bjc hidden">?</div>';
+        }
+    }
+    if (playerScore) playerScore.textContent = res.playerScore ?? res.score ?? 0;
+    if (dealerScore) dealerScore.textContent = res.dealerScore ?? '?';
+}
+
     playSound('click');
     socket.emit('balance:add', { amount }, (res) => {
         if (res?.error) return showToast('❌ ' + res.error, 'error');
