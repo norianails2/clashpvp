@@ -640,7 +640,8 @@ function vibrate(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } cat
 function updateBalance() {
     const amt = balance;
     document.getElementById('balanceAmount').textContent = amt.toFixed(0);
-    document.getElementById('balance').textContent = amt.toFixed(0) + ' <i class="tg-s">★</i>';
+    const bl = document.getElementById('balance');
+    if (bl) bl.innerHTML = amt.toFixed(0) + ' <i class="tg-s">★</i>';
     document.getElementById('balanceCurrency').textContent = 'Stars';
 }
 
@@ -680,7 +681,7 @@ function showHistory() {
     closeModal('depositModal'); closeModal('withdrawModal'); document.getElementById('historyModal').classList.add('show');
 }
 function showToast(msg, type) {
-    const t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast';
+    const t = document.getElementById('toast'); t.innerHTML = msg; t.className = 'toast';
     if (type) t.classList.add(type); void t.offsetWidth; t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2200);
 }
@@ -1888,8 +1889,8 @@ window.buyStars = function(amount) {
 window.withdrawStars = function() {
     const amt = parseInt(document.getElementById('withdrawAmount').value) || 0, err = document.getElementById('withdrawError');
     if (amt <= 0) { err.textContent = '⚠️ Введи сумму больше 0'; err.classList.add('show'); return; }
-    if (amt > balance) { err.textContent = '❌ Недостаточно. Доступно: ' + balance.toFixed(0) + ' <i class="tg-s">★</i>'; err.classList.add('show'); return; }
-    if (amt < 1) { err.textContent = '⚠️ Минимум 1 <i class="tg-s">★</i>'; err.classList.add('show'); return; }
+    if (amt > balance) { err.innerHTML = '❌ Недостаточно. Доступно: ' + balance.toFixed(0) + ' <i class="tg-s">★</i>'; err.classList.add('show'); return; }
+    if (amt < 1) { err.innerHTML = '⚠️ Минимум 1 <i class="tg-s">★</i>'; err.classList.add('show'); return; }
     err.classList.remove('show');
     if (!socket?.connected) { showToast('❌ Нет соединения', 'error'); return; }
     const tg = window.Telegram?.WebApp;
