@@ -444,7 +444,7 @@
             <div class="balance-left">
                 <div class="label" id="balanceLabel">Баланс</div>
                 <div class="balance-row">
-                    <span style="font-size:22px;line-height:1;margin-right:2px;">⭐</span>
+                    <span style="font-size:22px;line-height:1;margin-right:2px;">🌟</span>
                     <span class="amount" id="balanceAmount">0</span>
                     <span class="currency" id="balanceCurrency">Stars</span>
                 </div>
@@ -495,11 +495,11 @@
             <div id="depositStars">
                 <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px;">Выбери сумму для пополнения</p>
                 <div class="modal-btns" style="margin-bottom:10px;">
-                    <span class="chip" onclick="buyStars(50)">⭐ 50</span>
-                    <span class="chip" onclick="buyStars(150)">⭐ 150</span>
-                    <span class="chip" onclick="buyStars(500)">⭐ 500</span>
-                    <span class="chip" onclick="buyStars(1500)">⭐ 1,500</span>
-                    <span class="chip" onclick="buyStars(5000)">⭐ 5,000</span>
+                    <span class="chip" onclick="buyStars(50)">🌟 50</span>
+                    <span class="chip" onclick="buyStars(150)">🌟 150</span>
+                    <span class="chip" onclick="buyStars(500)">🌟 500</span>
+                    <span class="chip" onclick="buyStars(1500)">🌟 1,500</span>
+                    <span class="chip" onclick="buyStars(5000)">🌟 5,000</span>
                 </div>
                 <p style="font-size:10px;color:rgba(255,255,255,0.15);text-align:center;">Оплата через Telegram Stars внутри приложения</p>
                 <div class="modal-error" id="starsError"></div>
@@ -514,12 +514,12 @@
         <div class="modal-box">
             <h2>💸 Вывод</h2>
             <div id="withdrawStars">
-                <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px;">Списание ⭐ Stars</p>
+                <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px;">Списание 🌟 Stars</p>
                 <div style="display:flex;justify-content:space-between;font-size:12px;margin:8px 0;padding:6px 8px;background:rgba(255,255,255,0.03);border-radius:8px;">
-                    <span style="color:rgba(255,255,255,0.3);">⭐ Твои Звёзды:</span>
-                    <span style="color:#22c55e;font-weight:700;" id="wdStarsBalance">0 ⭐</span>
+                    <span style="color:rgba(255,255,255,0.3);">🌟 Твои Звёзды:</span>
+                    <span style="color:#22c55e;font-weight:700;" id="wdStarsBalance">0 🌟</span>
                 </div>
-                <input class="modal-input" type="number" id="withdrawAmount" value="10" placeholder="Сумма в ⭐" min="1">
+                <input class="modal-input" type="number" id="withdrawAmount" value="10" placeholder="Сумма в 🌟" min="1">
                 <div class="modal-error" id="withdrawError"></div>
                 <button class="modal-confirm wd" onclick="withdrawStars()">💸 Вывести</button>
             </div>
@@ -550,7 +550,7 @@
         <div class="game-header">
             <span class="back" onclick="closeGame()">←</span>
             <h2 id="gameTitle">Игра</h2>
-            <span class="balance" id="balance">0 ⭐</span>
+            <span class="balance" id="balance">0 🌟</span>
             <span class="rules-btn" onclick="showRules()">📖</span>
         </div>
         <div class="game-area" id="gameArea"></div>
@@ -639,7 +639,7 @@ function vibrate(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } cat
 function updateBalance() {
     const amt = balance;
     document.getElementById('balanceAmount').textContent = amt.toFixed(0);
-    document.getElementById('balance').textContent = amt.toFixed(0) + ' ⭐';
+    document.getElementById('balance').textContent = amt.toFixed(0) + ' 🌟';
     document.getElementById('balanceCurrency').textContent = 'Stars';
 }
 
@@ -656,7 +656,7 @@ function spawnParticles(parent, count, color) {
 }
 function showBalFlash(parent, amount, isPlus) {
     const el = document.createElement('div'); el.className = 'bal-flash ' + (isPlus ? 'plus' : 'minus');
-    el.textContent = (isPlus ? '+' : '') + amount + ' ⭐'; parent.style.position = 'relative'; parent.appendChild(el);
+    el.textContent = (isPlus ? '+' : '') + amount + ' 🌟'; parent.style.position = 'relative'; parent.appendChild(el);
     setTimeout(() => el.remove(), 1000);
 }
 
@@ -664,7 +664,7 @@ function openModal(id) { document.getElementById(id).classList.add('show'); cons
 function closeModal(id) { document.getElementById(id).classList.remove('show'); const e = document.querySelector('#' + id + ' .modal-error'); if (e) e.classList.remove('show'); }
 function addHistory(type, amount) {
     const icons = {deposit:'💰',withdraw:'💸',game:'🎮',win:'🏆',lose:'💔',draw:'🤝'}, titles = {deposit:'Пополнение',withdraw:'Вывод',game:'Ставка',win:'Выигрыш',lose:'Проигрыш',draw:'Ничья'};
-    transactions.unshift({icon:icons[type]||'💫',title:titles[type]||'Операция',amount:amount,currency:'⭐',date:new Date().toLocaleString('ru-RU',{hour:'2-digit',minute:'2-digit'})});
+    transactions.unshift({icon:icons[type]||'💫',title:titles[type]||'Операция',amount:amount,currency:'🌟',date:new Date().toLocaleString('ru-RU',{hour:'2-digit',minute:'2-digit'})});
     if (transactions.length > 20) transactions.pop();
 }
 
@@ -674,7 +674,7 @@ function showHistory() {
     else list.innerHTML = transactions.map(t => {
         const cls = t.amount > 0 ? 'green' : (t.amount < 0 ? 'red' : 'gold');
         const sign = t.amount > 0 ? '+' : '';
-        return '<div class="history-item"><span class="h-icon">' + t.icon + '</span><div class="h-info"><div class="h-title">' + t.title + '</div><div class="h-date">' + t.date + '</div></div><span class="h-amount ' + cls + '">' + sign + t.amount + ' ⭐</span></div>';
+        return '<div class="history-item"><span class="h-icon">' + t.icon + '</span><div class="h-info"><div class="h-title">' + t.title + '</div><div class="h-date">' + t.date + '</div></div><span class="h-amount ' + cls + '">' + sign + t.amount + ' 🌟</span></div>';
     }).join('');
     closeModal('depositModal'); closeModal('withdrawModal'); document.getElementById('historyModal').classList.add('show');
 }
@@ -731,8 +731,8 @@ function pvpAdjBet(type) {
 
 function pvpCreateRoom(gameType) {
     const bet = parseInt(document.getElementById('pvpCreateBet').value);
-    if (isNaN(bet) || bet < MIN_BET) return showToast('⚠️ Минимум ' + MIN_BET + ' ⭐', 'warn');
-    if (bet > balance) return showToast('❌ Недостаточно ⭐', 'error');
+    if (isNaN(bet) || bet < MIN_BET) return showToast('⚠️ Минимум ' + MIN_BET + ' 🌟', 'warn');
+    if (bet > balance) return showToast('❌ Недостаточно 🌟', 'error');
     if (!socket?.connected) return showToast('❌ Нет соединения с сервером', 'error');
 
     balance -= bet;
@@ -838,12 +838,12 @@ function renderLobby() {
     const meId = myUserId;
     let myRoomHtml = '';
     if (currentRoom && currentRoom.status === 'waiting') {
-        myRoomHtml = '<div class="pvp-room" style="border-color:rgba(251,191,36,0.3);background:rgba(251,191,36,0.05);"><span class="pv-avatar searching-pulse">😎</span><div class="pv-info"><div class="pv-name" style="color:#fbbf24;">Твоя комната</div><div class="pv-desc">⏳ Ждём соперника <span class="searching-dots"><span></span><span></span><span></span></span></div></div><div class="pv-bet-block"><span class="pv-bet">' + currentRoom.bet_amount + '</span><span class="pv-coin">⭐</span></div><button class="pvp-join cancel" onclick="pvpCancelRoom()">✕</button></div>';
+        myRoomHtml = '<div class="pvp-room" style="border-color:rgba(251,191,36,0.3);background:rgba(251,191,36,0.05);"><span class="pv-avatar searching-pulse">😎</span><div class="pv-info"><div class="pv-name" style="color:#fbbf24;">Твоя комната</div><div class="pv-desc">⏳ Ждём соперника <span class="searching-dots"><span></span><span></span><span></span></span></div></div><div class="pv-bet-block"><span class="pv-bet">' + currentRoom.bet_amount + '</span><span class="pv-coin">🌟</span></div><button class="pvp-join cancel" onclick="pvpCancelRoom()">✕</button></div>';
     }
     let list = rooms.filter(r => r.creator_id !== meId);
     if (!list.length && !myRoomHtml) list = [{ id:'_none', creator_avatar:'🕐', creator_name:'Нет активных комнат', bet:'' }];
-    let html = '<div class="pvp-title"><span class="live"></span> Комнаты <span style="color:rgba(255,255,255,0.2);font-weight:400;text-transform:none;letter-spacing:0;">— играй на ⭐</span></div>';
-    html += '<div class="pvp-create"><div class="pvc-label">✦ СТАВКА</div><div class="pvc-row"><div class="pvc-input-wrap"><span class="pvc-star">⭐</span><input type="number" id="pvpCreateBet" value="' + MIN_BET + '" min="' + MIN_BET + '"><span class="pvc-currency">★</span></div><div class="pvc-adj"><button onclick="pvpAdjBet(\'min\')">MIN</button><button onclick="pvpAdjBet(\'half\')">½</button><button onclick="pvpAdjBet(\'double\')">2×</button><button onclick="pvpAdjBet(\'max\')">MAX</button></div></div><button class="pvp-create-btn" onclick="pvpCreateRoom(\'' + (currentGameId||'rps') + '\')">✦ СОЗДАТЬ КОМНАТУ</button></div>';
+    let html = '<div class="pvp-title"><span class="live"></span> Комнаты <span style="color:rgba(255,255,255,0.2);font-weight:400;text-transform:none;letter-spacing:0;">— играй на 🌟</span></div>';
+    html += '<div class="pvp-create"><div class="pvc-label">✦ СТАВКА</div><div class="pvc-row"><div class="pvc-input-wrap"><span class="pvc-star">🌟</span><input type="number" id="pvpCreateBet" value="' + MIN_BET + '" min="' + MIN_BET + '"><span class="pvc-currency">★</span></div><div class="pvc-adj"><button onclick="pvpAdjBet(\'min\')">MIN</button><button onclick="pvpAdjBet(\'half\')">½</button><button onclick="pvpAdjBet(\'double\')">2×</button><button onclick="pvpAdjBet(\'max\')">MAX</button></div></div><button class="pvp-create-btn" onclick="pvpCreateRoom(\'' + (currentGameId||'rps') + '\')">✦ СОЗДАТЬ КОМНАТУ</button></div>';
     html += '<div class="pvp-list-wrap">';
     html += myRoomHtml;
     html += '<div class="pvp-list">';
@@ -851,7 +851,7 @@ function renderLobby() {
         if (r.id === '_none') html += '<div style="text-align:center;padding:16px 0;font-size:13px;color:rgba(255,255,255,0.15);">🕐 Нет активных комнат</div>';
         else {
             const isOwn = r.creator_id === meId;
-            html += '<div class="pvp-room"><span class="pv-avatar">' + (r.creator_photo ? '<img class="pv-avatar-img" src="' + r.creator_photo + '">' : '😎') + '</span><div class="pv-info"><div class="pv-name">' + (r.creator_name || 'Player') + '</div></div><div class="pv-bet-block"><span class="pv-bet">' + r.bet + '</span><span class="pv-coin">⭐</span></div>' + (isOwn ? '<span class="pv-waiting">⏳</span>' : '<button class="pvp-join" onclick="pvpJoinRoom(\'' + r.id + '\')">⚔️</button>') + '</div>';
+            html += '<div class="pvp-room"><span class="pv-avatar">' + (r.creator_photo ? '<img class="pv-avatar-img" src="' + r.creator_photo + '">' : '😎') + '</span><div class="pv-info"><div class="pv-name">' + (r.creator_name || 'Player') + '</div></div><div class="pv-bet-block"><span class="pv-bet">' + r.bet + '</span><span class="pv-coin">🌟</span></div>' + (isOwn ? '<span class="pv-waiting">⏳</span>' : '<button class="pvp-join" onclick="pvpJoinRoom(\'' + r.id + '\')">⚔️</button>') + '</div>';
         }
     });
     html += '</div></div>';
@@ -1106,7 +1106,7 @@ function renderCrash(area) {
       '<button class="cf-verify-btn" onclick="crRunVerification()">🔍 ПРОВЕРИТЬ HMAC</button>' +
       '<div class="cf-result" id="cfResult"></div></div></div>' +
       '<div class="crash-bet-panel"><div class="c-bet-label">✦ НА СЛЕД. РАУНД</div>' +
-      '<div class="c-bet-row"><div class="c-bet-input-wrap"><span class="c-cr-sm">⭐</span>' +
+      '<div class="c-bet-row"><div class="c-bet-input-wrap"><span class="c-cr-sm">🌟</span>' +
       '<input type="number" id="crBetInput" value="10" min="1"><span class="c-usd">★</span></div>' +
       '<div class="c-bet-adj"><button onclick="crAdjBet(\'min\')">MIN</button><button onclick="crAdjBet(\'half\')">½</button><button onclick="crAdjBet(\'double\')">2×</button><button onclick="crAdjBet(\'max\')">MAX</button></div></div>' +
       '<div class="c-auto-row"><span class="c-auto-label">🚀 АВТОВЫВОД</span>' +
@@ -1597,7 +1597,7 @@ function renderSoloMines(area) {
         '<div class="c-auto-row"><span class="c-auto-label">💣 МИНЫ</span>' +
         '<input class="c-auto-input" id="minesCountInput" type="number" value="3" min="1" max="24" style="width:50px;"></div>' +
         '<div class="c-bet-label" style="margin-top:4px;">✦ СТАВКА</div>' +
-        '<div class="c-bet-row"><div class="c-bet-input-wrap"><span class="c-cr-sm">⭐</span>' +
+        '<div class="c-bet-row"><div class="c-bet-input-wrap"><span class="c-cr-sm">🌟</span>' +
         '<input type="number" id="minesBetInput" value="10" min="1"><span class="c-usd">★</span></div>' +
         '<div class="c-bet-adj"><button onclick="minesAdjBet(\'min\')">MIN</button><button onclick="minesAdjBet(\'half\')">½</button><button onclick="minesAdjBet(\'double\')">2×</button><button onclick="minesAdjBet(\'max\')">MAX</button></div></div>' +
         '<div style="display:flex;gap:8px;align-items:center;min-height:40px;" id="minesActions">' +
@@ -1673,7 +1673,7 @@ function minesReveal(idx) {
         if (res.gameOver) {
             document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => c.style.pointerEvents = 'none');
             document.getElementById('minesCashoutBtn').style.display = 'none';
-            document.getElementById('minesStatus').textContent = '🏆 Все алмазы! +' + res.payout + ' ⭐';
+            document.getElementById('minesStatus').textContent = '🏆 Все алмазы! +' + res.payout + ' 🌟';
             _minesGame = null;
             setTimeout(() => {
                 const btn = document.getElementById('minesStartBtn');
@@ -1690,7 +1690,7 @@ function minesCashout() {
         if (res?.error) { document.getElementById('minesCashoutBtn').disabled = false; return showToast('❌ ' + res.error, 'error'); }
         document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => c.style.pointerEvents = 'none');
         document.getElementById('minesCashoutBtn').style.display = 'none';
-        document.getElementById('minesStatus').textContent = '✅ ВЫИГРЫШ ' + res.payout + ' ⭐ (x' + res.multiplier.toFixed(2) + ')';
+        document.getElementById('minesStatus').textContent = '✅ ВЫИГРЫШ ' + res.payout + ' 🌟 (x' + res.multiplier.toFixed(2) + ')';
         _minesGame = null;
         balance += res.payout;
         updateBalance();
@@ -1720,7 +1720,7 @@ function renderSoloBJ(area) {
         '<div class="bj-row"><div class="bj-label">Ты</div><div class="bj-score" id="bjPlayerScore">0</div><div class="bj-hand" id="bjPlayerHand"></div></div>' +
         '</div>' +
         '<div class="c-bet-label" style="margin-top:4px;">✦ СТАВКА</div>' +
-        '<div class="c-bet-row"><div class="c-bet-input-wrap"><span class="c-cr-sm">⭐</span>' +
+        '<div class="c-bet-row"><div class="c-bet-input-wrap"><span class="c-cr-sm">🌟</span>' +
         '<input type="number" id="bjBetInput" value="10" min="1"><span class="c-usd">★</span></div>' +
         '<div class="c-bet-adj"><button onclick="bjAdjBet(\'min\')">MIN</button><button onclick="bjAdjBet(\'half\')">½</button><button onclick="bjAdjBet(\'double\')">2×</button><button onclick="bjAdjBet(\'max\')">MAX</button></div></div>' +
         '<div style="display:flex;gap:8px;align-items:center;min-height:40px;" id="bjActions">' +
@@ -1793,7 +1793,7 @@ function bjGameOver(res) {
     } else if (res.winnerId === 'dealer') {
         document.getElementById('bjStatus').textContent = '💥 Проигрыш!';
     } else {
-        document.getElementById('bjStatus').textContent = '🏆 Победа! +' + (res.payout || 0) + ' ⭐';
+        document.getElementById('bjStatus').textContent = '🏆 Победа! +' + (res.payout || 0) + ' 🌟';
         if (res.payout) { balance += res.payout; updateBalance(); }
     }
     setTimeout(() => {
@@ -1825,7 +1825,7 @@ window.addDevStars = function(amount) {
         if (res?.error) return showToast('❌ ' + res.error, 'error');
         balance = res.balance;
         updateBalance();
-        showToast('🧪 +' + amount + ' ⭐ Stars (dev)', 'success');
+        showToast('🧪 +' + amount + ' 🌟 Stars (dev)', 'success');
         spawnParticles(document.getElementById('balanceBlock'), 20, '#a78bfa');
         addHistory('deposit', amount);
         playSound('win');
@@ -1854,7 +1854,7 @@ window.buyStars = function(amount) {
             }
             balance = res.balance;
             updateBalance();
-            showToast('✅ +' + amount + ' ⭐ Stars куплены!', 'success');
+            showToast('✅ +' + amount + ' 🌟 Stars куплены!', 'success');
             spawnParticles(document.getElementById('balanceBlock'), 15, '#22c55e');
             addHistory('deposit', amount);
             playSound('win');
@@ -1887,15 +1887,15 @@ window.buyStars = function(amount) {
 window.withdrawStars = function() {
     const amt = parseInt(document.getElementById('withdrawAmount').value) || 0, err = document.getElementById('withdrawError');
     if (amt <= 0) { err.textContent = '⚠️ Введи сумму больше 0'; err.classList.add('show'); return; }
-    if (amt > balance) { err.textContent = '❌ Недостаточно. Доступно: ' + balance.toFixed(0) + ' ⭐'; err.classList.add('show'); return; }
-    if (amt < 1) { err.textContent = '⚠️ Минимум 1 ⭐'; err.classList.add('show'); return; }
+    if (amt > balance) { err.textContent = '❌ Недостаточно. Доступно: ' + balance.toFixed(0) + ' 🌟'; err.classList.add('show'); return; }
+    if (amt < 1) { err.textContent = '⚠️ Минимум 1 🌟'; err.classList.add('show'); return; }
     err.classList.remove('show');
     if (!socket?.connected) { showToast('❌ Нет соединения', 'error'); return; }
     const tg = window.Telegram?.WebApp;
     if (!tg || !tg.initData) {
         // Dev mode: simulate
         balance -= amt; updateBalance(); closeModal('withdrawModal');
-        addHistory('withdraw', -amt); showToast('💸 Списано ' + amt + ' ⭐ (dev)', 'info');
+        addHistory('withdraw', -amt); showToast('💸 Списано ' + amt + ' 🌟 (dev)', 'info');
         return;
     }
     showToast('⏳ Создание инвойса...', 'info');
@@ -2131,7 +2131,7 @@ function handleGameResult(game, isDraw, isWin, netPayout, data) {
 
 function showGameResult(game, isDraw, isWin, amount) {
     if (isDraw) { showToast('🤝 НИЧЬЯ!', 'info'); addHistory('draw', 0); }
-    else if (isWin) { showToast('🏆 ПОБЕДА! +' + amount + ' ⭐', 'success'); spawnParticles(document.getElementById('gameArea'), 20, '#22c55e'); addHistory('win', amount); playSound('win'); vibrate(100); }
+    else if (isWin) { showToast('🏆 ПОБЕДА! +' + amount + ' 🌟', 'success'); spawnParticles(document.getElementById('gameArea'), 20, '#22c55e'); addHistory('win', amount); playSound('win'); vibrate(100); }
     else { showToast('💔 ПОРАЖЕНИЕ', 'error'); addHistory('lose', 0); playSound('lose'); vibrate(150); }
 }
 
