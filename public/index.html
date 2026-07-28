@@ -551,7 +551,7 @@
         <div class="game-header">
             <span class="back" onclick="closeGame()">←</span>
             <h2 id="gameTitle">Игра</h2>
-            <span class="balance" id="balance">0 <i class="tg-s"></i></span>
+                    <span class="balance" id="balance">0<i class="tg-s"></i></span>
             <span class="rules-btn" onclick="showRules()">📖</span>
         </div>
         <div class="game-area" id="gameArea"></div>
@@ -641,7 +641,7 @@ function updateBalance() {
     const amt = balance;
     document.getElementById('balanceAmount').textContent = amt.toFixed(0);
     const bl = document.getElementById('balance');
-    if (bl) bl.innerHTML = amt.toFixed(0) + ' <i class="tg-s"></i>';
+    if (bl) bl.innerHTML = amt.toFixed(0) + '<i class="tg-s"></i>';
     document.getElementById('balanceCurrency').textContent = 'Stars';
 }
 
@@ -658,7 +658,7 @@ function spawnParticles(parent, count, color) {
 }
 function showBalFlash(parent, amount, isPlus) {
     const el = document.createElement('div'); el.className = 'bal-flash ' + (isPlus ? 'plus' : 'minus');
-    el.textContent = (isPlus ? '+' : '') + amount + ' <i class="tg-s"></i>'; parent.style.position = 'relative'; parent.appendChild(el);
+    el.innerHTML = (isPlus ? '+' : '') + amount + '<i class="tg-s"></i>'; parent.style.position = 'relative'; parent.appendChild(el);
     setTimeout(() => el.remove(), 1000);
 }
 
