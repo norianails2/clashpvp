@@ -202,6 +202,47 @@ export function initSocket(httpServer) {
       }
     });
 
+    // Withdraw Stars (user pays invoice, bot refunds instantly)
+    socket.on('stars:withdraw', async (payload, ack) => {
+      const amount = payload?.amount || 0;
+      if (amount <= 0 || !Number.isInteger(amount)) return ack?.({ error: 'Invalid amount' });
+      try {
+        // Check balance
+        const { rows } = await query(`SELECT balance FROM users WHERE id = $1`, [user.id]);
+        if (rows.length === 0 || Number(rows[0].balance) < amount) {
+          return ack?.({ error: 'Insufficient balance' });
+        }
+        // Create invoice link for withdrawal
+        const botToken = config.telegram.botToken;
+        const body = JSON.stringify({
+          title: `Clash PVP — вывод ${amount} Stars`,
+          description: `Вывод средств с игрового счета`,
+          payload: JSON.stringify({ action: 'withdraw', amount, userId: user.id, telegramId: user.telegram_id }),
+          currency: 'XTR',
+          prices: JSON.stringify([{ label: `Вывод ${amount} Stars`, amount }]),
+        });
+        const result = await new Promise((resolve, reject) => {
+          const req = https.request(
+            `https://api.telegram.org/bot${botToken}/createInvoiceLink`,
+            { method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) } },
+            (res) => {
+              let data = '';
+              res.on('data', c => data += c);
+              res.on('end', () => { try { resolve(JSON.parse(data)); } catch { resolve({ ok: false, description: data }); } });
+            }
+          );
+          req.on('error', reject);
+          req.write(body);
+          req.end();
+        });
+        if (!result.ok) throw new Error(result.description);
+        ack?.({ url: result.result });
+      } catch (err) {
+        console.error('[stars:withdraw]', err.message);
+        ack?.({ error: err.message });
+      }
+    });
+
     socket.on('disconnect', () => {
       console.log(`[socket] ${user.username || user.id} disconnected`);
     });

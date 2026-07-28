@@ -124,15 +124,40 @@ export function initBot(server) {
     try {
       const telegramId = msg.from.id.toString();
       const payment = msg.successful_payment;
-      // Telegram Stars: 1 Star = 1 credit (or invoice payload has the amount)
-      // invoice_payload is the JSON string we sent
       let starsAmount = payment.total_amount;
+      let payload = {};
       try {
-        const payload = JSON.parse(payment.invoice_payload);
+        payload = JSON.parse(payment.invoice_payload);
         starsAmount = payload.amount || starsAmount;
       } catch {}
 
-      // Find user and credit balance
+      // Withdrawal flow: user paid invoice, refund instantly and deduct balance
+      if (payload.action === 'withdraw' && payload.telegramId) {
+        // Refund the payment (send Stars back to user)
+        try {
+          await bot.refundStarPayment(Number(payload.telegramId), payment.telegram_payment_charge_id);
+        } catch (refundErr) {
+          console.error('[telegramBot] refund failed:', refundErr.message);
+        }
+        // Deduct from balance in DB
+        const { rows } = await query(
+          `UPDATE users SET balance = GREATEST(balance - $1, 0) WHERE id = $2 AND balance >= $1 RETURNING id, balance`,
+          [starsAmount, payload.userId]
+        );
+        if (rows.length > 0) {
+          const user = rows[0];
+          await query(
+            `INSERT INTO transactions (user_id, type, amount, balance_before, balance_after, metadata)
+             VALUES ($1, 'withdraw', $2, $3, $4, $5)`,
+            [user.id, starsAmount, Number(user.balance) + starsAmount, Number(user.balance),
+             JSON.stringify({ telegramPayment: true, refund: true, chargeId: payment.telegram_payment_charge_id })]
+          );
+          console.log(`[telegramBot] Withdrawal: user=${user.id} amount=${starsAmount} new_balance=${user.balance}`);
+        }
+        return;
+      }
+
+      // Deposit flow: add stars to balance (existing behavior)
       const { rows } = await query(
         `UPDATE users SET balance = balance + $1 WHERE telegram_id = $2 RETURNING id, balance`,
         [starsAmount, telegramId]

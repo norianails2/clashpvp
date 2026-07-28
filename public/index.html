@@ -520,7 +520,7 @@
                 </div>
                 <input class="modal-input" type="number" id="withdrawAmount" value="10" placeholder="Сумма в ⭐" min="1">
                 <div class="modal-error" id="withdrawError"></div>
-                <button class="modal-confirm wd" onclick="simulateWithdraw()">💸 Списать Stars</button>
+                <button class="modal-confirm wd" onclick="withdrawStars()">💸 Вывести</button>
             </div>
             <button class="modal-cancel" onclick="closeModal('withdrawModal')">Закрыть</button>
         </div>
@@ -1883,17 +1883,34 @@ window.buyStars = function(amount) {
         }
     });
 };
-window.simulateWithdraw = function() {
-    const amt = parseFloat(document.getElementById('withdrawAmount').value) || 0, err = document.getElementById('withdrawError');
+window.withdrawStars = function() {
+    const amt = parseInt(document.getElementById('withdrawAmount').value) || 0, err = document.getElementById('withdrawError');
     if (amt <= 0) { err.textContent = '⚠️ Введи сумму больше 0'; err.classList.add('show'); return; }
     if (amt > balance) { err.textContent = '❌ Недостаточно. Доступно: ' + balance.toFixed(0) + ' ⭐'; err.classList.add('show'); return; }
     if (amt < 1) { err.textContent = '⚠️ Минимум 1 ⭐'; err.classList.add('show'); return; }
     err.classList.remove('show');
-    balance -= amt; updateBalance(); closeModal('withdrawModal');
-    addHistory('withdraw', -amt); showToast('💸 Списано ' + amt.toFixed(0) + ' ⭐', 'info');
-    playSound('click');
-    const wdStars = document.getElementById('wdStarsBalance');
-    if (wdStars) wdStars.textContent = balance.toFixed(0) + ' ⭐';
+    if (!socket?.connected) { showToast('❌ Нет соединения', 'error'); return; }
+    const tg = window.Telegram?.WebApp;
+    if (!tg || !tg.initData) {
+        // Dev mode: simulate
+        balance -= amt; updateBalance(); closeModal('withdrawModal');
+        addHistory('withdraw', -amt); showToast('💸 Списано ' + amt + ' ⭐ (dev)', 'info');
+        return;
+    }
+    showToast('⏳ Создание инвойса...', 'info');
+    socket.emit('stars:withdraw', { amount: amt }, async (res) => {
+        if (res?.error) return showToast('❌ ' + res.error, 'error');
+        if (res?.url && tg?.openInvoice) {
+            try {
+                await tg.openInvoice(res.url);
+                showToast('✅ Вывод оформлен! Stars возвращены', 'success');
+                closeModal('withdrawModal');
+                socket.emit('balance:get', {}, (r) => { if (r?.balance !== undefined) { balance = r.balance; updateBalance(); } });
+            } catch (e) {
+                showToast('❌ Вывод отменён', 'error');
+            }
+        }
+    });
 };
 </script>
 <script>
