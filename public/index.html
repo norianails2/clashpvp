@@ -919,13 +919,18 @@ const RPS_MOVES = ['rock', 'paper', 'scissors'];
 const RPS_ICONS = ['✊', '✋', '✌️'];
 
 function pvpShowRPS(area, r) {
-    area.innerHTML = '<div class="pvp-timer" id="pvpTimer" style="display:none;font-size:11px;color:rgba(255,255,255,0.4);font-weight:700;text-align:center;padding:4px 0;">⏱ 30с</div><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;"><div class="pvp-rps-choices" id="rpsChoices">' +
-        RPS_ICONS.map((icon, i) => '<div class="pvp-rps-btn" onclick="pvpRPSPick(' + i + ')">' + icon + '</div>').join('') +
-        '</div><div style="font-size:12px;color:rgba(255,255,255,0.4);font-weight:600;min-height:20px;" id="rpsStatus">👆 Выбери ход</div></div>';
+    area.innerHTML = '<div class="pvp-timer" id="pvpTimer" style="display:none;font-size:10px;color:rgba(255,255,255,0.3);font-weight:700;text-align:center;padding:2px 0;letter-spacing:1px;">⏱ 30с</div><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;">' +
+        '<div style="font-size:13px;color:rgba(255,255,255,0.25);font-weight:700;text-transform:uppercase;letter-spacing:2px;">Сделай выбор</div>' +
+        '<div class="pvp-rps-choices" id="rpsChoices" style="display:flex;gap:14px;">' +
+        RPS_ICONS.map((icon, i) => '<div class="pvp-rps-btn" onclick="pvpRPSPick(' + i + ')" style="width:80px;height:80px;border-radius:20px;border:2px solid rgba(255,255,255,0.08);background:linear-gradient(145deg,rgba(255,255,255,0.05),rgba(255,255,255,0.01));font-size:38px;cursor:pointer;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,0.2);position:relative;">' + icon + '</div>').join('') +
+        '</div><div style="font-size:13px;color:rgba(255,255,255,0.35);font-weight:600;min-height:22px;" id="rpsStatus">👆 Выбери ход</div></div>';
 }
 function pvpRPSPick(idx) {
     document.getElementById('rpsStatus').textContent = '⏳ Ждём ход соперника...';
-    document.querySelectorAll('.pvp-rps-btn').forEach(b => b.style.pointerEvents = 'none');
+    document.querySelectorAll('.pvp-rps-btn').forEach((b,i) => {
+        b.style.pointerEvents = 'none';
+        if (i === idx) b.style.cssText = 'border-color:#fbbf24!important;background:linear-gradient(145deg,rgba(251,191,36,0.2),rgba(251,191,36,0.06))!important;box-shadow:0 0 30px rgba(251,191,36,0.3)!important;transform:scale(1.08)!important';
+    });
     socket?.emit('rps:make_move', { roomId: currentRoom?.id, move: RPS_MOVES[idx] }, (res) => {
         if (res?.error) showToast('❌ ' + res.error, 'error');
     });
