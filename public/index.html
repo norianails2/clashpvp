@@ -1804,7 +1804,7 @@ function bjGameOver(res) {
     if (res.draw) {
         document.getElementById('bjStatus').textContent = '🤝 Ничья!';
     } else if (res.winnerId === 'dealer') {
-        document.getElementById('bjStatus').innerHTML = '💣 −' + (document.getElementById('bjBetInput')?.value || '') + ' <i class="tg-s"></i>';
+        document.getElementById('bjStatus').innerHTML = '−' + (document.getElementById('bjBetInput')?.value || '') + ' <i class="tg-s"></i>';
     } else {
         document.getElementById('bjStatus').innerHTML = '+' + (res.payout || 0) + ' <i class="tg-s"></i>';
     }
