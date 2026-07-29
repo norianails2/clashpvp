@@ -1784,9 +1784,10 @@ function bjHit() {
     socket?.emit('bj:hit', {}, (res) => {
         clearTimeout(hitTimeout);
         _bjBusy = false;
+        console.log('bj:hit res', res);
         if (res?.error) { document.getElementById('bjStatus').textContent = 'Твой ход'; return showToast('❌ ' + res.error, 'error'); }
         updateBJHands(res);
-        if (res.gameOver) { bjGameOver(res); }
+        if (res.gameOver) { console.log('bj:hit gameOver!'); bjGameOver(res); }
         else { document.getElementById('bjStatus').textContent = 'Твой ход'; }
     });
 }
