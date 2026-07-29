@@ -122,7 +122,7 @@ export function registerSoloBlackjackHandlers(io, socket) {
   });
 
   socket.on('disconnect', () => {
-    soloGames.delete(userId);
+    // Keep game alive for reconnection
   });
 }
 
