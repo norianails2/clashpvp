@@ -1746,15 +1746,12 @@ function renderSoloBJ(area) {
         '</div>';
 }
 function bjAdjBet(type) {
-    const inp = document.getElementById('bjBetInput');
-    if (!inp) return;
+    const inp = document.getElementById('bjBetInput'); if (!inp) return;
     let val = parseInt(inp.value) || 10;
-    switch (type) {
-        case 'min': val = 1; break;
-        case 'half': val = Math.max(1, Math.floor(val / 2)); break;
-        case 'double': val = Math.min(balance || 0, val * 2); break;
-        case 'max': val = Math.max(1, balance || 0); break;
-    }
+    if (type === 'min') val = 1;
+    else if (type === 'half') val = Math.max(1, Math.floor(val / 2));
+    else if (type === 'double') val = Math.min(balance || 0, val * 2);
+    else if (type === 'max') val = Math.max(1, balance || 0);
     inp.value = val;
 }
 function bjStart() {
@@ -1772,50 +1769,35 @@ function bjStart() {
         document.getElementById('bjHitBtn').style.display = '';
         document.getElementById('bjStandBtn').style.display = '';
         document.getElementById('bjStatus').textContent = 'Твой ход';
-        updateBJHands(res);
-        if (res.gameOver) { bjGameOver(res); }
+        bjHandleResult(res);
+        if (res.gameOver) bjGameOver(res);
     });
 }
 function bjHit() {
     if (_bjBusy) return;
     _bjBusy = true;
     document.getElementById('bjStatus').textContent = '⏳...';
-    var hitTimeout = setTimeout(function() { _bjBusy = false; document.getElementById('bjStatus').textContent = 'Твой ход'; showToast('⚠️ Таймаут сервера', 'error'); }, 4000);
-    socket?.emit('bj:hit', {}, (res) => {
-        clearTimeout(hitTimeout);
-        _bjBusy = false;
-        console.log('bj:hit res', res);
-        if (res?.error) { document.getElementById('bjStatus').textContent = 'Твой ход'; return showToast('❌ ' + res.error, 'error'); }
-        updateBJHands(res);
-        if (res.gameOver) { console.log('bj:hit gameOver!'); bjGameOver(res); }
-        else { document.getElementById('bjStatus').textContent = 'Твой ход'; }
-    });
+    socket?.emit('bj:hit', {}, (res) => { bjOnHitResp(res); });
 }
 function bjStand() {
     if (_bjBusy) return;
     _bjBusy = true;
     document.getElementById('bjStatus').textContent = '⏳ Ход дилера...';
-    var standTimeout = setTimeout(function() { _bjBusy = false; document.getElementById('bjStatus').textContent = 'Твой ход'; showToast('⚠️ Таймаут сервера', 'error'); }, 4000);
-    socket?.emit('bj:stand', {}, (res) => {
-        clearTimeout(standTimeout);
-        _bjBusy = false;
-        if (res?.error) return showToast('❌ ' + res.error, 'error');
-        updateBJHands(res);
-        bjGameOver(res);
-    });
+    socket?.emit('bj:stand', {}, (res) => { bjOnStandResp(res); });
+}
+// Also listen for server-pushed responses (dual delivery ensures callback works)
+function bjOnHitResp(res) { if (_bjBusy) { _bjBusy = false; bjHandleResult(res); if (res?.error) { document.getElementById('bjStatus').textContent = 'Твой ход'; return showToast('❌ ' + res.error, 'error'); } if (res.gameOver) bjGameOver(res); else document.getElementById('bjStatus').textContent = 'Твой ход'; } }
+function bjOnStandResp(res) { if (_bjBusy) { _bjBusy = false; bjHandleResult(res); if (res?.error) { document.getElementById('bjStatus').textContent = 'Твой ход'; return showToast('❌ ' + res.error, 'error'); } bjGameOver(res); } }
+function bjHandleResult(res) {
+    updateBJHands(res);
 }
 function bjGameOver(res) {
     document.getElementById('bjHitBtn').style.display = 'none';
     document.getElementById('bjStandBtn').style.display = 'none';
-    _bjBusy = false;
-    if (res.draw) {
-        document.getElementById('bjStatus').textContent = '🤝 Ничья!';
-    } else if (res.winnerId === 'dealer') {
-        document.getElementById('bjStatus').innerHTML = '−' + (document.getElementById('bjBetInput')?.value || '') + ' <i class="tg-s"></i>';
-    } else {
-        document.getElementById('bjStatus').innerHTML = '+' + (res.payout || 0) + ' <i class="tg-s"></i>';
-    }
-    setTimeout(() => {
+    if (res.draw) document.getElementById('bjStatus').textContent = '🤝 Ничья!';
+    else if (res.winnerId !== null && res.winnerId !== undefined && res.winnerId !== 'dealer') document.getElementById('bjStatus').innerHTML = '+' + (res.payout || 0) + ' <i class="tg-s"></i>';
+    else document.getElementById('bjStatus').innerHTML = '−' + (document.getElementById('bjBetInput')?.value || '') + ' <i class="tg-s"></i>';
+    setTimeout(function() {
         document.getElementById('bjStartBtn').style.display = '';
         document.getElementById('bjStartBtn').textContent = '🃏 СТАРТ';
     }, 2000);
@@ -2133,6 +2115,10 @@ function connectSocket(initData) {
         const netPayout = data.payout || Math.floor((currentRoom?.bet_amount || 0) * 2 * 0.90);
         handleGameResult('blackjack', isDraw, isWin, netPayout, data);
     });
+
+    // Solo BJ fallback: server pushes response via event when ack callback fails
+    socket.on('bj:hit_resp', (res) => { if (typeof bjOnHitResp === 'function') bjOnHitResp(res); });
+    socket.on('bj:stand_resp', (res) => { if (typeof bjOnStandResp === 'function') bjOnStandResp(res); });
 }
 
 function handleGameOver(data) {
