@@ -1658,9 +1658,14 @@ function minesReveal(idx) {
     const cell = document.querySelector('#minesGrid .pvp-mine-cell[data-idx="' + idx + '"]');
     if (!cell || cell.classList.length > 1) return;
     cell.style.cursor = 'default';
+    document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => c.style.pointerEvents = 'none');
     document.getElementById('minesStatus').textContent = '⏳ Открываем...';
     socket?.emit('mines:reveal', { cellIndex: idx }, (res) => {
-        if (res?.error) { document.getElementById('minesStatus').textContent = '💎 Открывай клетки!'; return showToast('❌ ' + res.error, 'error'); }
+        if (res?.error) {
+            document.getElementById('minesStatus').textContent = '💎 Открывай клетки!';
+            document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => { if (c.classList.length <= 1) c.style.pointerEvents = ''; });
+            return showToast('❌ ' + res.error, 'error');
+        }
         if (res.isMine) {
             cell.classList.add('bomb'); cell.textContent = '💣';
             document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => c.style.pointerEvents = 'none');
@@ -1686,6 +1691,8 @@ function minesReveal(idx) {
                 const btn = document.getElementById('minesStartBtn');
                 if (btn) { btn.style.display = ''; btn.disabled = false; btn.textContent = '💣 СТАРТ'; }
             }, 2000);
+        } else {
+            document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => { if (c.classList.length <= 1) c.style.pointerEvents = ''; });
         }
     });
 }
