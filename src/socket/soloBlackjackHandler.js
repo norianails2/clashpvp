@@ -29,6 +29,7 @@ export function registerSoloBlackjackHandlers(io, socket) {
 
       const playerScore = calculateScore(playerCards);
       const dealerScore = calculateScore(dealerCards);
+      console.log('[bj:start] user=' + userId + ' hold=' + balanceAfter + ' player=' + JSON.stringify(playerCards) + '(' + playerScore + ') dealer=' + JSON.stringify(dealerCards) + '(' + dealerScore + ')');
 
       const game = {
         userId, betAmount,
