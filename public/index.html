@@ -1780,7 +1780,9 @@ function bjHit() {
     if (_bjBusy) return;
     _bjBusy = true;
     document.getElementById('bjStatus').textContent = '⏳...';
+    var hitTimeout = setTimeout(function() { _bjBusy = false; document.getElementById('bjStatus').textContent = 'Твой ход'; showToast('⚠️ Таймаут сервера', 'error'); }, 4000);
     socket?.emit('bj:hit', {}, (res) => {
+        clearTimeout(hitTimeout);
         _bjBusy = false;
         if (res?.error) { document.getElementById('bjStatus').textContent = 'Твой ход'; return showToast('❌ ' + res.error, 'error'); }
         updateBJHands(res);
@@ -1792,7 +1794,9 @@ function bjStand() {
     if (_bjBusy) return;
     _bjBusy = true;
     document.getElementById('bjStatus').textContent = '⏳ Ход дилера...';
+    var standTimeout = setTimeout(function() { _bjBusy = false; document.getElementById('bjStatus').textContent = 'Твой ход'; showToast('⚠️ Таймаут сервера', 'error'); }, 4000);
     socket?.emit('bj:stand', {}, (res) => {
+        clearTimeout(standTimeout);
         _bjBusy = false;
         if (res?.error) return showToast('❌ ' + res.error, 'error');
         updateBJHands(res);
