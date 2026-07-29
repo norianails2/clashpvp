@@ -1761,8 +1761,8 @@ function bjStart() {
     _bjTimer = setTimeout(function() { if (_bjBusy) { _bjBusy = false; showToast('⚠️ Сервер не отвечает', 'error'); } }, 5000);
     socket?.emit('bj:start', { betAmount: bet });
 }
-function bjHit() { if (_bjBusy) return; _bjBusy = true; document.getElementById('bjStatus').textContent = '⏳ Хит...'; _bjTimer = setTimeout(function() { if (_bjBusy) { _bjBusy = false; document.getElementById('bjStatus').textContent = 'Твой ход #' + _bjHitCount; showToast('⚠️ Сервер не отвечает', 'error'); } }, 5000); socket?.emit('bj:hit', {}); }
-function bjStand() { if (_bjBusy) return; _bjBusy = true; document.getElementById('bjStatus').textContent = '⏳ Ход дилера...'; _bjTimer = setTimeout(function() { if (_bjBusy) { _bjBusy = false; document.getElementById('bjStatus').textContent = 'Твой ход #' + _bjHitCount; showToast('⚠️ Сервер не отвечает', 'error'); } }, 5000); socket?.emit('bj:stand', {}); }
+function bjHit() { if (_bjBusy) return; _bjBusy = true; document.getElementById('bjStatus').textContent = '⏳ Хит...'; _bjTimer = setTimeout(function() { if (_bjBusy) { _bjBusy = false; document.getElementById('bjStatus').textContent = 'Твой ход #' + _bjHitCount; showToast('⚠️ Сервер не отвечает', 'error'); } }, 5000); socket?.emit('bj:hit', {}, function(res) { if (_bjBusy) bjOnHitResult(res); }); }
+function bjStand() { if (_bjBusy) return; _bjBusy = true; document.getElementById('bjStatus').textContent = '⏳ Ход дилера...'; _bjTimer = setTimeout(function() { if (_bjBusy) { _bjBusy = false; document.getElementById('bjStatus').textContent = 'Твой ход #' + _bjHitCount; showToast('⚠️ Сервер не отвечает', 'error'); } }, 5000); socket?.emit('bj:stand', {}, function(res) { if (_bjBusy) bjOnStandResult(res); }); }
 
 function bjOnStartResult(res) {
     clearTimeout(_bjTimer); _bjBusy = false;
