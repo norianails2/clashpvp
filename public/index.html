@@ -1640,8 +1640,9 @@ function minesStart() {
     document.getElementById('minesStartBtn').disabled = true;
     document.getElementById('minesStartBtn').textContent = '⏳ СТАРТ...';
     document.getElementById('minesStatus').textContent = '⏳ Генерация поля...';
+    balance -= bet; updateBalance();
     socket?.emit('mines:start', { betAmount: bet, minesCount: count }, (res) => {
-        if (res?.error) { document.getElementById('minesStartBtn').disabled = false; document.getElementById('minesStartBtn').textContent = '💣 СТАРТ'; return showToast('❌ ' + res.error, 'error'); }
+        if (res?.error) { balance += bet; updateBalance(); document.getElementById('minesStartBtn').disabled = false; document.getElementById('minesStartBtn').textContent = '💣 СТАРТ'; return showToast('❌ ' + res.error, 'error'); }
         _minesGame = { bet };
         document.getElementById('minesStartBtn').style.display = 'none';
         document.getElementById('minesStatus').textContent = '💎 Открывай клетки!';
@@ -1694,8 +1695,6 @@ function minesCashout() {
         document.getElementById('minesCashoutBtn').style.display = 'none';
         document.getElementById('minesStatus').textContent = '✅ ВЫИГРЫШ ' + res.payout + ' <i class="tg-s"></i> (x' + res.multiplier.toFixed(2) + ')';
         _minesGame = null;
-        balance += res.payout;
-        updateBalance();
         setTimeout(() => {
             const btn = document.getElementById('minesStartBtn');
             if (btn) { btn.style.display = ''; btn.disabled = false; btn.textContent = '💣 СТАРТ'; }
@@ -1751,8 +1750,9 @@ function bjStart() {
     document.getElementById('bjStartBtn').disabled = true;
     document.getElementById('bjStartBtn').textContent = '⏳...';
     document.getElementById('bjStatus').textContent = '⏳ Раздача...';
+    balance -= bet; updateBalance();
     socket?.emit('bj:start', { betAmount: bet }, (res) => {
-        if (res?.error) { document.getElementById('bjStartBtn').disabled = false; document.getElementById('bjStartBtn').textContent = '🃏 СТАРТ'; return showToast('❌ ' + res.error, 'error'); }
+        if (res?.error) { balance += bet; updateBalance(); document.getElementById('bjStartBtn').disabled = false; document.getElementById('bjStartBtn').textContent = '🃏 СТАРТ'; return showToast('❌ ' + res.error, 'error'); }
         document.getElementById('bjStartBtn').style.display = 'none';
         document.getElementById('bjHitBtn').style.display = '';
         document.getElementById('bjStandBtn').style.display = '';
@@ -1796,7 +1796,6 @@ function bjGameOver(res) {
         document.getElementById('bjStatus').textContent = '💥 Проигрыш!';
     } else {
         document.getElementById('bjStatus').textContent = '🏆 Победа! +' + (res.payout || 0) + ' <i class="tg-s"></i>';
-        if (res.payout) { balance += res.payout; updateBalance(); }
     }
     setTimeout(() => {
         document.getElementById('bjStartBtn').style.display = ''; document.getElementById('bjStartBtn').disabled = false; document.getElementById('bjStartBtn').textContent = '🃏 СТАРТ';

@@ -18,7 +18,8 @@ export function registerSoloBlackjackHandlers(io, socket) {
 
       if (soloGames.has(userId)) return ack?.({ error: 'You already have an active game' });
 
-      await holdBet(userId, betAmount, 'blackjack', null, null);
+      const { balanceAfter } = await holdBet(userId, betAmount, 'blackjack', null, null);
+      socket.emit('balance:update', { balance: balanceAfter });
 
       const deck = shuffleDeck(createDeck());
       const { cards: playerCards, deck: d1 } = dealCards(deck, 2);
@@ -149,7 +150,8 @@ async function playDealer(game, userId, ack) {
     // Push - refund (the bet stays, no payout)
   } else if (winnerId === userId) {
     const winAmount = Math.floor(game.betAmount * 2 * (1 - HOUSE_EDGE));
-    await payout(userId, winAmount, 'blackjack', null, null, 0);
+    const { balanceAfter } = await payout(userId, winAmount, 'blackjack', null, null, 0);
+    socket.emit('balance:update', { balance: balanceAfter });
     soloGames.delete(userId);
     return ack?.({
       playerCards: game.playerCards, playerScore,

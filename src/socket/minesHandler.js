@@ -26,7 +26,8 @@ export function registerMinesHandlers(io, socket) {
 
       if (soloGames.has(userId)) return ack?.({ error: 'You already have an active game' });
 
-      await holdBet(userId, betAmount, 'mines', null, null);
+      const { balanceAfter } = await holdBet(userId, betAmount, 'mines', null, null);
+      socket.emit('balance:update', { balance: balanceAfter });
 
       const minePositions = generateMinePositions(count);
       const game = {
@@ -75,9 +76,10 @@ export function registerMinesHandlers(io, socket) {
       const totalSafe = TOTAL_CELLS - game.minesCount;
       if (newSafe >= totalSafe) {
         const win = Math.floor(game.betAmount * mult * (1 - HOUSE_EDGE));
-        await payout(userId, win, 'mines', null, null, 0);
+        const { balanceAfter } = await payout(userId, win, 'mines', null, null, 0);
         game.active = false;
         soloGames.delete(userId);
+        socket.emit('balance:update', { balance: balanceAfter });
         return ack?.({ isMine: false, gameOver: true, multiplier: mult, payout: win, allSafe: true });
       }
 
@@ -95,9 +97,10 @@ export function registerMinesHandlers(io, socket) {
       if (game.safeOpenedCount === 0) return ack?.({ error: 'Open at least one cell first' });
 
       const win = Math.floor(game.betAmount * game.multiplier * (1 - HOUSE_EDGE));
-      await payout(userId, win, 'mines', null, null, 0);
+      const { balanceAfter } = await payout(userId, win, 'mines', null, null, 0);
       game.active = false;
       soloGames.delete(userId);
+      socket.emit('balance:update', { balance: balanceAfter });
 
       ack?.({ success: true, multiplier: game.multiplier, payout: win, safeOpenedCount: game.safeOpenedCount });
     } catch (err) {
