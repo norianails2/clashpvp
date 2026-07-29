@@ -40,7 +40,7 @@ export function registerSoloBlackjackHandlers(io, socket) {
             socket.emit('balance:update', { balance: r.balanceAfter });
             payoutAmount = win;
           }
-          socket.emit('bj:start_result', { playerCards: playerCards, playerScore, dealerCards, dealerScore, gameOver: true, winnerId, draw, payout: payoutAmount });
+          socket.emit('bj:start_result', { playerCards, playerScore, dealerCards, dealerScore, gameOver: true, winnerId, draw, payout: payoutAmount });
           return ack?.({ playerCards, playerScore, dealerCards, dealerScore, gameOver: true, winnerId, draw, payout: payoutAmount });
         }
 
@@ -57,77 +57,85 @@ export function registerSoloBlackjackHandlers(io, socket) {
   });
 
   socket.on('bj:hit', (payload, ack) => {
-    (async () => {
-      try {
-        const game = soloGames.get(userId);
-        if (!game || !game.active) {
-          socket.emit('bj:hit_result', { error: 'No active game' });
-          return ack?.({ error: 'No active game' });
-        }
-        if (game.playerDone) {
-          socket.emit('bj:hit_result', { error: 'You already stood' });
-          return ack?.({ error: 'You already stood' });
-        }
+    try {
+      const game = soloGames.get(userId);
+      if (!game || !game.active) {
+        const r = { error: 'No active game' };
+        socket.emit('bj:hit_result', r);
+        return ack?.(r);
+      }
+      if (game.playerDone) {
+        const r = { error: 'You already stood' };
+        socket.emit('bj:hit_result', r);
+        return ack?.(r);
+      }
 
-        const { cards: dealt, deck: newDeck } = dealCards(game.deck, 1);
-        const card = dealt[0];
-        game.playerCards.push(card);
-        game.deck = newDeck;
-        const score = calculateScore(game.playerCards);
+      const { cards: dealt, deck: newDeck } = dealCards(game.deck, 1);
+      const card = dealt[0];
+      game.playerCards.push(card);
+      game.deck = newDeck;
+      const score = calculateScore(game.playerCards);
 
-        if (isBust(score)) {
-          game.active = false;
-          soloGames.delete(userId);
-          const r = { card, score, bust: true, gameOver: true, winnerId: 'dealer', playerCards: game.playerCards, dealerCards: game.dealerCards };
-          socket.emit('bj:hit_result', r);
-          return ack?.(r);
-        }
+      if (isBust(score)) {
+        game.active = false;
+        soloGames.delete(userId);
+        const r = { card, score, bust: true, gameOver: true, winnerId: 'dealer', playerCards: game.playerCards, dealerCards: game.dealerCards };
+        socket.emit('bj:hit_result', r);
+        return ack?.(r);
+      }
 
-        if (score === 21) {
-          game.active = false;
-          game.playerDone = true;
+      if (score === 21) {
+        game.active = false;
+        game.playerDone = true;
+        (async () => {
           const r = await runDealer(game, userId, socket);
           soloGames.delete(userId);
           socket.emit('bj:hit_result', r);
-          return ack?.(r);
-        }
-
-        const r = { card, score, bust: false, gameOver: false, playerCards: game.playerCards };
-        socket.emit('bj:hit_result', r);
-        ack?.(r);
-      } catch (err) {
-        console.error('[bj:hit]', err?.message);
-        socket.emit('bj:hit_result', { error: err?.message || 'Failed' });
-        ack?.({ error: err?.message || 'Failed' });
+          ack?.(r);
+        })();
+        return;
       }
-    })();
+
+      // Normal hit - no DB operations, sync response
+      const r = { card, score, bust: false, gameOver: false, playerCards: game.playerCards };
+      socket.emit('bj:hit_result', r);
+      ack?.(r);
+    } catch (err) {
+      console.error('[bj:hit]', err?.message);
+      const r = { error: err?.message || 'Failed' };
+      socket.emit('bj:hit_result', r);
+      ack?.(r);
+    }
   });
 
   socket.on('bj:stand', (payload, ack) => {
-    (async () => {
-      try {
-        const game = soloGames.get(userId);
-        if (!game || !game.active) {
-          socket.emit('bj:stand_result', { error: 'No active game' });
-          return ack?.({ error: 'No active game' });
-        }
-        if (game.playerDone) {
-          socket.emit('bj:stand_result', { error: 'Already stood' });
-          return ack?.({ error: 'Already stood' });
-        }
+    try {
+      const game = soloGames.get(userId);
+      if (!game || !game.active) {
+        const r = { error: 'No active game' };
+        socket.emit('bj:stand_result', r);
+        return ack?.(r);
+      }
+      if (game.playerDone) {
+        const r = { error: 'Already stood' };
+        socket.emit('bj:stand_result', r);
+        return ack?.(r);
+      }
 
-        game.playerDone = true;
-        game.active = false;
+      game.playerDone = true;
+      game.active = false;
+      (async () => {
         const r = await runDealer(game, userId, socket);
         soloGames.delete(userId);
         socket.emit('bj:stand_result', r);
         ack?.(r);
-      } catch (err) {
-        console.error('[bj:stand]', err?.message);
-        socket.emit('bj:stand_result', { error: err?.message || 'Failed' });
-        ack?.({ error: err?.message || 'Failed' });
-      }
-    })();
+      })();
+    } catch (err) {
+      console.error('[bj:stand]', err?.message);
+      const r = { error: err?.message || 'Failed' };
+      socket.emit('bj:stand_result', r);
+      ack?.(r);
+    }
   });
 
   socket.on('disconnect', () => {});
