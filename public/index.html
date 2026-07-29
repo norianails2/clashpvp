@@ -1685,7 +1685,7 @@ function minesReveal(idx) {
         if (res.gameOver) {
             document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => c.style.pointerEvents = 'none');
             document.getElementById('minesCashoutBtn').style.display = 'none';
-            document.getElementById('minesStatus').innerHTML = '+' + res.payout + ' <i class="tg-s"></i> x' + res.multiplier.toFixed(2);
+            document.getElementById('minesStatus').innerHTML = '+' + res.payout + ' <i class="tg-s"></i> (x' + res.multiplier.toFixed(2) + ')';
             _minesGame = null;
             setTimeout(() => {
                 const btn = document.getElementById('minesStartBtn');
@@ -1704,7 +1704,7 @@ function minesCashout() {
         if (res?.error) { document.getElementById('minesCashoutBtn').disabled = false; return showToast('❌ ' + res.error, 'error'); }
         document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => c.style.pointerEvents = 'none');
         document.getElementById('minesCashoutBtn').style.display = 'none';
-        document.getElementById('minesStatus').innerHTML = '+' + res.payout + ' <i class="tg-s"></i> x' + res.multiplier.toFixed(2);
+        document.getElementById('minesStatus').innerHTML = '+' + res.payout + ' <i class="tg-s"></i> (x' + res.multiplier.toFixed(2) + ')';
         _minesGame = null;
         setTimeout(() => {
             const btn = document.getElementById('minesStartBtn');
