@@ -103,7 +103,7 @@ export function registerSoloBlackjackHandlers(io, socket) {
         return;
       }
 
-      ack?.({ card, score, bust: false, gameOver: false });
+      ack?.({ card, score, bust: false, gameOver: false, playerCards: game.playerCards });
     } catch (err) {
       console.error('[bj:hit]', err?.message || err);
       ack?.({ error: err?.message || 'Failed to hit' });
