@@ -1598,10 +1598,10 @@ function renderSoloMines(area) {
         '<div class="pvp-mines-grid" id="minesGrid" style="margin-top:12px;"></div>' +
         '<div class="c-auto-row"><span class="c-auto-label">💣 МИНЫ</span>' +
         '<input class="c-auto-input" id="minesCountInput" type="number" value="3" min="1" max="24" style="width:50px;"></div>' +
-        '<div class="c-bet-label" style="margin-top:4px;">✦ СТАВКА</div>' +
-        '<div class="c-bet-row"><div class="c-bet-input-wrap"><span class="c-cr-sm"><i class="tg-s"></i></span>' +
-        '<input type="number" id="minesBetInput" value="10" min="1"><span class="c-usd">★</span></div>' +
-        '<div class="c-bet-adj"><button onclick="minesAdjBet(\'min\')">MIN</button><button onclick="minesAdjBet(\'half\')">½</button><button onclick="minesAdjBet(\'double\')">2×</button><button onclick="minesAdjBet(\'max\')">MAX</button></div></div>' +
+        '<div class="pvc-label" style="margin-top:4px;position:relative;z-index:1;">✦ СТАВКА</div>' +
+        '<div class="pvc-row"><div class="pvc-input-wrap"><span class="pvc-star"><i class="tg-s"></i></span>' +
+        '<input type="number" id="minesBetInput" value="10" min="1"><span class="pvc-currency">★</span></div>' +
+        '<div class="pvc-adj"><button onclick="minesAdjBet(\'min\')">MIN</button><button onclick="minesAdjBet(\'half\')">½</button><button onclick="minesAdjBet(\'double\')">2×</button><button onclick="minesAdjBet(\'max\')">MAX</button></div></div>' +
         '<div style="display:flex;gap:8px;align-items:center;min-height:40px;" id="minesActions">' +
         '<button class="c-main-btn" id="minesStartBtn" onclick="minesStart()">💣 СТАРТ</button>' +
         '<button class="c-main-btn cashout" id="minesCashoutBtn" onclick="minesCashout()" style="display:none;">◆ ЗАБРАТЬ <span id="minesMult">1.00</span>x</button></div>' +
@@ -1721,10 +1721,10 @@ function renderSoloBJ(area) {
         '<div style="height:4px;border-top:1px solid rgba(255,255,255,0.06);margin:6px 0;"></div>' +
         '<div class="bj-row"><div class="bj-label">Ты</div><div class="bj-score" id="bjPlayerScore">0</div><div class="bj-hand" id="bjPlayerHand"></div></div>' +
         '</div>' +
-        '<div class="c-bet-label" style="margin-top:4px;">✦ СТАВКА</div>' +
-        '<div class="c-bet-row"><div class="c-bet-input-wrap"><span class="c-cr-sm"><i class="tg-s"></i></span>' +
-        '<input type="number" id="bjBetInput" value="10" min="1"><span class="c-usd">★</span></div>' +
-        '<div class="c-bet-adj"><button onclick="bjAdjBet(\'min\')">MIN</button><button onclick="bjAdjBet(\'half\')">½</button><button onclick="bjAdjBet(\'double\')">2×</button><button onclick="bjAdjBet(\'max\')">MAX</button></div></div>' +
+        '<div class="pvc-label" style="margin-top:4px;position:relative;z-index:1;">✦ СТАВКА</div>' +
+        '<div class="pvc-row"><div class="pvc-input-wrap"><span class="pvc-star"><i class="tg-s"></i></span>' +
+        '<input type="number" id="bjBetInput" value="10" min="1"><span class="pvc-currency">★</span></div>' +
+        '<div class="pvc-adj"><button onclick="bjAdjBet(\'min\')">MIN</button><button onclick="bjAdjBet(\'half\')">½</button><button onclick="bjAdjBet(\'double\')">2×</button><button onclick="bjAdjBet(\'max\')">MAX</button></div></div>' +
         '<div style="display:flex;gap:8px;align-items:center;min-height:40px;" id="bjActions">' +
         '<button class="c-main-btn" id="bjStartBtn" onclick="bjStart()">🃏 СТАРТ</button>' +
         '<button class="pvp-bj-btn hit" id="bjHitBtn" onclick="bjHit()" style="display:none;">➕ Ещё</button>' +
