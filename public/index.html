@@ -1725,6 +1725,17 @@ function minesCashout() {
 
 // Solo Blackjack
 var _bjBusy = false, _bjTimer = 0, _bjHitCount = 0;
+// Solo Blackjack - event delegation on document (Telegram CSP safe)
+document.addEventListener('click', function(e) {
+    var id = e.target.id;
+    if (id === 'bjStartBtn') bjStart();
+    else if (id === 'bjHitBtn') bjHit();
+    else if (id === 'bjStandBtn') bjStand();
+    else if (id === 'bjAdjMin') bjAdjBet('min');
+    else if (id === 'bjAdjHalf') bjAdjBet('half');
+    else if (id === 'bjAdjDbl') bjAdjBet('double');
+    else if (id === 'bjAdjMax') bjAdjBet('max');
+});
 function renderSoloBJ(area) {
     document.getElementById('gameTitle').textContent = '🃏 Блекджек';
     area.innerHTML =
@@ -1743,14 +1754,6 @@ function renderSoloBJ(area) {
         '<button class="pvp-bj-btn stand" id="bjStandBtn" style="display:none;">✋ Хватит</button></div>' +
         '<div style="font-size:14px;color:#fbbf24;font-weight:700;min-height:22px;" id="bjStatus">Установи ставку и нажми СТАРТ</div>' +
         '</div>';
-    // Attach event listeners (CSP-safe for Telegram)
-    document.getElementById('bjStartBtn').addEventListener('click', bjStart);
-    document.getElementById('bjHitBtn').addEventListener('click', bjHit);
-    document.getElementById('bjStandBtn').addEventListener('click', bjStand);
-    document.getElementById('bjAdjMin').addEventListener('click', function() { bjAdjBet('min'); });
-    document.getElementById('bjAdjHalf').addEventListener('click', function() { bjAdjBet('half'); });
-    document.getElementById('bjAdjDbl').addEventListener('click', function() { bjAdjBet('double'); });
-    document.getElementById('bjAdjMax').addEventListener('click', function() { bjAdjBet('max'); });
 }
 function bjAdjBet(type) {
     const inp = document.getElementById('bjBetInput'); if (!inp) return;
