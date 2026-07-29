@@ -16,7 +16,9 @@ export function registerSoloBlackjackHandlers(io, socket) {
       if (!betAmount || betAmount < MIN_BET) return ack?.({ error: 'Minimum bet is ' + MIN_BET });
       if (betAmount > MAX_BET) return ack?.({ error: 'Maximum bet is ' + MAX_BET });
 
-      if (soloGames.has(userId)) return ack?.({ error: 'You already have an active game' });
+      if (soloGames.has(userId)) {
+        soloGames.delete(userId); // cleanup stale game
+      }
 
       const { balanceAfter } = await holdBet(userId, betAmount, 'blackjack', null, null);
       socket.emit('balance:update', { balance: balanceAfter });
@@ -47,16 +49,17 @@ export function registerSoloBlackjackHandlers(io, socket) {
         game.active = false;
         const { winnerId, draw } = resolveGame(playerScore, 'stood', dealerScore, 'stood', userId, 'dealer');
         if (draw) {
-          // Refund goes here
+          const { balanceAfter } = await payout(userId, betAmount, 'blackjack', null, null, 0);
+          socket.emit('balance:update', { balance: balanceAfter });
         } else if (winnerId === userId) {
-          await payout(userId, betAmount * 2, 'blackjack', null, null, HOUSE_EDGE);
+          const { balanceAfter } = await payout(userId, betAmount * 2, 'blackjack', null, null, HOUSE_EDGE);
+          socket.emit('balance:update', { balance: balanceAfter });
         }
-        // If dealer also has 21, it's a push (refund)
         soloGames.delete(userId);
         return ack?.({
           cards: playerCards, score: playerScore,
           dealerCards, dealerScore,
-          gameOver: true, winnerId, draw,
+          gameOver: true, winnerId, draw, payout: draw ? betAmount : (winnerId === userId ? Math.floor(betAmount * 2 * (1 - HOUSE_EDGE)) : 0),
         });
       }
 
@@ -147,7 +150,8 @@ async function playDealer(game, userId, ack) {
   const { winnerId, draw } = resolveGame(playerScore, playerStatus, dealerScore, dealerStatus, userId, 'dealer');
 
   if (draw) {
-    // Push - refund (the bet stays, no payout)
+    const { balanceAfter: balanceAfterDraw } = await payout(userId, game.betAmount, 'blackjack', null, null, 0);
+    socket.emit('balance:update', { balance: balanceAfterDraw });
   } else if (winnerId === userId) {
     const winAmount = Math.floor(game.betAmount * 2 * (1 - HOUSE_EDGE));
     const { balanceAfter } = await payout(userId, winAmount, 'blackjack', null, null, 0);

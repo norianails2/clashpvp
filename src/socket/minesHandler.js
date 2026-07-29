@@ -24,7 +24,9 @@ export function registerMinesHandlers(io, socket) {
       const count = minesCount ?? 3;
       if (!isValidMinesCount(count)) return ack?.({ error: `Mines count must be between ${MIN_MINES} and ${MAX_MINES}` });
 
-      if (soloGames.has(userId)) return ack?.({ error: 'You already have an active game' });
+      if (soloGames.has(userId)) {
+        soloGames.delete(userId); // cleanup stale game
+      }
 
       const { balanceAfter } = await holdBet(userId, betAmount, 'mines', null, null);
       socket.emit('balance:update', { balance: balanceAfter });
