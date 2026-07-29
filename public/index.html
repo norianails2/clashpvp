@@ -1669,7 +1669,7 @@ function minesReveal(idx) {
         if (res.isMine) {
             cell.classList.add('bomb'); cell.textContent = '💣';
             document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => c.style.pointerEvents = 'none');
-            document.getElementById('minesStatus').innerHTML = '💣 −' + (_minesGame?.bet || '') + ' <i class="tg-s"></i>';
+            document.getElementById('minesStatus').innerHTML = '−' + (_minesGame?.bet || '') + ' <i class="tg-s"></i>';
             document.getElementById('minesCashoutBtn').style.display = 'none';
             _minesGame = null;
             setTimeout(() => {
