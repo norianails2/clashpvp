@@ -244,14 +244,16 @@
         .pvp-bj-btn:active { transform:scale(0.95); }
         .pvp-bj-btn.hit { background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.12); }
         .pvp-bj-btn.stand { background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1a0a2e;box-shadow:0 4px 15px rgba(251,191,36,0.2); }
-        .bj-solo-table { width:100%;background:rgba(0,0,0,0.2);border-radius:16px;padding:12px 16px;border:1px solid rgba(255,255,255,0.05); }
-        .bj-row { display:flex;flex-direction:column;gap:4px;padding:4px 0; }
-        .bj-label { font-size:9px;color:rgba(255,255,255,0.3);font-weight:700;text-transform:uppercase;letter-spacing:1px; }
-        .bj-score { font-family:'Fredoka',sans-serif;font-size:18px;font-weight:700;color:#fbbf24; }
-        .bj-hand { display:flex;gap:6px;flex-wrap:wrap;min-height:40px; }
-        .bj-hand .bjc { width:36px;height:50px;border-radius:8px;background:linear-gradient(180deg,#fff,#f5f5f5);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#1a0a2e;border:1px solid #ddd;animation:dealCard 0.3s ease backwards;box-shadow:0 2px 8px rgba(0,0,0,0.15); }
+        .bj-solo-table { width:100%;background:linear-gradient(160deg,#1a4731,#0f2b1d);border-radius:20px;padding:16px 20px;border:3px solid rgba(255,255,255,0.08);box-shadow:inset 0 2px 20px rgba(0,0,0,0.3),0 4px 20px rgba(0,0,0,0.2);position:relative;overflow:hidden; }
+        .bj-solo-table::after { content:'';position:absolute;inset:0;border:2px solid rgba(255,215,0,0.08);border-radius:17px;pointer-events:none; }
+        .bj-row { display:flex;flex-direction:column;gap:6px;padding:8px 0;position:relative;z-index:1; }
+        .bj-row:first-child { border-bottom:1px dashed rgba(255,255,255,0.08);margin-bottom:4px;padding-bottom:10px; }
+        .bj-label { font-size:10px;color:rgba(255,255,255,0.35);font-weight:700;text-transform:uppercase;letter-spacing:2px;display:flex;align-items:center;justify-content:space-between; }
+        .bj-score { font-family:'Fredoka',sans-serif;font-size:22px;font-weight:800;color:#fbbf24;text-shadow:0 0 10px rgba(251,191,36,0.15);min-width:24px;text-align:right; }
+        .bj-hand { display:flex;gap:8px;flex-wrap:wrap;min-height:56px; }
+        .bj-hand .bjc { width:40px;height:58px;border-radius:10px;background:linear-gradient(180deg,#fff,#f0f0f0);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#1a0a2e;border:1.5px solid #ddd;animation:dealCard 0.3s ease backwards;box-shadow:0 3px 10px rgba(0,0,0,0.2); }
         .bj-hand .bjc.red { color:#ef4444; }
-        .bj-hand .bjc.hidden { background:linear-gradient(145deg,#6c5ce7,#a29bfe);color:#fff;border-color:#6c5ce7;font-size:20px; }
+        .bj-hand .bjc.hidden { background:linear-gradient(145deg,#6c5ce7,#4834d4);color:#fff;border-color:#6c5ce7;font-size:22px; }
         .bj-hand .bjc.hidden::after { content:'?'; }
         .pvp-bj-btn:disabled { opacity:0.25;cursor:not-allowed;transform:none!important;box-shadow:none!important; }
 
@@ -1727,9 +1729,8 @@ function renderSoloBJ(area) {
     area.innerHTML =
         '<div class="bj-solo" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;padding:0 16px;">' +
         '<div class="bj-solo-table" style="width:100%;">' +
-        '<div class="bj-row"><div class="bj-label">Дилер</div><div class="bj-score" id="bjDealerScore">?</div><div class="bj-hand" id="bjDealerHand"></div></div>' +
-        '<div style="height:4px;border-top:1px solid rgba(255,255,255,0.06);margin:6px 0;"></div>' +
-        '<div class="bj-row"><div class="bj-label">Ты</div><div class="bj-score" id="bjPlayerScore">0</div><div class="bj-hand" id="bjPlayerHand"></div></div>' +
+        '<div class="bj-row"><div class="bj-label">🎩 ДИЛЕР <span class="bj-score" id="bjDealerScore">?</span></div><div class="bj-hand" id="bjDealerHand"></div></div>' +
+        '<div class="bj-row"><div class="bj-label">👤 ТЫ <span class="bj-score" id="bjPlayerScore">0</span></div><div class="bj-hand" id="bjPlayerHand"></div></div>' +
         '</div>' +
         '<div class="pvc-label" style="margin-top:4px;position:relative;z-index:1;">✦ СТАВКА</div>' +
         '<div class="pvc-row"><div class="pvc-input-wrap"><span class="pvc-star"><i class="tg-s"></i></span>' +
