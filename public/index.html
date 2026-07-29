@@ -1609,6 +1609,7 @@ function renderSoloMines(area) {
         '</div>';
 
     const g = document.getElementById('minesGrid');
+    g.innerHTML = '';
     g.style.gridTemplateColumns = 'repeat(5,1fr)';
     for (let i = 0; i < 25; i++) {
         const c = document.createElement('div'); c.className = 'pvp-mine-cell';
@@ -1640,11 +1641,14 @@ function minesStart() {
     document.getElementById('minesStartBtn').disabled = true;
     document.getElementById('minesStartBtn').textContent = '⏳ СТАРТ...';
     document.getElementById('minesStatus').textContent = '⏳ Генерация поля...';
+    // Reset grid
+    document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => { c.className = 'pvp-mine-cell'; c.textContent = ''; c.style.pointerEvents = ''; c.style.cursor = ''; });
     balance -= bet; updateBalance();
     socket?.emit('mines:start', { betAmount: bet, minesCount: count }, (res) => {
         if (res?.error) { balance += bet; updateBalance(); document.getElementById('minesStartBtn').disabled = false; document.getElementById('minesStartBtn').textContent = '💣 СТАРТ'; return showToast('❌ ' + res.error, 'error'); }
         _minesGame = { bet };
         document.getElementById('minesStartBtn').style.display = 'none';
+        document.getElementById('minesCashoutBtn').style.display = 'none';
         document.getElementById('minesStatus').textContent = '💎 Открывай клетки!';
         document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => c.style.cursor = 'pointer');
     });
