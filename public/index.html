@@ -1779,52 +1779,32 @@ function bjStart() {
     });
 }
 function bjHit() {
-    const hitBtn = document.getElementById('bjHitBtn');
-    if (!hitBtn || hitBtn.disabled) { return; }
+    const btn = document.getElementById('bjHitBtn');
+    if (!btn || btn.disabled) return;
+    if (!socket?.connected) { showToast('🔌 Нет соединения', 'error'); connectSocket(); return; }
     document.getElementById('bjHitBtn').disabled = true;
     document.getElementById('bjStandBtn').disabled = true;
     document.getElementById('bjStatus').textContent = '⏳...';
-    let done = false;
-    const timeout = setTimeout(() => {
-        if (!done) {
-            document.getElementById('bjHitBtn').disabled = false;
-            document.getElementById('bjStandBtn').disabled = false;
-            document.getElementById('bjStatus').textContent = 'Твой ход';
-            showToast('⚠️ Нет ответа от сервера', 'error');
-        }
-    }, 5000);
-    socket?.emit('bj:hit', {}, (res) => {
-        done = true; clearTimeout(timeout);
-        console.log('bj:hit response', res);
-        if (res?.error) { document.getElementById('bjHitBtn').disabled = false; document.getElementById('bjStandBtn').disabled = false; return showToast('❌ ' + res.error, 'error'); }
+    socket.emit('bj:hit', {}, (res) => {
+        document.getElementById('bjHitBtn').disabled = false;
+        document.getElementById('bjStandBtn').disabled = false;
+        if (res?.error) { document.getElementById('bjStatus').textContent = 'Твой ход'; return showToast('❌ ' + res.error, 'error'); }
         updateBJHands(res);
-        if (res.gameOver) {
-            bjGameOver(res);
-        } else {
-            document.getElementById('bjHitBtn').disabled = false;
-            document.getElementById('bjStandBtn').disabled = false;
-            document.getElementById('bjStatus').textContent = 'Твой ход';
-        }
+        if (res.gameOver) { bjGameOver(res); }
+        else { document.getElementById('bjStatus').textContent = 'Твой ход'; }
     });
 }
 function bjStand() {
-    const sBtn = document.getElementById('bjStandBtn');
-    if (!sBtn || sBtn.disabled) { return; }
+    const btn = document.getElementById('bjStandBtn');
+    if (!btn || btn.disabled) return;
+    if (!socket?.connected) { showToast('🔌 Нет соединения', 'error'); connectSocket(); return; }
     document.getElementById('bjHitBtn').disabled = true;
     document.getElementById('bjStandBtn').disabled = true;
     document.getElementById('bjStatus').textContent = '⏳ Ход дилера...';
-    let done = false;
-    const timeout = setTimeout(() => {
-        if (!done) {
-            document.getElementById('bjHitBtn').disabled = false;
-            document.getElementById('bjStandBtn').disabled = false;
-            document.getElementById('bjStatus').textContent = 'Твой ход';
-            showToast('⚠️ Нет ответа от сервера', 'error');
-        }
-    }, 5000);
-    socket?.emit('bj:stand', {}, (res) => {
-        done = true; clearTimeout(timeout);
-        if (res?.error) { document.getElementById('bjHitBtn').disabled = false; document.getElementById('bjStandBtn').disabled = false; return showToast('❌ ' + res.error, 'error'); }
+    socket.emit('bj:stand', {}, (res) => {
+        document.getElementById('bjHitBtn').disabled = false;
+        document.getElementById('bjStandBtn').disabled = false;
+        if (res?.error) return showToast('❌ ' + res.error, 'error');
         updateBJHands(res);
         bjGameOver(res);
     });
