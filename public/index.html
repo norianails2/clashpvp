@@ -1764,6 +1764,7 @@ function bjStart() {
     document.getElementById('bjStatus').textContent = '⏳ Раздача...';
     balance -= bet; updateBalance();
     socket?.emit('bj:start', { betAmount: bet }, (res) => {
+        console.log('bj:start response', res);
         if (res?.error) { balance += bet; updateBalance(); document.getElementById('bjStartBtn').disabled = false; document.getElementById('bjStartBtn').textContent = '🃏 СТАРТ'; return showToast('❌ ' + res.error, 'error'); }
         document.getElementById('bjStartBtn').style.display = 'none';
         document.getElementById('bjHitBtn').style.display = '';
@@ -1776,15 +1777,19 @@ function bjStart() {
     });
 }
 function bjHit() {
+    const btn = document.getElementById('bjHitBtn');
+    if (!btn || btn.disabled) { console.log('bjHit: button disabled or missing'); return; }
     document.getElementById('bjHitBtn').disabled = true;
     document.getElementById('bjStatus').textContent = '⏳...';
     socket?.emit('bj:hit', {}, (res) => {
-        if (res?.error) { document.getElementById('bjHitBtn').disabled = false; return showToast('❌ ' + res.error, 'error'); }
+        console.log('bj:hit response', res);
+        if (res?.error) { document.getElementById('bjHitBtn').disabled = false; document.getElementById('bjStandBtn').disabled = false; return showToast('❌ ' + res.error, 'error'); }
         updateBJHands(res);
         if (res.gameOver) {
             bjGameOver(res);
         } else {
             document.getElementById('bjHitBtn').disabled = false;
+            document.getElementById('bjStandBtn').disabled = false;
             document.getElementById('bjStatus').textContent = 'Твой ход';
         }
     });

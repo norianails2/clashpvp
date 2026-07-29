@@ -77,6 +77,7 @@ export function registerSoloBlackjackHandlers(io, socket) {
   socket.on('bj:hit', async (payload, ack) => {
     try {
       const game = soloGames.get(userId);
+      console.log('[bj:hit] userId=' + userId + ' game=' + !!game + ' active=' + (game?.active) + ' done=' + (game?.playerDone) + ' cards=' + (game?.playerCards?.length) + ' deck=' + (game?.deck?.length));
       if (!game || !game.active) return ack?.({ error: 'No active game' });
       if (game.playerDone) return ack?.({ error: 'You already stood' });
 
@@ -85,6 +86,7 @@ export function registerSoloBlackjackHandlers(io, socket) {
       game.playerCards.push(card);
       game.deck = newDeck;
       const score = calculateScore(game.playerCards);
+      console.log('[bj:hit] drew ' + card + ' score=' + score + ' bust=' + isBust(score) + ' deckLeft=' + game.deck.length);
 
       if (isBust(score)) {
         game.playerDone = true;
