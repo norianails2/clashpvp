@@ -1724,7 +1724,9 @@ function minesCashout() {
 
 
 // Solo Blackjack
+var _bjBusy = false;
 function renderSoloBJ(area) {
+    _bjBusy = false;
     document.getElementById('gameTitle').textContent = '🃏 Блекджек';
     area.innerHTML =
         '<div class="bj-solo" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;padding:0 16px;">' +
@@ -1756,38 +1758,30 @@ function bjAdjBet(type) {
     inp.value = val;
 }
 function bjStart() {
+    if (_bjBusy) return;
     const bet = parseInt(document.getElementById('bjBetInput')?.value) || 10;
     if (bet < 1) return showToast('❌ Минимум 1 ★', 'error');
     if (bet > balance) return showToast('❌ Недостаточно ★', 'error');
-    document.getElementById('bjStartBtn').disabled = true;
-    document.getElementById('bjStartBtn').textContent = '⏳...';
+    _bjBusy = true;
     document.getElementById('bjStatus').textContent = '⏳ Раздача...';
     balance -= bet; updateBalance();
     socket?.emit('bj:start', { betAmount: bet }, (res) => {
-        console.log('bj:start response', res);
-        if (res?.error) { balance += bet; updateBalance(); document.getElementById('bjStartBtn').disabled = false; document.getElementById('bjStartBtn').textContent = '🃏 СТАРТ'; return showToast('❌ ' + res.error, 'error'); }
+        _bjBusy = false;
+        if (res?.error) { balance += bet; updateBalance(); return showToast('❌ ' + res.error, 'error'); }
         document.getElementById('bjStartBtn').style.display = 'none';
         document.getElementById('bjHitBtn').style.display = '';
-        document.getElementById('bjHitBtn').disabled = false;
         document.getElementById('bjStandBtn').style.display = '';
-        document.getElementById('bjStandBtn').disabled = false;
         document.getElementById('bjStatus').textContent = 'Твой ход';
         updateBJHands(res);
-        if (res.gameOver) {
-            bjGameOver(res);
-        }
+        if (res.gameOver) { bjGameOver(res); }
     });
 }
 function bjHit() {
-    const btn = document.getElementById('bjHitBtn');
-    if (!btn || btn.disabled) return;
-    if (!socket?.connected) { showToast('🔌 Нет соединения', 'error'); connectSocket(); return; }
-    document.getElementById('bjHitBtn').disabled = true;
-    document.getElementById('bjStandBtn').disabled = true;
+    if (_bjBusy) return;
+    _bjBusy = true;
     document.getElementById('bjStatus').textContent = '⏳...';
-    socket.emit('bj:hit', {}, (res) => {
-        document.getElementById('bjHitBtn').disabled = false;
-        document.getElementById('bjStandBtn').disabled = false;
+    socket?.emit('bj:hit', {}, (res) => {
+        _bjBusy = false;
         if (res?.error) { document.getElementById('bjStatus').textContent = 'Твой ход'; return showToast('❌ ' + res.error, 'error'); }
         updateBJHands(res);
         if (res.gameOver) { bjGameOver(res); }
@@ -1795,15 +1789,11 @@ function bjHit() {
     });
 }
 function bjStand() {
-    const btn = document.getElementById('bjStandBtn');
-    if (!btn || btn.disabled) return;
-    if (!socket?.connected) { showToast('🔌 Нет соединения', 'error'); connectSocket(); return; }
-    document.getElementById('bjHitBtn').disabled = true;
-    document.getElementById('bjStandBtn').disabled = true;
+    if (_bjBusy) return;
+    _bjBusy = true;
     document.getElementById('bjStatus').textContent = '⏳ Ход дилера...';
-    socket.emit('bj:stand', {}, (res) => {
-        document.getElementById('bjHitBtn').disabled = false;
-        document.getElementById('bjStandBtn').disabled = false;
+    socket?.emit('bj:stand', {}, (res) => {
+        _bjBusy = false;
         if (res?.error) return showToast('❌ ' + res.error, 'error');
         updateBJHands(res);
         bjGameOver(res);
@@ -1812,6 +1802,7 @@ function bjStand() {
 function bjGameOver(res) {
     document.getElementById('bjHitBtn').style.display = 'none';
     document.getElementById('bjStandBtn').style.display = 'none';
+    _bjBusy = false;
     if (res.draw) {
         document.getElementById('bjStatus').textContent = '🤝 Ничья!';
     } else if (res.winnerId === 'dealer') {
@@ -1820,7 +1811,8 @@ function bjGameOver(res) {
         document.getElementById('bjStatus').innerHTML = '+' + (res.payout || 0) + ' <i class="tg-s"></i>';
     }
     setTimeout(() => {
-        document.getElementById('bjStartBtn').style.display = ''; document.getElementById('bjStartBtn').disabled = false; document.getElementById('bjStartBtn').textContent = '🃏 СТАРТ';
+        document.getElementById('bjStartBtn').style.display = '';
+        document.getElementById('bjStartBtn').textContent = '🃏 СТАРТ';
     }, 2000);
 }
 function updateBJHands(res) {
