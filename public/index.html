@@ -1605,8 +1605,8 @@ function renderSoloMines(area) {
         '<input type="number" id="minesBetInput" value="10" min="1"><span class="pvc-currency">★</span></div>' +
         '<div class="pvc-adj"><button onclick="minesAdjBet(\'min\')">MIN</button><button onclick="minesAdjBet(\'half\')">½</button><button onclick="minesAdjBet(\'double\')">2×</button><button onclick="minesAdjBet(\'max\')">MAX</button></div></div>' +
         '<div style="display:flex;gap:8px;align-items:center;min-height:40px;" id="minesActions">' +
-        '<button class="c-main-btn" id="minesStartBtn">💣 СТАРТ</button>' +
-        '<button class="c-main-btn cashout" id="minesCashoutBtn" style="display:none;">◆ ЗАБРАТЬ <span id="minesMult">1.00</span>x</button></div>' +
+        '<button class="c-main-btn mines-act-btn" data-act="start">💣 СТАРТ</button>' +
+        '<button class="c-main-btn cashout mines-act-btn" data-act="cashout" style="display:none;">◆ ЗАБРАТЬ <span id="minesMult">1.00</span>x</button></div>' +
         '<div style="font-size:12px;color:rgba(255,255,255,0.4);font-weight:600;min-height:20px;" id="minesStatus">Установи ставку и нажми СТАРТ</div>' +
         '</div>';
 
@@ -1621,6 +1621,14 @@ function renderSoloMines(area) {
         };
         g.appendChild(c);
     }
+    // Direct onclick
+    area.querySelectorAll('.mines-act-btn').forEach(function(btn) {
+        btn.onclick = function() {
+            var act = this.getAttribute('data-act');
+            if (act === 'start') minesStart();
+            else if (act === 'cashout') minesCashout();
+        };
+    });
 }
 function minesAdjBet(type) {
     const inp = document.getElementById('minesBetInput');
@@ -1756,13 +1764,27 @@ function renderSoloBJ(area) {
         '<div class="pvc-label" style="margin-top:4px;position:relative;z-index:1;">✦ СТАВКА</div>' +
         '<div class="pvc-row"><div class="pvc-input-wrap"><span class="pvc-star"><i class="tg-s"></i></span>' +
         '<input type="number" id="bjBetInput" value="10" min="1"><span class="pvc-currency">★</span></div>' +
-        '<div class="pvc-adj"><button id="bjAdjMin">MIN</button><button id="bjAdjHalf">½</button><button id="bjAdjDbl">2×</button><button id="bjAdjMax">MAX</button></div></div>' +
+        '<div class="pvc-adj"><button class="bj-adj-btn" data-adj="min">MIN</button><button class="bj-adj-btn" data-adj="half">½</button><button class="bj-adj-btn" data-adj="double">2×</button><button class="bj-adj-btn" data-adj="max">MAX</button></div></div>' +
         '<div style="display:flex;gap:8px;align-items:center;min-height:40px;" id="bjActions">' +
-        '<button class="c-main-btn" id="bjStartBtn">🃏 СТАРТ</button>' +
-        '<button class="pvp-bj-btn hit" id="bjHitBtn" style="display:none;">➕ Ещё</button>' +
-        '<button class="pvp-bj-btn stand" id="bjStandBtn" style="display:none;">✋ Хватит</button></div>' +
+        '<button class="c-main-btn bj-act-btn" data-act="start">🃏 СТАРТ</button>' +
+        '<button class="pvp-bj-btn hit bj-act-btn" data-act="hit" style="display:none;">➕ Ещё</button>' +
+        '<button class="pvp-bj-btn stand bj-act-btn" data-act="stand" style="display:none;">✋ Хватит</button></div>' +
         '<div style="font-size:14px;color:#fbbf24;font-weight:700;min-height:22px;" id="bjStatus">Установи ставку и нажми СТАРТ</div>' +
         '</div>';
+    // Direct onclick assignment (bypasses CSP issues)
+    area.querySelectorAll('.bj-act-btn').forEach(function(btn) {
+        btn.onclick = function() {
+            var act = this.getAttribute('data-act');
+            if (act === 'start') bjStart();
+            else if (act === 'hit') bjHit();
+            else if (act === 'stand') bjStand();
+        };
+    });
+    area.querySelectorAll('.bj-adj-btn').forEach(function(btn) {
+        btn.onclick = function() {
+            bjAdjBet(this.getAttribute('data-adj'));
+        };
+    });
 }
 function bjAdjBet(type) {
     const inp = document.getElementById('bjBetInput'); if (!inp) return;
