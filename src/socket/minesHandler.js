@@ -105,6 +105,7 @@ export function registerMinesHandlers(io, socket) {
       soloGames.delete(userId);
       socket.emit('balance:update', { balance: balanceAfter });
 
+      socket.emit('mines:cashout_result', { success: true, multiplier: game.multiplier, payout: win, safeOpenedCount: game.safeOpenedCount });
       ack?.({ success: true, multiplier: game.multiplier, payout: win, safeOpenedCount: game.safeOpenedCount });
     } catch (err) {
       console.error('[mines:cashout]', err?.message || err);

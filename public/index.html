@@ -1701,19 +1701,16 @@ function minesReveal(idx) {
 }
 function minesCashout() {
     if (!_minesGame) return;
-    document.getElementById('minesCashoutBtn').disabled = true;
-    document.getElementById('minesStatus').textContent = '⏳ Забираем...';
-    socket?.emit('mines:cashout', {}, (res) => {
-        if (res?.error) { document.getElementById('minesCashoutBtn').disabled = false; return showToast('❌ ' + res.error, 'error'); }
-        document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => c.style.pointerEvents = 'none');
-        document.getElementById('minesCashoutBtn').style.display = 'none';
-        document.getElementById('minesStatus').innerHTML = '+' + res.payout + ' <i class="tg-s"></i> (x' + res.multiplier.toFixed(2) + ')';
-        _minesGame = null;
-        setTimeout(() => {
-            const btn = document.getElementById('minesStartBtn');
-            if (btn) { btn.style.display = ''; btn.disabled = false; btn.textContent = '💣 СТАРТ'; }
-        }, 2000);
-    });
+    // Optimistic: show win immediately
+    var payoutBet = _minesGame.bet || 0;
+    var payoutMult = parseFloat(document.getElementById('minesMult')?.textContent || '1');
+    document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => c.style.pointerEvents = 'none');
+    document.getElementById('minesCashoutBtn').style.display = 'none';
+    document.getElementById('minesStatus').innerHTML = '+' + Math.floor(payoutBet * payoutMult * 0.9) + ' <i class="tg-s"></i> (x' + payoutMult.toFixed(2) + ')';
+    _minesGame = null;
+    setTimeout(function() { var btn = document.getElementById('minesStartBtn'); if (btn) { btn.style.display = ''; btn.disabled = false; btn.textContent = '💣 СТАРТ'; } }, 2000);
+    // Send server request (will correct balance)
+    socket?.emit('mines:cashout', {});
 }
 
 
@@ -2133,6 +2130,15 @@ function connectSocket(initData) {
         document.getElementById('minesCashoutBtn').style.display = 'none';
         document.getElementById('minesStatus').textContent = '💎 Открывай клетки!';
         document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => c.style.cursor = 'pointer');
+    });
+    socket.on('mines:cashout_result', function(res) {
+        if (res?.error) return showToast('❌ ' + res.error, 'error');
+        if (!res?.success) return;
+        document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(function(c) { c.style.pointerEvents = 'none'; });
+        document.getElementById('minesCashoutBtn').style.display = 'none';
+        document.getElementById('minesStatus').innerHTML = '+' + res.payout + ' <i class="tg-s"></i> (x' + res.multiplier.toFixed(2) + ')';
+        _minesGame = null;
+        setTimeout(function() { var btn = document.getElementById('minesStartBtn'); if (btn) { btn.style.display = ''; btn.disabled = false; btn.textContent = '💣 СТАРТ'; } }, 2000);
     });
     socket.on('bj:start_result', (res) => { if (typeof bjOnStartResult === 'function') bjOnStartResult(res); });
     socket.on('bj:hit_result', (res) => { if (typeof bjOnHitResult === 'function') bjOnHitResult(res); });
