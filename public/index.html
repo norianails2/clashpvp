@@ -1778,27 +1778,22 @@ function renderSoloBJ(area) {
         '<div class="pvc-label" style="margin-top:4px;position:relative;z-index:1;">✦ СТАВКА</div>' +
         '<div class="pvc-row"><div class="pvc-input-wrap"><span class="pvc-star"><i class="tg-s"></i></span>' +
         '<input type="number" id="bjBetInput" value="10" min="1"><span class="pvc-currency">★</span></div>' +
-        '<div class="pvc-adj"><button class="bj-adj-btn" data-adj="min">MIN</button><button class="bj-adj-btn" data-adj="half">½</button><button class="bj-adj-btn" data-adj="double">2×</button><button class="bj-adj-btn" data-adj="max">MAX</button></div></div>' +
+        '<div class="pvc-adj"><button id="bjAdjMin">MIN</button><button id="bjAdjHalf">½</button><button id="bjAdjDbl">2×</button><button id="bjAdjMax">MAX</button></div></div>' +
         '<div style="display:flex;gap:8px;align-items:center;min-height:40px;" id="bjActions">' +
-        '<button class="c-main-btn bj-act-btn" id="bjStartBtn" data-act="start">🃏 СТАРТ</button>' +
-        '<button class="pvp-bj-btn hit bj-act-btn" id="bjHitBtn" data-act="hit" style="display:none;">➕ Ещё</button>' +
-        '<button class="pvp-bj-btn stand bj-act-btn" id="bjStandBtn" data-act="stand" style="display:none;">✋ Хватит</button></div>' +
+        '<button class="c-main-btn" id="bjStartBtn">🃏 СТАРТ</button>' +
+        '<button class="pvp-bj-btn hit" id="bjHitBtn" style="display:none;">➕ Ещё</button>' +
+        '<button class="pvp-bj-btn stand" id="bjStandBtn" style="display:none;">✋ Хватит</button></div>' +
         '<div style="font-size:14px;color:#fbbf24;font-weight:700;min-height:22px;" id="bjStatus">Установи ставку и нажми СТАРТ</div>' +
         '</div>';
-    // Direct onclick assignment (bypasses CSP issues)
-    area.querySelectorAll('.bj-act-btn').forEach(function(btn) {
-        function bjHandler(e) {
-            var act = btn.getAttribute('data-act');
-            if (act === 'start') bjStart();
-            else if (act === 'hit') bjHit();
-            else if (act === 'stand') bjStand();
-        }
-        btn.addEventListener('touchstart', bjHandler, {passive:true});
-        btn.addEventListener('click', bjHandler);
-    });
-    area.querySelectorAll('.bj-adj-btn').forEach(function(btn) {
-        btn.addEventListener('click', function() { bjAdjBet(this.getAttribute('data-adj')); });
-    });
+    setTimeout(function() {
+        var b = document.getElementById('bjStartBtn'); if (b) b.onclick = bjStart;
+        var h = document.getElementById('bjHitBtn'); if (h) h.onclick = bjHit;
+        var s = document.getElementById('bjStandBtn'); if (s) s.onclick = bjStand;
+        var a = document.getElementById('bjAdjMin'); if (a) a.onclick = function(){bjAdjBet('min');};
+        var p = document.getElementById('bjAdjHalf'); if (p) p.onclick = function(){bjAdjBet('half');};
+        var d = document.getElementById('bjAdjDbl'); if (d) d.onclick = function(){bjAdjBet('double');};
+        var m = document.getElementById('bjAdjMax'); if (m) m.onclick = function(){bjAdjBet('max');};
+    }, 0);
 }
 function bjAdjBet(type) {
     const inp = document.getElementById('bjBetInput'); if (!inp) return;
