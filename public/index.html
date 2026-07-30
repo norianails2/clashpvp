@@ -1657,13 +1657,14 @@ function minesStart() {
     });
 }
 function minesReveal(idx) {
-    if (!_minesGame) return;
+    if (!_minesGame) { console.log('minesReveal: _minesGame is null'); return; }
     const cell = document.querySelector('#minesGrid .pvp-mine-cell[data-idx="' + idx + '"]');
     if (!cell || cell.classList.length > 1) return;
     cell.style.cursor = 'default';
     document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => c.style.pointerEvents = 'none');
     document.getElementById('minesStatus').textContent = '⏳ Открываем...';
     socket?.emit('mines:reveal', { cellIndex: idx }, (res) => {
+        console.log('mines:reveal response', res);
         if (res?.error) {
             document.getElementById('minesStatus').textContent = '💎 Открывай клетки!';
             document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => { if (c.classList.length <= 1) c.style.pointerEvents = ''; });
@@ -1726,9 +1727,12 @@ var _bjBusy = false, _bjTimer = 0, _bjHitCount = 0;
 // Solo Blackjack - event delegation on document (Telegram CSP safe)
 document.addEventListener('click', function(e) {
     if (!e || !e.target) return;
+    // Walk up to find button-like element (has id OR is button)
     var el = e.target;
-    // Walk up to find button with ID (handles clicks on child elements like <i>)
-    while (el && !el.id) el = el.parentElement;
+    while (el && el !== document.body) {
+        if (el.id === 'bjStartBtn' || el.id === 'bjHitBtn' || el.id === 'bjStandBtn' || el.id === 'bjAdjMin' || el.id === 'bjAdjHalf' || el.id === 'bjAdjDbl' || el.id === 'bjAdjMax' || el.id === 'minesStartBtn' || el.id === 'minesCashoutBtn') break;
+        el = el.parentElement;
+    }
     if (!el) return;
     var id = el.id;
     if (id === 'bjStartBtn') bjStart();
