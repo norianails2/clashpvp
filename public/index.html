@@ -557,6 +557,12 @@
             <span class="rules-btn" onclick="showRules()">📖</span>
         </div>
         <div class="game-area" id="gameArea"></div>
+        <!-- Static buttons using href javascript: (works where onclick CSP blocks) -->
+        <div id="bjStaticActions" style="display:none;padding:0 16px 12px;gap:8px;align-items:center;justify-content:center;min-height:40px;">
+            <a class="pvp-bj-btn hit" href="javascript:bjHit()" id="bjStaticHit" style="text-decoration:none;display:inline-block;padding:8px 20px;border-radius:9999px;background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.12);font-family:Nunito,sans-serif;font-size:13px;font-weight:700;">➕ Ещё</a>
+            <a class="pvp-bj-btn stand" href="javascript:bjStand()" id="bjStaticStand" style="text-decoration:none;display:inline-block;padding:8px 20px;border-radius:9999px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1a0a2e;font-family:Nunito,sans-serif;font-size:13px;font-weight:700;">✋ Хватит</a>
+        </div>
+        <a class="c-main-btn cashout" href="javascript:minesCashout()" id="mineStaticCashout" style="display:none;text-decoration:none;">◆ ЗАБРАТЬ <span id="minesMult">1.00</span>x</a>
     </div>
 
 
@@ -1604,11 +1610,28 @@ function renderSoloMines(area) {
         '<div class="pvc-row"><div class="pvc-input-wrap"><span class="pvc-star"><i class="tg-s"></i></span>' +
         '<input type="number" id="minesBetInput" value="10" min="1"><span class="pvc-currency">★</span></div>' +
         '<div class="pvc-adj"><button onclick="minesAdjBet(\'min\')">MIN</button><button onclick="minesAdjBet(\'half\')">½</button><button onclick="minesAdjBet(\'double\')">2×</button><button onclick="minesAdjBet(\'max\')">MAX</button></div></div>' +
-        '<div style="display:flex;gap:8px;align-items:center;min-height:40px;" id="minesActions">' +
-        '<button class="c-main-btn mines-act-btn" id="minesStartBtn" data-act="start">💣 СТАРТ</button>' +
-        '<button class="c-main-btn cashout mines-act-btn" id="minesCashoutBtn" data-act="cashout" style="display:none;">◆ ЗАБРАТЬ <span id="minesMult">1.00</span>x</button></div>' +
+        '<div style="display:flex;gap:8px;align-items:center;min-height:40px;" id="minesActions"></div>' +
         '<div style="font-size:12px;color:rgba(255,255,255,0.4);font-weight:600;min-height:20px;" id="minesStatus">Установи ставку и нажми СТАРТ</div>' +
         '</div>';
+
+    // Create buttons via DOM (bypasses innerHTML inline handler issue in Telegram)
+    var actDiv = document.getElementById('minesActions');
+    actDiv.innerHTML = '';
+    var startBtn = document.createElement('button');
+    startBtn.id = 'minesStartBtn'; startBtn.className = 'c-main-btn';
+    startBtn.textContent = '💣 СТАРТ';
+    startBtn.onclick = minesStart;
+    actDiv.appendChild(startBtn);
+    var cashBtn = document.createElement('button');
+    cashBtn.id = 'minesCashoutBtn'; cashBtn.className = 'c-main-btn cashout';
+    cashBtn.style.display = 'none';
+    cashBtn.innerHTML = '◆ ЗАБРАТЬ <span id="minesMult">1.00</span>x';
+    cashBtn.onclick = minesCashout;
+    actDiv.appendChild(cashBtn);
+
+    const g = document.getElementById('minesGrid');
+    g.innerHTML = '';
+    g.style.gridTemplateColumns = 'repeat(5,1fr)';
 
     const g = document.getElementById('minesGrid');
     g.innerHTML = '';
@@ -1780,21 +1803,32 @@ function renderSoloBJ(area) {
         '<div class="pvc-row"><div class="pvc-input-wrap"><span class="pvc-star"><i class="tg-s"></i></span>' +
         '<input type="number" id="bjBetInput" value="10" min="1"><span class="pvc-currency">★</span></div>' +
         '<div class="pvc-adj"><button id="bjAdjMin">MIN</button><button id="bjAdjHalf">½</button><button id="bjAdjDbl">2×</button><button id="bjAdjMax">MAX</button></div></div>' +
-        '<div style="display:flex;gap:8px;align-items:center;min-height:40px;" id="bjActions">' +
-        '<button class="c-main-btn" id="bjStartBtn">🃏 СТАРТ</button>' +
-        '<button class="pvp-bj-btn hit" id="bjHitBtn" style="display:none;">➕ Ещё</button>' +
-        '<button class="pvp-bj-btn stand" id="bjStandBtn" style="display:none;">✋ Хватит</button></div>' +
+        '<div style="display:flex;gap:8px;align-items:center;min-height:40px;" id="bjActions"></div>' +
         '<div style="font-size:14px;color:#fbbf24;font-weight:700;min-height:22px;" id="bjStatus">Установи ставку и нажми СТАРТ</div>' +
         '</div>';
-    setTimeout(function() {
-        var b = document.getElementById('bjStartBtn'); if (b) b.onclick = bjStart;
-        var h = document.getElementById('bjHitBtn'); if (h) h.onclick = bjHit;
-        var s = document.getElementById('bjStandBtn'); if (s) s.onclick = bjStand;
-        var a = document.getElementById('bjAdjMin'); if (a) a.onclick = function(){bjAdjBet('min');};
-        var p = document.getElementById('bjAdjHalf'); if (p) p.onclick = function(){bjAdjBet('half');};
-        var d = document.getElementById('bjAdjDbl'); if (d) d.onclick = function(){bjAdjBet('double');};
-        var m = document.getElementById('bjAdjMax'); if (m) m.onclick = function(){bjAdjBet('max');};
-    }, 0);
+    // Create BJ buttons via DOM (bypasses Telegram innerHTML issue)
+    var ac = document.getElementById('bjActions');
+    ac.innerHTML = '';
+    var sBtn = document.createElement('button');
+    sBtn.id = 'bjStartBtn'; sBtn.className = 'c-main-btn';
+    sBtn.textContent = '🃏 СТАРТ';
+    sBtn.onclick = bjStart;
+    ac.appendChild(sBtn);
+    var hBtn = document.createElement('button');
+    hBtn.id = 'bjHitBtn'; hBtn.className = 'pvp-bj-btn hit';
+    hBtn.textContent = '➕ Ещё'; hBtn.style.display = 'none';
+    hBtn.onclick = bjHit;
+    ac.appendChild(hBtn);
+    var stBtn = document.createElement('button');
+    stBtn.id = 'bjStandBtn'; stBtn.className = 'pvp-bj-btn stand';
+    stBtn.textContent = '✋ Хватит'; stBtn.style.display = 'none';
+    stBtn.onclick = bjStand;
+    ac.appendChild(stBtn);
+    // Adjust buttons onclick
+    document.getElementById('bjAdjMin').onclick = function(){bjAdjBet('min');};
+    document.getElementById('bjAdjHalf').onclick = function(){bjAdjBet('half');};
+    document.getElementById('bjAdjDbl').onclick = function(){bjAdjBet('double');};
+    document.getElementById('bjAdjMax').onclick = function(){bjAdjBet('max');};
 }
 function bjAdjBet(type) {
     const inp = document.getElementById('bjBetInput'); if (!inp) return;
