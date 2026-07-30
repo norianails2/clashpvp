@@ -2063,9 +2063,10 @@ function connectSocket(initData) {
     });
     socket.on('coin:result', (data) => {
         if (window._resultHandled) { window._resultHandled = false; return; }
+        const isDraw = data.draw || (data.winnerId === null);
         const isWin = data.winnerId === myUserId;
-        const netPayout = Math.floor((currentRoom?.bet_amount || 0) * 2 * 0.90);
-        handleGameResult('coin', false, isWin, netPayout, data);
+        const netPayout = data.payout || (isDraw ? (currentRoom?.bet_amount || 0) : Math.floor((currentRoom?.bet_amount || 0) * 2 * 0.90));
+        handleGameResult('coin', isDraw, isWin, netPayout, data);
     });
 
     // --- Mines ---

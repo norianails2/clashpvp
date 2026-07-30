@@ -110,8 +110,8 @@ export function registerCoinHandlers(io, socket) {
           await client.query('COMMIT');
 
           io.to(`room:${room.id}`).emit('coin:result', {
-            roomId, picks: newPicks, flip, winnerId,
-            payout: Math.floor(pot * (1 - HOUSE_EDGE)),
+            roomId, picks: newPicks, flip, winnerId, draw,
+            payout: draw ? room.bet_amount : Math.floor(pot * (1 - HOUSE_EDGE)),
           });
           broadcastLobbyUpdate(io, 'coin');
           return ack?.({ flip, winnerId, gameOver: true });
