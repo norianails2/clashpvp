@@ -52,21 +52,22 @@ async function checkUserBalance(client, userId, minAmount) {
 // 1. ХОЛД (списание ставки)
 // ---------------------------------------------------------------------------
 export async function holdBet(userId, amount, gameType, roomId, txClient) {
-  if (!userId || !amount || amount < 1) {
+  const _amount = parseInt(amount, 10);
+  if (!userId || !_amount || _amount < 1) {
     throw Object.assign(new Error('Invalid bet params'), { status: 400 });
   }
 
   return withClient(txClient, async (client) => {
-    const { balanceBefore } = await checkUserBalance(client, userId, amount);
+    const { balanceBefore } = await checkUserBalance(client, userId, _amount);
 
-    const balanceAfter = balanceBefore - amount;
+    const balanceAfter = balanceBefore - _amount;
 
     await client.query(`UPDATE users SET balance = $1 WHERE id = $2`, [balanceAfter, userId]);
 
     await client.query(
       `INSERT INTO transactions (user_id, type, amount, balance_before, balance_after, game_type, room_id)
        VALUES ($1, 'bet', $2, $3, $4, $5, $6)`,
-      [userId, amount, balanceBefore, balanceAfter, gameType || null, roomId || null]
+      [userId, _amount, balanceBefore, balanceAfter, gameType || null, roomId || null]
     );
 
     return { balanceBefore, balanceAfter };
@@ -79,11 +80,12 @@ export async function holdBet(userId, amount, gameType, roomId, txClient) {
 //    Для PvP игр передавайте HOUSE_EDGE (0.10 → 10%).
 // ---------------------------------------------------------------------------
 export async function payout(userId, grossAmount, gameType, roomId, txClient, commission = 0) {
-  if (!userId || !grossAmount || grossAmount < 1) {
+  const _gross = parseInt(grossAmount, 10);
+  if (!userId || !_gross || _gross < 1) {
     throw Object.assign(new Error('Invalid payout params'), { status: 400 });
   }
 
-  const netAmount = commission > 0 ? Math.floor(grossAmount * (1 - commission)) : grossAmount;
+  const netAmount = commission > 0 ? Math.floor(_gross * (1 - commission)) : _gross;
 
   return withClient(txClient, async (client) => {
     const { balanceBefore } = await checkUserBalance(client, userId);
@@ -107,21 +109,22 @@ export async function payout(userId, grossAmount, gameType, roomId, txClient, co
 // 3. ВОЗВРАТ (отмена игры, ничья, техническая ошибка)
 // ---------------------------------------------------------------------------
 export async function refund(userId, amount, gameType, roomId, txClient) {
-  if (!userId || !amount || amount < 1) {
+  const _amount = parseInt(amount, 10);
+  if (!userId || !_amount || _amount < 1) {
     throw Object.assign(new Error('Invalid refund params'), { status: 400 });
   }
 
   return withClient(txClient, async (client) => {
     const { balanceBefore } = await checkUserBalance(client, userId);
 
-    const balanceAfter = balanceBefore + amount;
+    const balanceAfter = balanceBefore + _amount;
 
     await client.query(`UPDATE users SET balance = $1 WHERE id = $2`, [balanceAfter, userId]);
 
     await client.query(
       `INSERT INTO transactions (user_id, type, amount, balance_before, balance_after, game_type, room_id)
        VALUES ($1, 'refund', $2, $3, $4, $5, $6)`,
-      [userId, amount, balanceBefore, balanceAfter, gameType || null, roomId || null]
+      [userId, _amount, balanceBefore, balanceAfter, gameType || null, roomId || null]
     );
 
     return { balanceBefore, balanceAfter };
@@ -136,7 +139,7 @@ export async function getBalance(userId) {
   if (rows.length === 0) {
     throw Object.assign(new Error('User not found'), { status: 404 });
   }
-  return Number(rows[0].balance);
+  return parseInt(rows[0].balance, 10);
 }
 
 // ---------------------------------------------------------------------------
