@@ -1643,16 +1643,17 @@ function minesStart() {
     document.getElementById('minesStartBtn').disabled = true;
     document.getElementById('minesStartBtn').textContent = '⏳ СТАРТ...';
     document.getElementById('minesStatus').textContent = '⏳ Генерация поля...';
-    // Reset grid
+    // Reset grid + set game optimistically
     document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => { c.className = 'pvp-mine-cell'; c.textContent = ''; c.style.pointerEvents = ''; c.style.cursor = ''; });
+    _minesGame = { bet };
+    document.getElementById('minesStartBtn').style.display = 'none';
+    document.getElementById('minesCashoutBtn').style.display = 'none';
+    document.getElementById('minesStatus').textContent = '💎 Открывай клетки!';
+    document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => c.style.cursor = 'pointer');
     balance -= bet; updateBalance();
     socket?.emit('mines:start', { betAmount: bet, minesCount: count }, (res) => {
-        if (res?.error) { balance += bet; updateBalance(); document.getElementById('minesStartBtn').disabled = false; document.getElementById('minesStartBtn').textContent = '💣 СТАРТ'; return showToast('❌ ' + res.error, 'error'); }
-        _minesGame = { bet };
-        document.getElementById('minesStartBtn').style.display = 'none';
-        document.getElementById('minesCashoutBtn').style.display = 'none';
-        document.getElementById('minesStatus').textContent = '💎 Открывай клетки!';
-        document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => c.style.cursor = 'pointer');
+        if (res?.error) { _minesGame = null; balance += bet; updateBalance(); document.getElementById('minesStartBtn').disabled = false; document.getElementById('minesStartBtn').textContent = '💣 СТАРТ'; document.getElementById('minesStartBtn').style.display = ''; return showToast('❌ ' + res.error, 'error'); }
+        // Server ack succeeded — game is already set up
     });
 }
 function minesReveal(idx) {
@@ -2121,7 +2122,18 @@ function connectSocket(initData) {
         handleGameResult('blackjack', isDraw, isWin, netPayout, data);
     });
 
-    // Solo BJ fallback: server pushes response via event when ack callback fails
+    // Solo Mines fallback
+    socket.on('mines:start_result', (res) => {
+        if (!res?.success && res?.error) return showToast('❌ ' + res.error, 'error');
+        // Check if this is a retry (already have game)
+        if (_minesGame) return;
+        const bet = parseInt(document.getElementById('minesBetInput')?.value) || 10;
+        _minesGame = { bet };
+        document.getElementById('minesStartBtn').style.display = 'none';
+        document.getElementById('minesCashoutBtn').style.display = 'none';
+        document.getElementById('minesStatus').textContent = '💎 Открывай клетки!';
+        document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => c.style.cursor = 'pointer');
+    });
     socket.on('bj:start_result', (res) => { if (typeof bjOnStartResult === 'function') bjOnStartResult(res); });
     socket.on('bj:hit_result', (res) => { if (typeof bjOnHitResult === 'function') bjOnHitResult(res); });
     socket.on('bj:stand_result', (res) => { if (typeof bjOnStandResult === 'function') bjOnStandResult(res); });

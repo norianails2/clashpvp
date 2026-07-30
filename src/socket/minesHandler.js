@@ -44,6 +44,7 @@ export function registerMinesHandlers(io, socket) {
       };
       soloGames.set(userId, game);
 
+      socket.emit('mines:start_result', { success: true, totalCells: TOTAL_CELLS, gridCols: Math.sqrt(TOTAL_CELLS) });
       ack?.({ success: true, totalCells: TOTAL_CELLS, gridCols: Math.sqrt(TOTAL_CELLS) });
     } catch (err) {
       console.error('[mines:start]', err?.message || err);
