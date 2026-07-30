@@ -18,19 +18,21 @@ export function getOppositeSide(choice) {
 }
 
 export function resolveCoin(winnerSide, creatorChoice, opponentChoice, creatorId, opponentId) {
+  // If both picked the same side, treat as draw (refund)
+  if (creatorChoice === opponentChoice) {
+    return { winnerId: null, draw: true };
+  }
+
   const creatorMatch = winnerSide === creatorChoice;
   const opponentMatch = winnerSide === opponentChoice;
 
-  if (creatorMatch && opponentMatch) {
-    return { winnerId: creatorId, draw: false }; // Split pot (payout both)
-  }
   if (creatorMatch) {
     return { winnerId: creatorId, draw: false };
   }
   if (opponentMatch) {
     return { winnerId: opponentId, draw: false };
   }
-  return { winnerId: null, draw: true }; // No one matched - house wins
+  return { winnerId: null, draw: true }; // Should never reach here with different picks
 }
 
 export { MIN_BET, MAX_BET };
