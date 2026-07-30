@@ -336,51 +336,49 @@
 
         /* === CYBER ARENA CRASH STYLE === */
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@500;600;700&display=swap');
-        .crash-game { display:flex;flex-direction:column;flex:1;background:linear-gradient(180deg,#0d0d14,#1a1040);position:relative;overflow:hidden; }
-        .crash-game::before { content:'';position:absolute;top:0;left:0;right:0;height:280px;background:radial-gradient(ellipse 80% 60% at 50% -20%,rgba(184,74,42,0.1),transparent);pointer-events:none; }
+        .crash-game { display:flex;flex-direction:column;flex:1;background:#0a0a14;position:relative;overflow:hidden; }
+        .crash-game::before { content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 30%,rgba(139,92,246,0.08),rgba(236,72,153,0.04),transparent);pointer-events:none; }
 
         .crash-header { display:flex;justify-content:space-between;align-items:center;padding:10px 16px;position:relative;z-index:2;border-bottom:1px solid rgba(255,255,255,0.04); }
         .crash-header .c-round { font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;letter-spacing:1.5px;color:rgba(255,255,255,0.35);text-transform:uppercase;display:flex;align-items:center;gap:6px; }
-        .crash-header .c-round .r-num { color:#fbbf24; }
-        .crash-header .c-countdown { display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.03);padding:4px 12px;border-radius:9999px;border:1px solid rgba(255,255,255,0.05); }
-        .crash-header .c-countdown .c-c-num { font-family:'Fredoka',sans-serif;font-size:18px;font-weight:700;color:#fbbf24;min-width:22px;text-align:center; }
-        .crash-header .c-countdown .c-c-num.danger { color:#ff4757;text-shadow:0 0 15px rgba(255,71,87,0.3); }
-        .crash-header .c-countdown .c-c-num.live { color:#22c55e;text-shadow:0 0 15px rgba(34,197,94,0.3);font-size:14px; }
+        .crash-header .c-round .r-num { color:#a78bfa; }
+        .crash-header .c-countdown { display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.04);padding:4px 12px;border-radius:9999px;border:1px solid rgba(139,92,246,0.15); }
+        .crash-header .c-countdown .c-c-num { font-family:'Fredoka',sans-serif;font-size:18px;font-weight:700;color:#a78bfa;min-width:22px;text-align:center; }
+        .crash-header .c-countdown .c-c-num.danger { color:#f43f5e;text-shadow:0 0 15px rgba(244,63,94,0.4); }
+        .crash-header .c-countdown .c-c-num.live { color:#22c55e;text-shadow:0 0 15px rgba(34,197,94,0.4);font-size:14px; }
         .crash-header .c-countdown .c-c-label { font-family:'Nunito',sans-serif;font-size:9px;font-weight:700;color:rgba(255,255,255,0.25);letter-spacing:1px;text-transform:uppercase; }
 
-        .crash-mult-area { display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;padding:6px 16px 0;min-height:90px; }
-        .crash-mult-area .c-mult { font-family:'Fredoka',sans-serif;font-size:64px;font-weight:800;color:#fbbf24;text-shadow:0 0 40px rgba(251,191,36,0.2);letter-spacing:-2px;line-height:1;z-index:2;transition:all 0.3s;background:linear-gradient(135deg,#fbbf24,#facc15);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 3s ease infinite; }
-        .crash-mult-area .c-mult .x-sfx { font-size:28px;font-weight:600;opacity:0.7; }
-        .crash-mult-area .c-mult.safe { background:linear-gradient(135deg,#22c55e,#4ade80);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 40px rgba(34,197,94,0.2); }
-        .crash-mult-area .c-mult.warn { background:linear-gradient(135deg,#fb923c,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 40px rgba(249,115,22,0.2); }
-        .crash-mult-area .c-player-count { font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;color:rgba(255,255,255,0.3);margin-top:6px;z-index:2;letter-spacing:0.5px; }
-        .crash-mult-area .c-status { font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:9999px;margin-top:6px;z-index:2;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.25); }
-        .crash-mult-area .c-status.live { color:#fbbf24;border-color:rgba(251,191,36,0.15);background:rgba(251,191,36,0.04);animation:badgePulse 2s ease infinite; }
-        .crash-mult-area .c-status.crashed { color:#ff4757;border-color:rgba(255,71,87,0.15);background:rgba(255,71,87,0.04); }
+        .crash-mult-area { display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 16px 0;min-height:80px; }
+        .crash-mult-area .c-mult { font-family:'Fredoka',sans-serif;font-size:68px;font-weight:900;letter-spacing:-3px;line-height:1;z-index:2;transition:all 0.2s;text-shadow:0 0 60px rgba(139,92,246,0.3),0 0 120px rgba(139,92,246,0.15);display:inline-block; }
+        .crash-mult-area .c-mult .x-sfx { font-size:24px;opacity:0.5; }
+        .crash-mult-area .c-mult.safe { color:#4ade80;text-shadow:0 0 40px rgba(74,222,128,0.4); }
+        .crash-mult-area .c-mult.warn { color:#fb923c;text-shadow:0 0 40px rgba(251,146,60,0.4); }
+        .crash-mult-area .c-mult.crashed { color:#f43f5e;text-shadow:0 0 40px rgba(244,63,94,0.5); }
+        .crash-mult-area .c-player-count { font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;color:rgba(255,255,255,0.3);margin-top:4px;z-index:2; }
+        .crash-mult-area .c-status { font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:9999px;margin-top:4px;z-index:2;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.3); }
+        .crash-mult-area .c-status.live { color:#a78bfa;border-color:rgba(139,92,246,0.25);background:rgba(139,92,246,0.08);animation:badgePulse 2s ease infinite; }
+        .crash-mult-area .c-status.crashed { color:#f43f5e;border-color:rgba(244,63,94,0.25);background:rgba(244,63,94,0.08); }
 
-        .crash-graph-area { height:220px;margin:0 12px;position:relative;flex-shrink:0;padding-top:2px; }
+        .crash-graph-area { height:220px;margin:0 12px;position:relative;flex-shrink:0; }
+        .crash-graph-area canvas { display:block;border-radius:12px; }
         .crash-graph-area svg { width:100%;height:100%; }
 
-        .crash-history-bar { display:flex;gap:4px;padding:8px 16px;overflow-x:auto;flex-shrink:0;scrollbar-width:none;border-top:1px solid rgba(255,255,255,0.03); }
+        .crash-history-bar { display:flex;gap:6px;padding:6px 16px;overflow-x:auto;flex-shrink:0;scrollbar-width:none; }
         .crash-history-bar::-webkit-scrollbar { display:none; }
-        .c-hist-chip { flex-shrink:0;padding:3px 10px;border-radius:9999px;font-family:'Nunito',sans-serif;font-size:9px;font-weight:800;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02); }
-        .c-hist-chip.green { color:#22c55e;border-color:rgba(34,197,94,0.15);background:rgba(34,197,94,0.04); }
-        .c-hist-chip.yellow { color:#fb923c;border-color:rgba(251,146,60,0.15);background:rgba(251,146,60,0.04); }
-        .c-hist-chip.red { color:#ff4757;border-color:rgba(255,71,87,0.12);background:rgba(255,71,87,0.03); }
-        .c-hist-chip.purple { color:#a855f7;border-color:rgba(168,85,247,0.15);background:rgba(168,85,247,0.04); }
+        .c-hist-chip { flex-shrink:0;padding:4px 12px;border-radius:9999px;font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;letter-spacing:0.3px; }
+        .c-hist-chip.green { color:#22c55e;border:1px solid rgba(34,197,94,0.2);background:rgba(34,197,94,0.08); }
+        .c-hist-chip.yellow { color:#fb923c;border:1px solid rgba(251,146,60,0.2);background:rgba(251,146,60,0.08); }
+        .c-hist-chip.red { color:#f43f5e;border:1px solid rgba(244,63,94,0.2);background:rgba(244,63,94,0.08); }
+        .c-hist-chip.purple { color:#a78bfa;border:1px solid rgba(167,139,250,0.25);background:rgba(167,139,250,0.1);text-shadow:0 0 8px rgba(167,139,250,0.3); }
 
-        .crash-bet-panel { margin:0 12px 8px;border-radius:20px;padding:12px 14px 14px;flex-shrink:0;background:linear-gradient(145deg,rgba(30,15,55,0.95),rgba(20,10,40,0.98));backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08);position:relative;overflow:hidden; }
-        .crash-bet-panel::before { content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:conic-gradient(from 0deg,transparent,rgba(184,74,42,0.04),transparent,rgba(251,191,36,0.04),transparent);animation:rotate 8s linear infinite;pointer-events:none; }
-        .crash-bet-panel::after { content:'';position:absolute;inset:1px;background:linear-gradient(145deg,rgba(30,15,55,0.95),rgba(20,10,40,0.98));border-radius:19px;pointer-events:none; }
+        .crash-bet-panel { margin:0 12px 8px;border-radius:20px;padding:12px 14px 14px;flex-shrink:0;background:rgba(15,15,30,0.95);border:1px solid rgba(139,92,246,0.12);position:relative;overflow:hidden; }
         .c-bet-label { font-family:'Nunito',sans-serif;font-size:9px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:8px;position:relative;z-index:1; }
         .c-bet-row { display:flex;align-items:center;gap:8px;margin-bottom:8px;position:relative;z-index:1; }
-        .c-bet-input-wrap { flex:1;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:6px 14px;max-width:130px; }
-        .c-bet-input-wrap .c-cr-sm { font-size:14px;flex-shrink:0;opacity:0.5;color:#fbbf24; }
+        .c-bet-input-wrap { flex:1;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:6px 14px;max-width:130px; }
         .c-bet-input-wrap input { flex:1;background:none;border:none;outline:none;padding:0;font-family:'Fredoka',sans-serif;font-size:15px;font-weight:700;color:#fff;min-width:0;line-height:1; }
-        .c-bet-input-wrap .c-usd { font-family:'Nunito',sans-serif;font-size:10px;color:rgba(255,255,255,0.25);font-weight:600;white-space:nowrap; }
         .c-bet-adj { display:flex;gap:4px; }
-        .c-bet-adj button { padding:6px 10px;border-radius:9999px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.4);font-family:'Nunito',sans-serif;font-size:9px;font-weight:800;cursor:pointer;transition:all 0.15s;letter-spacing:0.5px; }
-        .c-bet-adj button:hover { border-color:rgba(184,74,42,0.2);color:#b84a2a;background:rgba(184,74,42,0.04); }
+        .c-bet-adj button { padding:6px 10px;border-radius:9999px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.5);font-family:'Nunito',sans-serif;font-size:9px;font-weight:800;cursor:pointer;transition:all 0.15s; }
+        .c-bet-adj button:hover { border-color:rgba(139,92,246,0.3);color:#a78bfa; }
         .c-bet-adj button:active { transform:scale(0.93); }
 
         .c-auto-row { display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;position:relative;z-index:1; }
@@ -1096,7 +1094,7 @@ function renderCrash(area) {
       '<div class="crash-mult-area"><div class="c-mult" id="crMult">1.00<span class="x-sfx">x</span></div>' +
       '<div class="c-status" id="crStatus">⏳ ЗАПУСК...</div>' +
       '<div class="c-player-count" id="crPlayerCount">👥 0 ИГРОКОВ</div></div>' +
-      '<div class="crash-graph-area" id="crGraphArea"><svg viewBox="0 0 340 200" id="crGraphSvg"></svg></div>' +
+      '<div class="crash-graph-area" id="crGraphArea"><canvas id="crGlowCanvas" style="position:absolute;inset:0;z-index:1;pointer-events:none;"></canvas><svg viewBox="0 0 340 200" id="crGraphSvg" style="position:relative;z-index:2;"></svg></div>' +
       '<div class="crash-history-bar" id="crHistBar"></div>' +
       '<div class="crash-fair-badge" id="crFairBadge"><span class="cf-icon">🔐</span><span class="cf-hash" id="crSeedHash">...</span><button class="cf-verify" onclick="crShowVerify()">ПРОВЕРИТЬ</button></div>' +
       '<div class="cf-modal-overlay" id="cfModal"><div class="cf-modal"><button class="cf-modal-close" onclick="crCloseVerify()">✕</button>' +
@@ -1188,6 +1186,7 @@ function crUpdateMult(state) {
         md.className = 'c-mult';
     }
     crUpdateGraph(state);
+    crUpdateGlow(state);
 }
 
 function crUpdateGraph(state) {
@@ -1354,6 +1353,62 @@ function crUpdateGraph(state) {
         rocket +
         // Multiplier text (flying only)
         (!isCrashed ? '<text x="24" y="' + (ry - 8).toFixed(1) + '" font-family="Fredoka,sans-serif" font-size="28" font-weight="800" fill="url(#multGrad)" filter="url(#gGlow)">' + mult.toFixed(2) + 'x</text>' : '');
+}
+
+var _glowPts = [];
+function crUpdateGlow(state) {
+    var can = document.getElementById('crGlowCanvas');
+    if (!can) return;
+    var area = document.getElementById('crGraphArea');
+    if (!area) return;
+    var r = area.getBoundingClientRect();
+    can.width = r.width || 316; can.height = r.height || 200;
+    var c = can.getContext('2d'), W = can.width, H = can.height, pad = 14;
+    c.clearRect(0, 0, W, H);
+    if (state.phase !== 'flying' || !state.mult) { _glowPts = []; return; }
+
+    var cp = state.crashPoint || 100, mult = state.mult;
+    var steps = 40, dp = Math.floor(steps * mult / cp);
+
+    // Neon gradient below line
+    c.beginPath(); c.moveTo(pad, H - pad);
+    for (var i = 0; i <= dp; i++) {
+        var m = Math.exp((i / steps) * Math.log(cp + 1));
+        var x = pad + (i / steps) * (W - pad * 2);
+        var y = H - pad - ((m - 1) / (cp)) * (H - pad * 2);
+        y = Math.max(pad, Math.min(H - pad, y));
+        c.lineTo(x, y);
+    }
+    c.lineTo(pad + (dp / steps) * (W - pad * 2), H - pad);
+    c.closePath();
+    var g = c.createLinearGradient(0, pad, 0, H - pad);
+    g.addColorStop(0, 'rgba(139,92,246,0.18)');
+    g.addColorStop(0.6, 'rgba(236,72,153,0.06)');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    c.fillStyle = g; c.fill();
+
+    // Rocket tip
+    var rx = pad + (dp / steps) * (W - pad * 2);
+    var ry = H - pad - ((mult - 1) / (cp)) * (H - pad * 2);
+    ry = Math.max(pad, Math.min(H - pad, ry));
+    var tg = c.createRadialGradient(rx, ry, 0, rx, ry, 35);
+    tg.addColorStop(0, 'rgba(168,85,247,0.35)');
+    tg.addColorStop(0.4, 'rgba(139,92,246,0.12)');
+    tg.addColorStop(1, 'rgba(0,0,0,0)');
+    c.fillStyle = tg; c.fillRect(rx - 35, ry - 35, 70, 70);
+
+    // Particles
+    for (var j = 0; j < 3; j++) {
+        _glowPts.push({ x: rx + Math.random() * 4 - 2, y: ry + 5, vx: (Math.random() - 0.5) * 1.5, vy: -Math.random() * 4 - 2, l: 1, s: Math.random() * 2 + 1 });
+    }
+    for (var k = _glowPts.length - 1; k >= 0; k--) {
+        var p = _glowPts[k]; p.x += p.vx; p.y += p.vy; p.l -= 0.04;
+        if (p.l <= 0) { _glowPts.splice(k, 1); continue; }
+        c.beginPath(); c.arc(p.x, p.y, p.s, 0, Math.PI * 2);
+        c.fillStyle = 'rgba(168,85,247,' + p.l.toFixed(2) + ')';
+        c.fill();
+    }
+    if (_glowPts.length > 80) _glowPts.splice(0, _glowPts.length - 80);
 }
 
 function crUpdateRound(state) {
