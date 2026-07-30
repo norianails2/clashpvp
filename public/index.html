@@ -2137,6 +2137,11 @@ function handleGameOver(data) {
 function handleGameResult(game, isDraw, isWin, netPayout, data) {
     pvpStopTimer();
     lastGameResult = data;
+    // Show result in game status
+    const statusEl = document.getElementById('gameArea')?.querySelector('#coinStatus, #diceStatus, #rpsStatus, #minesStatus, #bjStatus');
+    if (statusEl) {
+        statusEl.innerHTML = isDraw ? '🤝 НИЧЬЯ!' : (isWin ? '🏆 +' + netPayout + ' <i class="tg-s"></i>' : '💔 −' + (currentRoom?.bet_amount || '') + ' <i class="tg-s"></i>');
+    }
     showGameResult(game, isDraw, isWin, netPayout);
     setTimeout(() => { if (!document.hidden) closeGame(); }, 3000);
 }
