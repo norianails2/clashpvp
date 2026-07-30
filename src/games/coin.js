@@ -18,21 +18,19 @@ export function getOppositeSide(choice) {
 }
 
 export function resolveCoin(winnerSide, creatorChoice, opponentChoice, creatorId, opponentId) {
-  // If both picked the same side, treat as draw (refund)
+  // Safety: same picks shouldn't happen (enforced by handler), but if they do, refund
   if (creatorChoice === opponentChoice) {
     return { winnerId: null, draw: true };
   }
 
-  const creatorMatch = winnerSide === creatorChoice;
-  const opponentMatch = winnerSide === opponentChoice;
-
-  if (creatorMatch) {
+  if (winnerSide === creatorChoice) {
     return { winnerId: creatorId, draw: false };
   }
-  if (opponentMatch) {
+  if (winnerSide === opponentChoice) {
     return { winnerId: opponentId, draw: false };
   }
-  return { winnerId: null, draw: true }; // Should never reach here with different picks
+  // Should never reach: one side always wins when picks differ
+  return { winnerId: null, draw: true };
 }
 
 export { MIN_BET, MAX_BET };
