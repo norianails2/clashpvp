@@ -1623,11 +1623,11 @@ function renderSoloMines(area) {
     }
     // Direct onclick
     area.querySelectorAll('.mines-act-btn').forEach(function(btn) {
-        btn.onclick = function() {
+        btn.addEventListener('click', function() {
             var act = this.getAttribute('data-act');
             if (act === 'start') minesStart();
             else if (act === 'cashout') minesCashout();
-        };
+        });
     });
 }
 function minesAdjBet(type) {
@@ -1733,26 +1733,40 @@ function minesCashout() {
 // Solo Blackjack
 var _bjBusy = false, _bjTimer = 0, _bjHitCount = 0;
 // Solo Blackjack - event delegation on document (Telegram CSP safe)
-document.addEventListener('click', function(e) {
-    if (!e || !e.target) return;
-    // Walk up to find button-like element (has id OR is button)
-    var el = e.target;
-    while (el && el !== document.body) {
-        if (el.id === 'bjStartBtn' || el.id === 'bjHitBtn' || el.id === 'bjStandBtn' || el.id === 'bjAdjMin' || el.id === 'bjAdjHalf' || el.id === 'bjAdjDbl' || el.id === 'bjAdjMax' || el.id === 'minesStartBtn' || el.id === 'minesCashoutBtn') break;
-        el = el.parentElement;
-    }
-    if (!el) return;
-    var id = el.id;
-    if (id === 'bjStartBtn') bjStart();
-    else if (id === 'bjHitBtn') bjHit();
-    else if (id === 'bjStandBtn') bjStand();
-    else if (id === 'bjAdjMin') bjAdjBet('min');
-    else if (id === 'bjAdjHalf') bjAdjBet('half');
-    else if (id === 'bjAdjDbl') bjAdjBet('double');
-    else if (id === 'bjAdjMax') bjAdjBet('max');
-    else if (id === 'minesStartBtn') minesStart();
-    else if (id === 'minesCashoutBtn') minesCashout();
-});
+    document.addEventListener('click', function(e) {
+        if (!e || !e.target) return;
+        var el = e.target;
+        while (el && el !== document.body) {
+            if (el.classList && (el.classList.contains('bj-act-btn') || el.classList.contains('mines-act-btn'))) {
+                var act = el.getAttribute('data-act');
+                if (act === 'start' && el.id === 'bjStartBtn') bjStart();
+                else if (act === 'hit') bjHit();
+                else if (act === 'stand') bjStand();
+                else if (act === 'start' && el.id === 'minesStartBtn') minesStart();
+                else if (act === 'cashout') minesCashout();
+                break;
+            }
+            if (el.classList && el.classList.contains('bj-adj-btn')) { bjAdjBet(el.getAttribute('data-adj')); break; }
+            el = el.parentElement;
+        }
+    });
+    document.addEventListener('touchstart', function(e) {
+        if (!e || !e.target) return;
+        var el = e.target;
+        while (el && el !== document.body) {
+            if (el.classList && (el.classList.contains('bj-act-btn') || el.classList.contains('mines-act-btn'))) {
+                var act = el.getAttribute('data-act');
+                if (act === 'start' && el.id === 'bjStartBtn') bjStart();
+                else if (act === 'hit') bjHit();
+                else if (act === 'stand') bjStand();
+                else if (act === 'start' && el.id === 'minesStartBtn') minesStart();
+                else if (act === 'cashout') minesCashout();
+                break;
+            }
+            if (el.classList && el.classList.contains('bj-adj-btn')) { bjAdjBet(el.getAttribute('data-adj')); break; }
+            el = el.parentElement;
+        }
+    }, {passive:true});
 function renderSoloBJ(area) {
     document.getElementById('gameTitle').textContent = '🃏 Блекджек';
     area.innerHTML =
@@ -1773,17 +1787,17 @@ function renderSoloBJ(area) {
         '</div>';
     // Direct onclick assignment (bypasses CSP issues)
     area.querySelectorAll('.bj-act-btn').forEach(function(btn) {
-        btn.onclick = function() {
-            var act = this.getAttribute('data-act');
+        function bjHandler(e) {
+            var act = btn.getAttribute('data-act');
             if (act === 'start') bjStart();
             else if (act === 'hit') bjHit();
             else if (act === 'stand') bjStand();
-        };
+        }
+        btn.addEventListener('touchstart', bjHandler, {passive:true});
+        btn.addEventListener('click', bjHandler);
     });
     area.querySelectorAll('.bj-adj-btn').forEach(function(btn) {
-        btn.onclick = function() {
-            bjAdjBet(this.getAttribute('data-adj'));
-        };
+        btn.addEventListener('click', function() { bjAdjBet(this.getAttribute('data-adj')); });
     });
 }
 function bjAdjBet(type) {
