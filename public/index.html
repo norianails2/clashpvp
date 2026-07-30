@@ -1626,10 +1626,6 @@ function renderSoloMines(area) {
     const g = document.getElementById('minesGrid');
     g.innerHTML = '';
     g.style.gridTemplateColumns = 'repeat(5,1fr)';
-
-    const g = document.getElementById('minesGrid');
-    g.innerHTML = '';
-    g.style.gridTemplateColumns = 'repeat(5,1fr)';
     for (let i = 0; i < 25; i++) {
         const c = document.createElement('div'); c.className = 'pvp-mine-cell';
         c.dataset.idx = i;
