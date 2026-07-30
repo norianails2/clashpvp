@@ -1094,7 +1094,7 @@ function renderCrash(area) {
       '<div class="crash-mult-area"><div class="c-mult" id="crMult">1.00<span class="x-sfx">x</span></div>' +
       '<div class="c-status" id="crStatus">⏳ ЗАПУСК...</div>' +
       '<div class="c-player-count" id="crPlayerCount">👥 0 ИГРОКОВ</div></div>' +
-      '<div class="crash-graph-area" id="crGraphArea"><canvas id="crGlowCanvas" style="position:absolute;inset:0;z-index:1;pointer-events:none;"></canvas><svg viewBox="0 0 340 200" id="crGraphSvg" style="position:relative;z-index:2;"></svg></div>' +
+      '<div class="crash-graph-area" id="crGraphArea"><canvas id="crCanvas"></canvas></div>' +
       '<div class="crash-history-bar" id="crHistBar"></div>' +
       '<div class="crash-fair-badge" id="crFairBadge"><span class="cf-icon">🔐</span><span class="cf-hash" id="crSeedHash">...</span><button class="cf-verify" onclick="crShowVerify()">ПРОВЕРИТЬ</button></div>' +
       '<div class="cf-modal-overlay" id="cfModal"><div class="cf-modal"><button class="cf-modal-close" onclick="crCloseVerify()">✕</button>' +
@@ -1186,231 +1186,197 @@ function crUpdateMult(state) {
         md.className = 'c-mult';
     }
     crUpdateGraph(state);
-    crUpdateGlow(state);
 }
 
 function crUpdateGraph(state) {
-    const svg = document.getElementById('crGraphSvg');
-    if (!svg) return;
-    const W = 340, H = 200, pad = 14;
-
-    // Defs
-    const bgDefs = '<defs>' +
-        '<linearGradient id="spaceGrad" x1="0" y1="0" x2="0" y2="1">' +
-        '<stop offset="0" stop-color="#12121f"/><stop offset="0.5" stop-color="#0d0d18"/><stop offset="1" stop-color="#0a0a12"/></linearGradient>' +
-        '<linearGradient id="cloudGrad" x1="0" y1="0" x2="0" y2="1">' +
-        '<stop offset="0" stop-color="rgba(139,92,246,0.08)"/><stop offset="1" stop-color="rgba(139,92,246,0.03)"/></linearGradient>' +
-        '<linearGradient id="fillG" x1="0" y1="0" x2="0" y2="1">' +
-        '<stop offset="0" stop-color="var(--lc)" stop-opacity="0.12"/><stop offset="1" stop-color="var(--lc)" stop-opacity="0"/></linearGradient>' +
-        '<linearGradient id="rocketBody" x1="0" y1="0" x2="0" y2="1">' +
-        '<stop offset="0" stop-color="rgba(255,255,255,0.95)"/><stop offset="0.5" stop-color="rgba(255,255,255,0.85)"/><stop offset="1" stop-color="rgba(255,255,255,0.75)"/></linearGradient>' +
-        '<linearGradient id="multGrad" x1="0" y1="0" x2="1" y2="0">' +
-        '<stop offset="0" stop-color="#a78bfa"/><stop offset="0.5" stop-color="#8b5cf6"/><stop offset="1" stop-color="#7c3aed"/></linearGradient>' +
-        '<filter id="gGlow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>' +
-        '<filter id="gGlowSoft"><feGaussianBlur stdDeviation="5"/></filter>' +
-        '</defs>';
-
-    if (state.phase === 'betting' || state.phase === 'idle') {
-        svg.innerHTML = bgDefs +
-            '<rect x="0" y="0" width="340" height="200" fill="url(#spaceGrad)" rx="14"/>' +
-            // Stars
-            '<g fill="rgba(255,255,255,0.25)">' +
-            '<circle cx="30" cy="25" r="0.8" opacity="0.5"/><circle cx="80" cy="40" r="0.5" opacity="0.3"/><circle cx="150" cy="15" r="0.7" opacity="0.4"/>' +
-            '<circle cx="200" cy="35" r="0.4" opacity="0.2"/><circle cx="280" cy="20" r="0.6" opacity="0.4"/><circle cx="320" cy="45" r="0.5" opacity="0.3"/>' +
-            '<circle cx="60" cy="70" r="0.4" opacity="0.2"/><circle cx="120" cy="85" r="0.5" opacity="0.3"/><circle cx="240" cy="60" r="0.4" opacity="0.2"/>' +
-            '<circle cx="310" cy="75" r="0.5" opacity="0.25"/><circle cx="40" cy="120" r="0.4" opacity="0.2"/><circle cx="180" cy="110" r="0.5" opacity="0.3"/>' +
-            '<circle cx="290" cy="100" r="0.4" opacity="0.2"/><circle cx="100" cy="140" r="0.4" opacity="0.2"/><circle cx="260" cy="130" r="0.5" opacity="0.25"/>' +
-            '</g>' +
-            // Clouds
-            '<ellipse cx="60" cy="185" rx="50" ry="14" fill="url(#cloudGrad)"/>' +
-            '<ellipse cx="180" cy="190" rx="60" ry="16" fill="url(#cloudGrad)"/>' +
-            '<ellipse cx="300" cy="186" rx="55" ry="15" fill="url(#cloudGrad)"/>' +
-            '<ellipse cx="130" cy="188" rx="45" ry="13" fill="url(#cloudGrad)"/>' +
-            '<ellipse cx="250" cy="192" rx="48" ry="14" fill="url(#cloudGrad)"/>';
-        return;
-    }
-
-    const mult = Math.max(state.mult || 1, 1.01);
-    const cp = state.crashPoint || 3;
-    const maxMult = Math.max(cp * 1.12, mult * 1.08, 2.5);
-    const maxLog = Math.log2(maxMult);
-    const curLog = Math.log2(mult);
-    const progress = state.phase === 'flying' ? Math.min(curLog / maxLog, 1) : 1;
-    const steps = 150;
-    const pts = [];
-    for (let i = 0; i <= steps; i++) {
-        const t = i / steps;
-        const m = 1 + (maxMult - 1) * Math.pow(t, 1.5);
-        const px = pad + t * (W - pad * 2);
-        const py = pad + (H - pad * 2) - (Math.log2(m) / maxLog) * (H - pad * 2);
-        pts.push(px.toFixed(1) + ',' + py.toFixed(1));
-    }
-
-    const idx = Math.min(Math.floor(progress * steps), steps);
-    const [rx, ry] = pts[idx].split(',').map(Number);
-    const livePts = pts.slice(0, idx + 1);
-
-    const isCrashed = state.phase === 'crashed';
-    const lineCol = isCrashed ? '#ef4444' : '#a78bfa';
-    const fillD = 'M' + livePts.join(' L') + ' L' + rx.toFixed(1) + ',' + (H - pad) + ' L' + pad + ',' + (H - pad) + ' Z';
-
-    // Crash line
-    const crashLy = Math.log2(cp);
-    const crashY = pad + (H - pad * 2) - (crashLy / maxLog) * (H - pad * 2);
-
-    // Grid lines
-    let gridHtml = '';
-    const gridMults = [1.5, 2, 3, 5, 10, 25, 50, 100];
-    gridMults.forEach(gm => {
-        if (gm < maxMult) {
-            const gy = pad + (H - pad * 2) - (Math.log2(gm) / maxLog) * (H - pad * 2);
-            if (gy > pad + 10 && gy < H - pad - 10) {
-                gridHtml += '<line x1="' + pad + '" y1="' + gy.toFixed(1) + '" x2="' + (W - pad) + '" y2="' + gy.toFixed(1) + '" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>';
-                gridHtml += '<text x="' + (W - pad - 2) + '" y="' + (gy - 4).toFixed(1) + '" text-anchor="end" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.1)">' + gm + 'x</text>';
-            }
-        }
-    });
-
-    // Rocket angle - more accurate using larger segment
-    let angle = -35;
-    if (idx > 5) {
-        const back = Math.max(idx - 5, 1);
-        const fwd = Math.min(idx + 2, steps);
-        const p1 = pts[back].split(',').map(Number);
-        const p2 = pts[fwd].split(',').map(Number);
-        const dx = p2[0] - p1[0];
-        const dy = p2[1] - p1[1];
-        angle = Math.atan2(dy, dx) * 180 / Math.PI;
-        // Clamp to reasonable range
-        angle = Math.max(-45, Math.min(45, angle));
-    } else {
-        angle = -35;
-    }
-
-    const rocket = isCrashed ? '' :
-        '<g transform="translate(' + rx.toFixed(1) + ',' + ry.toFixed(1) + ') rotate(' + angle.toFixed(1) + ')">' +
-        // Glow trail
-        '<ellipse cx="-10" cy="0" rx="12" ry="6" fill="rgba(251,191,36,0.06)"/>' +
-        '<ellipse cx="-8" cy="0" rx="9" ry="4.5" fill="rgba(251,191,36,0.1)"/>' +
-        '<ellipse cx="-7" cy="0" rx="7" ry="3.5" fill="rgba(251,191,36,0.14)"/>' +
-        // Flame trail
-        '<ellipse cx="-6" cy="0" rx="5" ry="2" fill="rgba(255,200,50,0.5)"/>' +
-        '<ellipse cx="-8" cy="0" rx="4" ry="1.5" fill="rgba(255,140,20,0.6)"/>' +
-        '<ellipse cx="-10" cy="0" rx="3" ry="1" fill="rgba(255,80,30,0.7)"/>' +
-        '<ellipse cx="-12" cy="0" rx="2" ry="0.7" fill="rgba(255,60,30,0.5)"/>' +
-        // Fins (more symmetric, cleaner)
-        '<path d="M-2,-3.5 L5,-9 L5,-3.5 Z" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>' +
-        '<path d="M-2,3.5 L5,9 L5,3.5 Z" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>' +
-        // Body (rounder, cleaner)
-        '<rect x="-6" y="-3.5" width="15" height="7.5" rx="3" fill="url(#rocketBody)"/>' +
-        '<rect x="-6" y="-3.5" width="15" height="7.5" rx="3" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/>' +
-        // Body stripe
-        '<rect x="-3" y="-3.5" width="4" height="7.5" rx="2" fill="rgba(0,0,0,0.08)"/>' +
-        // Nose cone (sharper)
-        '<path d="M9,-3.5 L16,0 L9,3.5 Z" fill="' + lineCol + '" stroke="rgba(255,255,255,0.25)" stroke-width="0.5"/>' +
-        '<path d="M9,-1.5 L13.5,0 L9,1.5 Z" fill="rgba(255,255,255,0.15)"/>' +
-        // Window (bigger, more visible)
-        '<circle cx="0" cy="0" r="2.2" fill="rgba(0,0,0,0.25)" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>' +
-        '<circle cx="-0.4" cy="-0.6" r="0.7" fill="rgba(255,255,255,0.5)"/>' +
-        // Body highlight
-        '<path d="M-5,-2.5 L-5,2.5" stroke="rgba(255,255,255,0.08)" stroke-width="0.4"/>' +
-        '</g>';
-
-    svg.innerHTML = bgDefs +
-        // Space background
-        '<rect x="0" y="0" width="340" height="200" fill="url(#spaceGrad)" rx="14"/>' +
-        // Stars
-        '<g fill="rgba(255,255,255,0.25)">' +
-        '<circle cx="30" cy="25" r="0.8" opacity="0.5"/><circle cx="80" cy="40" r="0.5" opacity="0.3"/><circle cx="150" cy="15" r="0.7" opacity="0.4"/>' +
-        '<circle cx="200" cy="35" r="0.4" opacity="0.2"/><circle cx="280" cy="20" r="0.6" opacity="0.4"/><circle cx="320" cy="45" r="0.5" opacity="0.3"/>' +
-        '<circle cx="60" cy="70" r="0.4" opacity="0.2"/><circle cx="120" cy="85" r="0.5" opacity="0.3"/><circle cx="240" cy="60" r="0.4" opacity="0.2"/>' +
-        '<circle cx="310" cy="75" r="0.5" opacity="0.25"/><circle cx="40" cy="120" r="0.4" opacity="0.2"/><circle cx="180" cy="110" r="0.5" opacity="0.3"/>' +
-        '<circle cx="290" cy="100" r="0.4" opacity="0.2"/><circle cx="100" cy="140" r="0.4" opacity="0.2"/><circle cx="260" cy="130" r="0.5" opacity="0.25"/>' +
-        '</g>' +
-        // Clouds
-        '<ellipse cx="60" cy="185" rx="50" ry="14" fill="url(#cloudGrad)"/>' +
-        '<ellipse cx="180" cy="190" rx="60" ry="16" fill="url(#cloudGrad)"/>' +
-        '<ellipse cx="300" cy="186" rx="55" ry="15" fill="url(#cloudGrad)"/>' +
-        '<ellipse cx="130" cy="188" rx="45" ry="13" fill="url(#cloudGrad)"/>' +
-        '<ellipse cx="250" cy="192" rx="48" ry="14" fill="url(#cloudGrad)"/>' +
-        // Grid
-        gridHtml +
-        // Fill area
-        '<path d="' + fillD + '" fill="url(#fillG)" style="--lc:' + lineCol + '"/>' +
-        // Dotted projection
-        '<path d="M' + pts.join(' L') + '" fill="none" stroke="rgba(255,255,255,0.02)" stroke-width="1" stroke-dasharray="3,6"/>' +
-        // Soft glow under line
-        '<path d="M' + livePts.join(' L') + '" fill="none" stroke="' + lineCol + '" stroke-width="5" stroke-linecap="round" opacity="0.08" filter="url(#gGlowSoft)"/>' +
-        // Main line
-        '<path d="M' + livePts.join(' L') + '" fill="none" stroke="' + lineCol + '" stroke-width="2.5" stroke-linecap="round" filter="url(#gGlow)"/>' +
-        // Crash line
-        (isCrashed ? '<line x1="' + pad + '" y1="' + crashY + '" x2="' + (W - pad) + '" y2="' + crashY + '" stroke="rgba(239,68,68,0.3)" stroke-width="2" stroke-dasharray="6,4"/>' : '') +
-        (isCrashed ? '<text x="' + (W - pad) + '" y="' + (crashY - 6) + '" text-anchor="end" font-family="monospace" font-size="11" font-weight="700" fill="rgba(239,68,68,0.6)">' + cp.toFixed(2) + 'x</text>' : '') +
-        // Axis
-        '<line x1="' + pad + '" y1="' + (H - pad) + '" x2="' + (W - pad) + '" y2="' + (H - pad) + '" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>' +
-        '<text x="' + pad + '" y="' + (H - 4) + '" font-family="monospace" font-size="8" fill="rgba(255,255,255,0.1)">1.00x</text>' +
-        // Rocket
-        rocket +
-        // Multiplier text (flying only)
-        (!isCrashed ? '<text x="24" y="' + (ry - 8).toFixed(1) + '" font-family="Fredoka,sans-serif" font-size="28" font-weight="800" fill="url(#multGrad)" filter="url(#gGlow)">' + mult.toFixed(2) + 'x</text>' : '');
-}
-
-var _glowPts = [];
-function crUpdateGlow(state) {
-    var can = document.getElementById('crGlowCanvas');
-    if (!can) return;
+    var canvas = document.getElementById('crCanvas');
+    if (!canvas) return;
     var area = document.getElementById('crGraphArea');
     if (!area) return;
     var r = area.getBoundingClientRect();
-    can.width = r.width || 316; can.height = r.height || 200;
-    var c = can.getContext('2d'), W = can.width, H = can.height, pad = 14;
-    c.clearRect(0, 0, W, H);
-    if (state.phase !== 'flying' || !state.mult) { _glowPts = []; return; }
+    var W = r.width || 340, H = r.height || 200;
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
 
-    var cp = state.crashPoint || 100, mult = state.mult;
-    var steps = 40, dp = Math.floor(steps * mult / cp);
+    var pad = 20;
+    var cp = state.crashPoint || 10000;
+    var mult = state.mult || 1;
+    var flying = state.phase === 'flying';
+    var crashed = state.phase === 'crashed';
+    var isFinished = flying || crashed;
 
-    // Neon gradient below line
-    c.beginPath(); c.moveTo(pad, H - pad);
-    for (var i = 0; i <= dp; i++) {
-        var m = Math.exp((i / steps) * Math.log(cp + 1));
-        var x = pad + (i / steps) * (W - pad * 2);
-        var y = H - pad - ((m - 1) / (cp)) * (H - pad * 2);
-        y = Math.max(pad, Math.min(H - pad, y));
-        c.lineTo(x, y);
+    // ---- Background Grid (parallax) ----
+    if (isFinished) {
+        var gridSpeed = flying ? mult : cp;
+        var gridOffset = (Date.now() / 20 * (flying ? mult * 0.3 : 0.3)) % 40;
+        ctx.strokeStyle = 'rgba(139,92,246,0.06)';
+        ctx.lineWidth = 1;
+        for (var gx = pad - gridOffset; gx < W - pad; gx += 20) {
+            ctx.beginPath(); ctx.moveTo(gx, pad); ctx.lineTo(gx, H - pad); ctx.stroke();
+        }
+        for (var gy = (H - pad) - (gridOffset * 0.7) % 20; gy > pad; gy -= 20) {
+            ctx.beginPath(); ctx.moveTo(pad, gy); ctx.lineTo(W - pad, gy); ctx.stroke();
+        }
+    } else {
+        // Idle/betting: static subtle grid
+        ctx.strokeStyle = 'rgba(139,92,246,0.04)';
+        ctx.lineWidth = 0.5;
+        for (var gx = pad; gx < W - pad; gx += 20) { ctx.beginPath(); ctx.moveTo(gx, pad); ctx.lineTo(gx, H - pad); ctx.stroke(); }
+        for (var gy = H - pad; gy > pad; gy -= 20) { ctx.beginPath(); ctx.moveTo(pad, gy); ctx.lineTo(W - pad, gy); ctx.stroke(); }
     }
-    c.lineTo(pad + (dp / steps) * (W - pad * 2), H - pad);
-    c.closePath();
-    var g = c.createLinearGradient(0, pad, 0, H - pad);
-    g.addColorStop(0, 'rgba(139,92,246,0.18)');
-    g.addColorStop(0.6, 'rgba(236,72,153,0.06)');
-    g.addColorStop(1, 'rgba(0,0,0,0)');
-    c.fillStyle = g; c.fill();
 
-    // Rocket tip
-    var rx = pad + (dp / steps) * (W - pad * 2);
-    var ry = H - pad - ((mult - 1) / (cp)) * (H - pad * 2);
-    ry = Math.max(pad, Math.min(H - pad, ry));
-    var tg = c.createRadialGradient(rx, ry, 0, rx, ry, 35);
-    tg.addColorStop(0, 'rgba(168,85,247,0.35)');
-    tg.addColorStop(0.4, 'rgba(139,92,246,0.12)');
-    tg.addColorStop(1, 'rgba(0,0,0,0)');
-    c.fillStyle = tg; c.fillRect(rx - 35, ry - 35, 70, 70);
+    if (!isFinished) return;
 
-    // Particles
-    for (var j = 0; j < 3; j++) {
-        _glowPts.push({ x: rx + Math.random() * 4 - 2, y: ry + 5, vx: (Math.random() - 0.5) * 1.5, vy: -Math.random() * 4 - 2, l: 1, s: Math.random() * 2 + 1 });
+    // ---- Calculate curve points ----
+    var displayMult = crashed ? cp : mult;
+    var maxMult = Math.max(displayMult, 2);
+    var points = [];
+    var steps = 80;
+    for (var i = 0; i <= steps; i++) {
+        var m = 1 + (maxMult - 1) * (i / steps);
+        var x = pad + (W - pad * 2) * (i / steps);
+        var y = H - pad - ((m - 1) / maxMult) * (H - pad * 2 - 20);
+        y = Math.max(pad + 20, Math.min(H - pad, y));
+        points.push({ x: x, y: y, m: m });
     }
-    for (var k = _glowPts.length - 1; k >= 0; k--) {
-        var p = _glowPts[k]; p.x += p.vx; p.y += p.vy; p.l -= 0.04;
-        if (p.l <= 0) { _glowPts.splice(k, 1); continue; }
-        c.beginPath(); c.arc(p.x, p.y, p.s, 0, Math.PI * 2);
-        c.fillStyle = 'rgba(168,85,247,' + p.l.toFixed(2) + ')';
-        c.fill();
+
+    // How far the rocket has traveled
+    var rocketT = 0;
+    if (flying) {
+        rocketT = Math.min(1, mult / maxMult);
+    } else if (crashed) {
+        rocketT = Math.min(1, cp / maxMult);
     }
-    if (_glowPts.length > 80) _glowPts.splice(0, _glowPts.length - 80);
+    var rocketIdx = Math.floor(rocketT * steps);
+    var rocketX = points[rocketIdx] ? points[rocketIdx].x : pad;
+    var rocketY = points[rocketIdx] ? points[rocketIdx].y : H - pad;
+
+    // ---- Neon glow under curve ----
+    ctx.beginPath();
+    ctx.moveTo(pad, H - pad);
+    for (var i = 0; i <= rocketIdx; i++) {
+        ctx.lineTo(points[i].x, points[i].y);
+    }
+    ctx.lineTo(rocketX, H - pad);
+    ctx.closePath();
+    var fillGrad = ctx.createLinearGradient(0, pad, 0, H - pad);
+    fillGrad.addColorStop(0, 'rgba(139,92,246,0.15)');
+    fillGrad.addColorStop(0.5, 'rgba(236,72,153,0.05)');
+    fillGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = fillGrad;
+    ctx.fill();
+
+    // ---- Main curve line with glow ----
+    ctx.beginPath();
+    ctx.moveTo(pad, H - pad);
+    for (var i = 0; i <= rocketIdx; i++) {
+        ctx.lineTo(points[i].x, points[i].y);
+    }
+    ctx.strokeStyle = 'rgba(168,85,247,0.6)';
+    ctx.lineWidth = 2;
+    ctx.shadowColor = 'rgba(139,92,246,0.4)';
+    ctx.shadowBlur = 6;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // ---- Brighter center line ----
+    ctx.beginPath();
+    ctx.moveTo(pad, H - pad);
+    for (var i = 0; i <= rocketIdx; i++) {
+        ctx.lineTo(points[i].x, points[i].y);
+    }
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // ---- Rocket SVG ----
+    ctx.save();
+    ctx.translate(rocketX, rocketY);
+    var angle = -Math.PI / 4;
+    if (rocketIdx > 1) {
+        var dx = points[rocketIdx].x - points[rocketIdx - 1].x;
+        var dy = points[rocketIdx].y - points[rocketIdx - 1].y;
+        angle = Math.atan2(dy, dx);
+    }
+    ctx.rotate(angle);
+
+    // Shadow
+    ctx.shadowColor = 'rgba(139,92,246,0.5)';
+    ctx.shadowBlur = 15;
+
+    // Draw rocket body
+    ctx.fillStyle = '#a78bfa';
+    ctx.beginPath();
+    ctx.moveTo(14, 0);
+    ctx.lineTo(-8, -6);
+    ctx.lineTo(-10, -3);
+    ctx.lineTo(-10, 3);
+    ctx.lineTo(-8, 6);
+    ctx.closePath();
+    ctx.fill();
+
+    // Window
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#7c3aed';
+    ctx.beginPath();
+    ctx.arc(4, 0, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Flame
+    ctx.fillStyle = '#f43f5e';
+    ctx.shadowColor = 'rgba(244,63,94,0.6)';
+    ctx.shadowBlur = 10;
+    ctx.beginPath();
+    ctx.moveTo(-10, -3);
+    ctx.lineTo(-16 + Math.random() * 3, 0);
+    ctx.lineTo(-10, 3);
+    ctx.closePath();
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    ctx.restore();
+
+    // ---- Particle trail ----
+    if (!window._crParticles) window._crParticles = [];
+    var pts = window._crParticles;
+    if (flying) {
+        for (var j = 0; j < 3; j++) {
+            pts.push({
+                x: rocketX + (Math.random() - 0.5) * 6,
+                y: rocketY + (Math.random() - 0.5) * 6,
+                vx: (Math.random() - 0.5) * 1,
+                vy: (Math.random() - 0.5) * 2 + 1,
+                life: 1,
+                size: Math.random() * 2.5 + 1,
+                color: Math.random() < 0.5 ? '139,92,246' : '236,72,153'
+            });
+        }
+    }
+    for (var k = pts.length - 1; k >= 0; k--) {
+        var p = pts[k];
+        p.x += p.vx; p.y += p.vy; p.life -= 0.03 + Math.random() * 0.02;
+        if (p.life <= 0 || k > 150) { pts.splice(k, 1); continue; }
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(' + p.color + ',' + (p.life * 0.7).toFixed(2) + ')';
+        ctx.fill();
+    }
+
+    // ---- Mult label on rocket ----
+    if (flying) {
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 12px Fredoka,sans-serif';
+        ctx.textAlign = 'center';
+        ctx.shadowColor = 'rgba(139,92,246,0.5)';
+        ctx.shadowBlur = 6;
+        ctx.fillText(mult.toFixed(2) + 'x', rocketX, rocketY - 14);
+        ctx.shadowBlur = 0;
+    }
 }
-
 function crUpdateRound(state) {
     const rn = document.getElementById('crRound');
     if (rn) rn.textContent = '#' + state.round;
