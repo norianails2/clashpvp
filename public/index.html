@@ -1693,6 +1693,7 @@ function minesReveal(idx) {
         cell.classList.add('diamond'); cell.textContent = '💎';
         document.getElementById('minesMult').textContent = res.multiplier.toFixed(2);
         document.getElementById('minesCashoutBtn').style.display = '';
+        document.getElementById('minesCashoutBtn').onclick = minesCashout;
         document.getElementById('minesStatus').textContent = '💎 ' + res.safeOpenedCount + ' алмазов • x' + res.multiplier.toFixed(2);
         if (res.gameOver) {
             document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => c.style.pointerEvents = 'none');
@@ -1817,6 +1818,9 @@ function bjOnStartResult(res) {
     document.getElementById('bjStartBtn').style.display = 'none';
     document.getElementById('bjHitBtn').style.display = '';
     document.getElementById('bjStandBtn').style.display = '';
+    // Set onclick AFTER buttons are visible
+    document.getElementById('bjHitBtn').onclick = bjHit;
+    document.getElementById('bjStandBtn').onclick = bjStand;
     document.getElementById('bjStatus').textContent = 'Твой ход';
     updateBJHands(res);
     if (res.gameOver) bjGameOver(res);
