@@ -1727,7 +1727,12 @@ function minesCashout() {
 var _bjBusy = false, _bjTimer = 0, _bjHitCount = 0;
 // Solo Blackjack - event delegation on document (Telegram CSP safe)
 document.addEventListener('click', function(e) {
-    var id = e.target.id;
+    if (!e || !e.target) return;
+    var el = e.target;
+    // Walk up to find button with ID (handles clicks on child elements like <i>)
+    while (el && !el.id) el = el.parentElement;
+    if (!el) return;
+    var id = el.id;
     if (id === 'bjStartBtn') bjStart();
     else if (id === 'bjHitBtn') bjHit();
     else if (id === 'bjStandBtn') bjStand();
