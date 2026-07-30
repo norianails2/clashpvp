@@ -83,13 +83,6 @@ export function registerCoinHandlers(io, socket) {
         const gd = room.game_data || {};
         if (gd.picks?.[user.id] !== undefined) { await client.query('ROLLBACK'); return ack?.({ error: 'Already picked' }); }
 
-        // Prevent picking the same side as opponent
-        const existingPicks = Object.values(gd.picks || {});
-        if (existingPicks.length > 0 && existingPicks.includes(choice)) {
-          await client.query('ROLLBACK');
-          return ack?.({ error: 'This side is already taken' });
-        }
-
         const newPicks = { ...(gd.picks || {}), [user.id]: choice };
         const pickedCount = Object.keys(newPicks).length;
 
