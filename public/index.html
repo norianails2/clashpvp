@@ -1814,8 +1814,8 @@ function bjStart() {
     balance -= bet; updateBalance();
     socket?.emit('bj:start', { betAmount: bet });
 }
-function bjHit() { showToast('⚡ ХИТ', 'info'); socket?.emit('bj:hit', {}); }
-function bjStand() { showToast('✋ СТОП', 'info'); socket?.emit('bj:stand', {}); }
+function bjHit() { try { showToast('⚡ ХИТ', 'info'); socket?.emit('bj:hit', {}); } catch(e) { showToast('❌ bjHit: ' + e.message, 'error'); } }
+function bjStand() { try { showToast('✋ СТОП', 'info'); socket?.emit('bj:stand', {}); } catch(e) { showToast('❌ bjStand: ' + e.message, 'error'); } }
 
 function bjOnStartResult(res) {
     if (res?.error) { balance += parseInt(document.getElementById('bjBetInput')?.value) || 0; updateBalance(); return showToast('❌ ' + res.error, 'error'); }
