@@ -1605,8 +1605,8 @@ function renderSoloMines(area) {
         '<input type="number" id="minesBetInput" value="10" min="1"><span class="pvc-currency">★</span></div>' +
         '<div class="pvc-adj"><button onclick="minesAdjBet(\'min\')">MIN</button><button onclick="minesAdjBet(\'half\')">½</button><button onclick="minesAdjBet(\'double\')">2×</button><button onclick="minesAdjBet(\'max\')">MAX</button></div></div>' +
         '<div style="display:flex;gap:8px;align-items:center;min-height:40px;" id="minesActions">' +
-        '<button class="c-main-btn" id="minesStartBtn" onclick="minesStart()">💣 СТАРТ</button>' +
-        '<button class="c-main-btn cashout" id="minesCashoutBtn" onclick="minesCashout()" style="display:none;">◆ ЗАБРАТЬ <span id="minesMult">1.00</span>x</button></div>' +
+        '<button class="c-main-btn" id="minesStartBtn">💣 СТАРТ</button>' +
+        '<button class="c-main-btn cashout" id="minesCashoutBtn" style="display:none;">◆ ЗАБРАТЬ <span id="minesMult">1.00</span>x</button></div>' +
         '<div style="font-size:12px;color:rgba(255,255,255,0.4);font-weight:600;min-height:20px;" id="minesStatus">Установи ставку и нажми СТАРТ</div>' +
         '</div>';
 
@@ -1738,6 +1738,8 @@ document.addEventListener('click', function(e) {
     else if (id === 'bjAdjHalf') bjAdjBet('half');
     else if (id === 'bjAdjDbl') bjAdjBet('double');
     else if (id === 'bjAdjMax') bjAdjBet('max');
+    else if (id === 'minesStartBtn') minesStart();
+    else if (id === 'minesCashoutBtn') minesCashout();
 });
 function renderSoloBJ(area) {
     document.getElementById('gameTitle').textContent = '🃏 Блекджек';
