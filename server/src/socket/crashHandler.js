@@ -19,7 +19,10 @@ export function registerCrashHandlers(io, socket) {
   socket.on('crash:bet', async (payload, ack) => {
     try {
       const { amount, autoCashoutAt } = payload || {};
-      if (!amount || amount < 1) return ack?.({ error: 'Minimum bet is 1' });
+      if (!Number.isInteger(amount) || amount < 1) return ack?.({ error: 'Minimum bet is 1' });
+      if (autoCashoutAt !== undefined && (!Number.isFinite(autoCashoutAt) || autoCashoutAt < 1)) {
+        return ack?.({ error: 'Invalid auto cashout multiplier' });
+      }
 
       const result = await crashEngine.placeBet(
         user.id,

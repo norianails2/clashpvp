@@ -1,5 +1,5 @@
-import { query } from '../db/pool.js';
 import provablyFair from '../services/provablyFairService.js';
+import { holdBet, payout, refund } from '../services/balanceService.js';
 
 class CrashEngine {
   constructor() {
@@ -9,6 +9,7 @@ class CrashEngine {
     this.mult = 1.0;
     this.crashPoint = 0;
     this.players = [];
+    this.pendingBets = new Set();
     this.history = [];
     this.timers = { main: null, countdown: null };
     this.HOUSE_EDGE = 0;
@@ -132,21 +133,19 @@ class CrashEngine {
 
   async placeBet(userId, username, betAmount, autoCashoutAt) {
     if (this.phase !== 'betting') return { error: 'Not betting phase' };
-    if (!betAmount || betAmount < 1) return { error: 'Minimum bet is 1' };
-    if (this.players.find(p => p.userId === userId)) return { error: 'Already bet this round' };
+    if (!Number.isInteger(betAmount) || betAmount < 1) return { error: 'Minimum bet is 1' };
+    if (this.players.find(p => p.userId === userId) || this.pendingBets.has(userId)) return { error: 'Already bet this round' };
+    if (autoCashoutAt !== null && autoCashoutAt !== undefined && (!Number.isFinite(autoCashoutAt) || autoCashoutAt < 1)) {
+      return { error: 'Invalid auto cashout multiplier' };
+    }
 
+    this.pendingBets.add(userId);
     try {
-      const { rows } = await query(
-        `UPDATE users SET balance = balance - $1 WHERE id = $2 AND balance >= $1 RETURNING balance`,
-        [betAmount, userId]
-      );
-      if (rows.length === 0) return { error: 'Insufficient balance' };
-
-      await query(
-        `INSERT INTO transactions (user_id, type, amount, balance_before, balance_after, game_type)
-         VALUES ($1, 'bet', $2, $3, $4, 'crash')`,
-        [userId, betAmount, Number(rows[0].balance) + betAmount, Number(rows[0].balance)]
-      );
+      const { balanceAfter } = await holdBet(userId, betAmount, 'crash', null, null);
+      if (this.phase !== 'betting') {
+        await refund(userId, betAmount, 'crash', null, null);
+        return { error: 'Betting phase has ended' };
+      }
 
       this.players.push({
         userId, username, bet: betAmount,
@@ -154,41 +153,37 @@ class CrashEngine {
       });
 
       this.broadcast();
-      return { success: true, balance: Number(rows[0].balance) };
+      return { success: true, balance: balanceAfter };
     } catch (err) {
       return { error: err.message };
+    } finally {
+      this.pendingBets.delete(userId);
     }
   }
 
   async cashout(userId, multiplier) {
     const player = this.players.find(p => p.userId === userId);
     if (!player) return { error: 'No bet placed' };
-    if (player.cashedAt) return { error: 'Already cashed out' };
+    if (player.cashedAt || player.cashingOut) return { error: 'Already cashed out' };
     if (this.phase !== 'flying') return { error: 'Not flying phase' };
 
-    const cashoutMult = Math.min(multiplier || this.mult, this.mult);
+    const requestedMultiplier = Number.isFinite(multiplier) && multiplier >= 1 ? multiplier : this.mult;
+    const cashoutMult = Math.min(requestedMultiplier, this.mult);
     const grossPayout = Math.ceil(player.bet * cashoutMult);
-    const netPayout = Math.ceil(grossPayout * (1 - this.HOUSE_EDGE));
+    player.cashingOut = true;
 
     try {
-      const { rows } = await query(
-        `UPDATE users SET balance = balance + $1 WHERE id = $2 RETURNING balance`,
-        [netPayout, userId]
-      );
-
-      await query(
-        `INSERT INTO transactions (user_id, type, amount, balance_before, balance_after, game_type)
-         VALUES ($1, 'win', $2, $3, $4, 'crash')`,
-        [userId, netPayout, Number(rows[0].balance) - netPayout, Number(rows[0].balance)]
-      );
+      const { balanceAfter, netAmount } = await payout(userId, grossPayout, 'crash', null, null, this.HOUSE_EDGE);
 
       player.cashedAt = cashoutMult;
-      player.payout = netPayout;
+      player.payout = netAmount;
       this.broadcast();
 
-      return { success: true, cashoutAt: cashoutMult, payout: netPayout, balance: Number(rows[0].balance) };
+      return { success: true, cashoutAt: cashoutMult, payout: netAmount, balance: balanceAfter };
     } catch (err) {
       return { error: err.message };
+    } finally {
+      player.cashingOut = false;
     }
   }
 
