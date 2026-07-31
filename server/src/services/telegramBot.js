@@ -120,6 +120,7 @@ export function initBot(server) {
   bot.on('pre_checkout_query', async (query_) => {
     try {
       const payload = JSON.parse(query_.invoice_payload || '{}');
+      if (payload.action !== 'deposit') throw new Error('Invalid invoice action');
       const { rows } = await query(
         `SELECT amount, telegram_id FROM star_invoices
          WHERE id = $1 AND status = $2 AND expires_at > NOW()`,
