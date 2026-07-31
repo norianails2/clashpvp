@@ -3,6 +3,7 @@ import { getReferralStats, generateReferralLink } from '../services/referralServ
 import { telegramRestAuth } from '../middleware/telegramRestAuth.js';
 
 const router = Router();
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 router.use(telegramRestAuth);
 
 // Get referral stats
@@ -30,7 +31,9 @@ router.get('/link', async (req, res, next) => {
 router.post('/apply', async (req, res, next) => {
   try {
     const { referrerId } = req.body;
-    if (!referrerId) return res.status(400).json({ error: 'Referrer ID required' });
+    if (typeof referrerId !== 'string' || !UUID_PATTERN.test(referrerId)) {
+      return res.status(400).json({ error: 'A valid referrer ID is required' });
+    }
 
     const { applyReferral } = await import('../services/referralService.js');
     await applyReferral(req.userId, referrerId);

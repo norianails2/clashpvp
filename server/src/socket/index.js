@@ -169,7 +169,7 @@ export function initSocket(httpServer) {
     // Create Telegram Stars invoice link (opens inside Mini App via openInvoice)
     socket.on('stars:create_invoice_link', async (payload, ack) => {
       const amount = payload?.amount || 0;
-      if (amount <= 0 || !Number.isInteger(amount)) {
+      if (!Number.isSafeInteger(amount) || amount < 1) {
         return ack?.({ error: 'Invalid amount' });
       }
       try {
