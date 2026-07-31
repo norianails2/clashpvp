@@ -152,7 +152,7 @@ export function initBot(server) {
         const { rows: invoices } = await client.query(
           `SELECT user_id FROM star_invoices
            WHERE id = $1 AND telegram_id = $2 AND amount = $3
-             AND status = 'pending' AND expires_at > NOW()
+             AND status = 'pending'
            FOR UPDATE`,
           [payload.invoiceId, telegramId, starsAmount]
         );
