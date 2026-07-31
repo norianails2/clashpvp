@@ -84,10 +84,7 @@ export async function createRoom(userId, gameType, betAmount, gameData = null) {
       await client.query(`UPDATE rooms SET status = 'CANCELLED' WHERE id = $1`, [waitingRoom.id]);
     }
 
-    // 1. Списать ставку (внутри SELECT ... FOR UPDATE)
-    await holdBet(userId, betAmount, gameType, null, client);
-
-    // 2. Создать комнату
+    // Create the room before holding the bet so the balance audit is linked to it.
     const { rows } = await client.query(
       `INSERT INTO rooms (game_type, bet_amount, creator_id${gameData ? ', game_data' : ''})
        VALUES ($1, $2, $3${gameData ? ', $4::jsonb' : ''})
@@ -96,6 +93,7 @@ export async function createRoom(userId, gameType, betAmount, gameData = null) {
     );
 
     const room = rows[0];
+    await holdBet(userId, betAmount, gameType, room.id, client);
 
     await client.query('COMMIT');
 
