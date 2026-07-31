@@ -198,6 +198,7 @@ export function initSocket(httpServer) {
             }
           );
           req.on('error', reject);
+          req.setTimeout(10_000, () => req.destroy(new Error('Telegram invoice request timed out')));
           req.write(body);
           req.end();
         });
