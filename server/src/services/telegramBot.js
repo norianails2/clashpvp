@@ -147,15 +147,6 @@ export function initBot(server) {
         throw new Error('Invalid Stars payment');
       }
 
-      // Old withdrawal invoices are refunded without changing the game balance.
-      if (payload.action === 'withdraw' && payload.telegramId) {
-        try {
-          await bot.refundStarPayment(Number(payload.telegramId), payment.telegram_payment_charge_id);
-        } catch (refundErr) {
-          console.error('[telegramBot] refund failed:', refundErr.message);
-        }
-        return;
-      }
       if (payload.action !== 'deposit') throw new Error('Invalid payment action');
 
       const client = await getClient();
