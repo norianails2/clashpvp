@@ -1,5 +1,5 @@
 import TelegramBot from 'node-telegram-bot-api';
-import { query } from '../db/pool.js';
+import { query, getClient } from '../db/pool.js';
 import { config } from '../config.js';
 import express from 'express';
 
@@ -128,14 +128,8 @@ export function initBot(server) {
     try {
       const telegramId = msg.from.id.toString();
       const payment = msg.successful_payment;
-      let starsAmount = payment.total_amount;
-      let payload = {};
-      try {
-        payload = JSON.parse(payment.invoice_payload);
-        const { rows: invoiceRows } = await query('SELECT user_id, amount FROM star_invoices WHERE id = $1 AND status = $2', [payload.invoiceId, 'pending']);
-        if (invoiceRows.length !== 1 || Number(invoiceRows[0].amount) !== starsAmount) throw new Error('Invalid or paid invoice');
-        payload.userId = invoiceRows[0].user_id;
-      } catch {}
+      const starsAmount = payment.total_amount;
+      const payload = JSON.parse(payment.invoice_payload || '{}');
 
       // Old withdrawal invoices are refunded without changing the game balance.
       if (payload.action === 'withdraw' && payload.telegramId) {
@@ -147,19 +141,21 @@ export function initBot(server) {
         return;
       }
 
-      // Deposit flow: add stars to balance (existing behavior)
-      const { rows } = await query(
-        `UPDATE users SET balance = balance + $1 WHERE id = $2 RETURNING id, balance`,
-        [starsAmount, payload.userId]
-      );
-
-      if (rows.length === 0) {
-        console.error('[telegramBot] successful_payment: user not found', telegramId);
-        return;
-      }
-
-      const user = rows[0];
-      await query(`UPDATE star_invoices SET status = 'paid', telegram_charge_id = $1, paid_at = NOW() WHERE id = $2`, [payment.telegram_payment_charge_id, payload.invoiceId]);
+      const client = await getClient();
+      let user;
+      try {
+        await client.query('BEGIN');
+        const { rows: invoices } = await client.query(
+          `SELECT user_id FROM star_invoices WHERE id = $1 AND telegram_id = $2 AND amount = $3 AND status = 'pending' FOR UPDATE`,
+          [payload.invoiceId, telegramId, starsAmount]
+        );
+        if (invoices.length !== 1) { await client.query('ROLLBACK'); return; }
+        const { rows } = await client.query(`UPDATE users SET balance = balance + $1 WHERE id = $2 RETURNING id, balance`, [starsAmount, invoices[0].user_id]);
+        if (!rows.length) throw new Error('Payment user not found');
+        user = rows[0];
+        await client.query(`UPDATE star_invoices SET status = 'paid', telegram_charge_id = $1, paid_at = NOW() WHERE id = $2`, [payment.telegram_payment_charge_id, payload.invoiceId]);
+        await client.query('COMMIT');
+      } catch (err) { await client.query('ROLLBACK'); throw err; } finally { client.release(); }
       await query(
         `INSERT INTO transactions (user_id, type, amount, balance_before, balance_after, metadata)
          VALUES ($1, 'deposit', $2, $3, $4, $5)`,
