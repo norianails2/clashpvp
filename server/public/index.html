@@ -622,7 +622,7 @@
         <div class="game-card c3" data-game="coin"><div class="glow"></div><div class="game-icon">🪙</div><div class="game-info"><div class="name">Монетка</div><div class="sub">Орёл или Решка</div></div><span class="game-arrow">›</span></div>
         <div class="game-card c4" data-game="mines"><div class="glow"></div><div class="game-icon">💣</div><div class="game-info"><div class="name">Мины</div><div class="sub">Найди алмазы, избегай бомб</div></div><div class="game-badge new">🔥 НОВОЕ</div><span class="game-arrow">›</span></div>
         <div class="game-card c5" data-game="blackjack"><div class="glow"></div><div class="game-icon">🃏</div><div class="game-info"><div class="name">Блекджек</div><div class="sub">Собери 21</div></div><span class="game-arrow">›</span></div>
-        <div class="game-card c6" data-game="crash"><div class="glow"></div><div class="game-icon">🚀</div><div class="game-info"><div class="name">Ракетка</div><div class="sub">Забери до взрыва</div></div><div class="game-badge updated">⚡ ОБНОВЛЕНО</div><span class="game-arrow">›</span></div>
+        <div class="game-card c6" data-game="crash"><div class="glow"></div><div class="game-icon">🚀</div><div class="game-info"><div class="name">Crash</div><div class="sub">Забери до взрыва</div></div><div class="game-badge updated">⚡ ОБНОВЛЕНО</div><span class="game-arrow">›</span></div>
     </div>
 
     <div class="modal-overlay" id="authModal">
@@ -832,7 +832,7 @@ const rulesData = {
     coin: {title:'🪙 Монетка',body:'Выбери Орла 🦅 или Решку 🪙. Угадал — забираешь ставку x2 минус 10% комиссия. Не угадал — проигрыш.'},
     mines: {title:'💣 Мины',body:'На поле 3×3 спрятаны 1 бомба и 8 алмазов. Открывай клетки, собирай алмазы. Наткнёшься на бомбу — стоп. У кого больше алмазов — победил. Комиссия: 10%.'},
     blackjack: {title:'🃏 Блекджек',body:'Собери 21 или ближе к 21, чем соперник. Карты: 2-10 по номиналу, J/Q/K = 10, A = 11. Hit — ещё карта, Stand — хватит. Перебор >21 — проигрыш. Комиссия: 10%.'},
-    crash: {title:'🚀 Ракетка',body:'Каждый раунд длится для всех одновременно. За 6 секунд сделай ставку. Множитель растёт с 1.00x — забери деньги ДО взрыва. Не успел — ставка сгорает. Комиссия платформы: 10%. Алгоритм Provably Fair (HMAC-SHA256).'},
+    crash: {title:'🚀 Crash',body:'Каждый раунд длится для всех одновременно. За 6 секунд сделай ставку. Множитель растёт с 1.00x — забери деньги ДО взрыва. Не успел — ставка сгорает. Комиссия платформы: 10%. Алгоритм Provably Fair (HMAC-SHA256).'},
 };
 function showRules() { const d = rulesData[currentGameId] || rulesData.rps; document.getElementById('rulesTitle').textContent = d.title; document.getElementById('rulesBody').innerHTML = d.body; document.getElementById('rulesPopup').classList.add('show'); }
 function closeRules() { document.getElementById('rulesPopup').classList.remove('show'); }
@@ -1395,7 +1395,7 @@ function closeGame() {
 function bjSum(arr) { return arr.reduce((a,b)=>a+b,0); }
 
 function renderCrash(area) {
-    document.getElementById('gameTitle').textContent='🚀 Ракетка';
+    document.getElementById('gameTitle').textContent='🚀 Crash';
     area.innerHTML = '<div class="crash-game" id="crashGame">' +
       '<div class="crash-header"><div class="c-round">✦ РАУНД <span class="r-num" id="crRound">#1</span></div>' +
       '<div class="c-countdown" id="crCountdown"><span class="c-c-num" id="crCountNum">10</span><span class="c-c-label" id="crCountLabel">сек</span></div></div>' +
