@@ -4,6 +4,7 @@ node_modules/
 server/node_modules/
 server/.env
 server/*.log
+server/backups/
 crash_state.json
 .DS_Store
 
