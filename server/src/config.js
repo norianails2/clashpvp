@@ -14,11 +14,11 @@ export const config = {
   },
 
   telegram: {
-    botToken: process.env.BOT_TOKEN || '8920598038:AAFdndgLQLxj_swUkfRGClMjQ_ynZNOXHEw',
+    botToken: process.env.BOT_TOKEN || '',
   },
 
   jwt: {
-    secret: process.env.JWT_SECRET || 'dev-secret-change-in-production',
+    secret: process.env.JWT_SECRET || '',
   },
 
   cors: {

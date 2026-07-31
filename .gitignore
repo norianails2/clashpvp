@@ -1,4 +1,11 @@
+# Root ignore for the whole monorepo
 node_modules/
 .env
+server/node_modules/
+server/.env
+server/*.log
 crash_state.json
-*.log
+.DS_Store
+
+# Separate embedded repo, not part of deployment
+blackjack-game/

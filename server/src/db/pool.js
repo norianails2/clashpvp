@@ -6,7 +6,7 @@ pg.types.setTypeParser(20, parseInt); // int8 -> number
 
 const databaseUrl = config.db.url && !config.db.url.includes('your_telegram')
   ? config.db.url
-  : 'postgresql://neondb_owner:npg_6MTro1KEszDQ@ep-winter-fire-a21gwkkw.eu-central-1.aws.neon.tech/neondb?sslmode=require';
+  : (process.env.DATABASE_URL || '');
 
 const pool = new pg.Pool({
   connectionString: databaseUrl,
