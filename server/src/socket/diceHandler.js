@@ -113,7 +113,7 @@ export function registerDiceHandlers(io, socket) {
 
           io.to(`room:${room.id}`).emit('dice:result', {
             roomId, rolls: newRolls, winnerId, draw,
-            payout: draw ? room.bet_amount : Math.floor(pot * (1 - HOUSE_EDGE)),
+            payout: draw ? room.bet_amount : Math.ceil(pot * (1 - HOUSE_EDGE)),
           });
           broadcastLobbyUpdate(io, 'dice');
           return ack?.({ roll, winnerId, draw, gameOver: true });

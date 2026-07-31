@@ -111,7 +111,7 @@ export function registerCoinHandlers(io, socket) {
 
           io.to(`room:${room.id}`).emit('coin:result', {
             roomId, picks: newPicks, flip, winnerId, draw,
-            payout: draw ? room.bet_amount : Math.floor(pot * (1 - HOUSE_EDGE)),
+            payout: draw ? room.bet_amount : Math.ceil(pot * (1 - HOUSE_EDGE)),
           });
           broadcastLobbyUpdate(io, 'coin');
           return ack?.({ flip, winnerId, gameOver: true });

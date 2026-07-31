@@ -124,7 +124,7 @@ export function registerRPSHandlers(io, socket) {
           winnerId, draw,
           payouts: draw
             ? { type: 'refund', amount: room.bet_amount }
-            : { type: 'win', winnerId, amount: Math.floor(room.bet_amount * 2 * 0.90) },
+            : { type: 'win', winnerId, amount: Math.ceil(room.bet_amount * 2 * 0.90) },
         });
 
         broadcastLobbyUpdate(io, 'rps');

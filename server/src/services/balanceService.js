@@ -85,7 +85,7 @@ export async function payout(userId, grossAmount, gameType, roomId, txClient, co
     throw Object.assign(new Error('Invalid payout params'), { status: 400 });
   }
 
-  const netAmount = commission > 0 ? Math.floor(_gross * (1 - commission)) : _gross;
+  const netAmount = commission > 0 ? Math.ceil(_gross * (1 - commission)) : _gross;
 
   return withClient(txClient, async (client) => {
     const { balanceBefore } = await checkUserBalance(client, userId);

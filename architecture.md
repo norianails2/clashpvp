@@ -1,4 +1,4 @@
-# Архитектура — Stars Clash
+# Архитектура — Clash PVP
 
 ## 1. Системная архитектура
 
@@ -57,7 +57,7 @@ HomeScreen (главная)
 ```mermaid
 graph TB
     subgraph "HomeScreen"
-        HEADER[Row: Stars Clash<br/>Welcome, Commander<br/>⭐ 1250]
+        HEADER[Row: Clash PVP<br/>Welcome, Commander<br/>⭐ 1250]
         MATCHMAKING[Matchmaking Card<br/>🎮 MATCHMAKING<br/>Gradient Shader BG]
         ACTIONS[Row: Create / Find<br/>ActionCard x2]
         PERFORMANCE[Your Performance Card<br/>Wins | Losses<br/>Win Rate]
@@ -69,7 +69,7 @@ graph TB
 
 ```
 ┌──────────────────────────────┐
-│ STARS CLASH          ⭐ 1250 │
+│ CLASH PVP            ⭐ 1250 │
 │ Welcome, Commander           │
 ├──────────────────────────────┤
 │ ┌──────────────────────────┐ │

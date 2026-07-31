@@ -78,7 +78,7 @@ export function registerMinesHandlers(io, socket) {
 
       const totalSafe = TOTAL_CELLS - game.minesCount;
       if (newSafe >= totalSafe) {
-        const win = Math.floor(game.betAmount * mult * (1 - HOUSE_EDGE));
+        const win = Math.ceil(game.betAmount * mult * (1 - HOUSE_EDGE));
         const { balanceAfter } = await payout(userId, win, 'mines', null, null, 0);
         game.active = false;
         soloGames.delete(userId);
@@ -99,7 +99,7 @@ export function registerMinesHandlers(io, socket) {
       if (!game || !game.active) return ack?.({ error: 'No active game' });
       if (game.safeOpenedCount === 0) return ack?.({ error: 'Open at least one cell first' });
 
-      const win = Math.floor(game.betAmount * game.multiplier * (1 - HOUSE_EDGE));
+      const win = Math.ceil(game.betAmount * game.multiplier * (1 - HOUSE_EDGE));
       const { balanceAfter } = await payout(userId, win, 'mines', null, null, 0);
       game.active = false;
       soloGames.delete(userId);

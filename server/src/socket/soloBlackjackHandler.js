@@ -1,234 +1,319 @@
-// ================================================================
-//  SOLO PvE BLACKJACK HANDLER – против дилера, со ставками из баланса
-// ================================================================
-
+import { getClient, query } from '../db/pool.js';
 import { holdBet, payout, HOUSE_EDGE } from '../services/balanceService.js';
 import {
-  createDeck, shuffleDeck, calculateScore, dealCards, isBust, isBlackjack, resolveGame,
+  createDeck, shuffleDeck, calculateScore, dealCards, isBust, resolveGame,
   MIN_BET, MAX_BET,
 } from '../games/blackjack.js';
-
-const soloGames = new Map();
 
 function shouldDealerHit(cards) {
   const score = calculateScore(cards);
   if (score < 17) return true;
-  // Soft 17 — count aces
-  let aces = 0, hard = 0;
-  for (const c of cards) {
-    const val = c.slice(0, -1);
-    if (val === 'A') aces++;
-    hard += (val === 'A' ? 11 : ['J','Q','K'].includes(val) ? 10 : parseInt(val, 10));
+
+  let aces = 0;
+  let hard = 0;
+  for (const card of cards) {
+    const value = card.slice(0, -1);
+    if (value === 'A') aces++;
+    hard += value === 'A' ? 11 : ['J', 'Q', 'K'].includes(value) ? 10 : parseInt(value, 10);
   }
-  while (hard > 21 && aces > 0) { hard -= 10; aces--; }
-  if (score === 17 && aces > 0) return true; // soft 17
-  return false;
+  while (hard > 21 && aces > 0) {
+    hard -= 10;
+    aces--;
+  }
+  return score === 17 && aces > 0;
 }
 
-export function registerSoloBlackjackHandlers(io, socket) {
-  const { user } = socket.data;
-  const userId = user.id;
-
-  socket.on('bj:start', async (payload, ack) => {
-    try {
-      const { betAmount } = payload || {};
-      if (!betAmount || betAmount < MIN_BET) return ack?.({ error: 'Minimum bet is ' + MIN_BET });
-      if (betAmount > MAX_BET) return ack?.({ error: 'Maximum bet is ' + MAX_BET });
-
-      if (soloGames.has(userId)) soloGames.delete(userId);
-
-      const { balanceAfter } = await holdBet(userId, betAmount, 'blackjack', null, null);
-      socket.emit('balance:update', { balance: balanceAfter });
-
-      const deck = shuffleDeck(createDeck());
-      const { cards: playerCards, deck: d1 } = dealCards(deck, 2);
-      const { cards: dealerCards, deck: d2 } = dealCards(d1, 2);
-      const playerScore = calculateScore(playerCards);
-      const dealerScore = calculateScore(dealerCards);
-
-      const state = {
-        userId, bet: betAmount,
-        deck: d2, playerCards, dealerCards,
-        playerScore, dealerScore,
-        phase: 'playing', // playing | dealer_turn | finished
-        over: false,
-      };
-      soloGames.set(userId, state);
-
-      // Check for instant blackjack
-      if (playerScore === 21) {
-        const { winnerId, draw } = resolveGame(playerScore, 'stood', dealerScore, 'stood', userId, 'dealer');
-        let payoutAmt = 0;
-        if (draw) {
-          const r = await payout(userId, betAmount, 'blackjack', null, null, 0);
-          socket.emit('balance:update', { balance: r.balanceAfter });
-          payoutAmt = betAmount;
-        } else if (winnerId === userId) {
-          const win = Math.floor(betAmount * 2.5 * (1 - HOUSE_EDGE)); // blackjack pays 3:2
-          const r = await payout(userId, win, 'blackjack', null, null, HOUSE_EDGE);
-          socket.emit('balance:update', { balance: r.balanceAfter });
-          payoutAmt = win;
-        }
-        state.over = true;
-        state.phase = 'finished';
-        soloGames.delete(userId);
-        return ack?.({
-          playerCards, playerScore,
-          dealerCards, dealerScore,
-          gameOver: true, winnerId, draw, payout: payoutAmt,
-        });
-      }
-
-      ack?.({
-        playerCards, playerScore,
-        dealerCard: dealerCards[0], dealerHidden: true,
-        gameOver: false,
-      });
-    } catch (err) {
-      console.error('[bj:start]', err?.message || err);
-      ack?.({ error: err?.message || 'Failed' });
-    }
-  });
-
-  socket.on('bj:hit', async (payload, ack) => {
-    try {
-      const state = soloGames.get(userId);
-      if (!state || state.phase !== 'playing') {
-        const r = { error: 'No active game' };
-        socket.emit('bj:hit_result', r);
-        return ack?.(r);
-      }
-
-      const { cards: dealt, deck: newDeck } = dealCards(state.deck, 1);
-      const card = dealt[0];
-      state.playerCards.push(card);
-      state.deck = newDeck;
-      const score = calculateScore(state.playerCards);
-
-      if (isBust(score)) {
-        state.phase = 'finished'; state.over = true;
-        soloGames.delete(userId);
-        const r = { card, score, bust: true, gameOver: true, playerCards: state.playerCards, dealerCards: state.dealerCards };
-        socket.emit('bj:hit_result', r);
-        return ack?.(r);
-      }
-
-      if (score === 21) {
-        state.phase = 'dealer_turn';
-        await playDealer(state, userId, socket);
-        soloGames.delete(userId);
-        return;
-      }
-
-      const r = { card, score, bust: false, gameOver: false, playerCards: state.playerCards };
-      socket.emit('bj:hit_result', r);
-      ack?.(r);
-    } catch (err) {
-      console.error('[bj:hit]', err?.message || err);
-      const r = { error: err?.message || 'Failed' };
-      socket.emit('bj:hit_result', r);
-      ack?.(r);
-    }
-  });
-
-  socket.on('bj:stand', async (payload, ack) => {
-    try {
-      const state = soloGames.get(userId);
-      if (!state || state.phase !== 'playing') {
-        const r = { error: 'No active game' };
-        socket.emit('bj:stand_result', r);
-        return ack?.(r);
-      }
-
-      state.phase = 'dealer_turn';
-      await playDealer(state, userId, socket);
-      soloGames.delete(userId);
-      ack?.({ gameOver: true });
-    } catch (err) {
-      console.error('[bj:stand]', err?.message || err);
-      const r = { error: err?.message || 'Failed' };
-      socket.emit('bj:stand_result', r);
-      ack?.(r);
-    }
-  });
-
-  socket.on('bj:double', async (payload, ack) => {
-    try {
-      const state = soloGames.get(userId);
-      if (!state || state.phase !== 'playing') {
-        const r = { error: 'No active game' };
-        return ack?.(r);
-      }
-      if (state.playerCards.length !== 2) {
-        const r = { error: 'Double only on first two cards' };
-        return ack?.(r);
-      }
-
-      // Hold extra bet
-      const { balanceAfter } = await holdBet(userId, state.bet, 'blackjack', null, null);
-      socket.emit('balance:update', { balance: balanceAfter });
-      state.bet *= 2;
-
-      const { cards: dealt, deck: newDeck } = dealCards(state.deck, 1);
-      const card = dealt[0];
-      state.playerCards.push(card);
-      state.deck = newDeck;
-      const score = calculateScore(state.playerCards);
-
-      if (isBust(score)) {
-        state.phase = 'finished'; state.over = true;
-        soloGames.delete(userId);
-        const r = { card, score, bust: true, gameOver: true, playerCards: state.playerCards, dealerCards: state.dealerCards };
-        return ack?.(r);
-      }
-
-      // Auto-stand after double
-      state.phase = 'dealer_turn';
-      await playDealer(state, userId, socket);
-      soloGames.delete(userId);
-      ack?.({ card, score, gameOver: true });
-    } catch (err) {
-      console.error('[bj:double]', err?.message || err);
-      ack?.({ error: err?.message || 'Failed' });
-    }
-  });
-
-  socket.on('disconnect', () => {
-    soloGames.delete(userId);
-  });
+async function loadGame(userId, txClient) {
+  const { rows } = await (txClient || { query }).query(
+    'SELECT game_data FROM solo_blackjack_games WHERE user_id = $1',
+    [userId]
+  );
+  return rows[0]?.game_data || null;
 }
 
-async function playDealer(state, userId, socket) {
+async function saveGame(userId, state, txClient) {
+  await txClient.query(
+    `INSERT INTO solo_blackjack_games (user_id, game_data, updated_at)
+     VALUES ($1, $2::jsonb, NOW())
+     ON CONFLICT (user_id) DO UPDATE SET game_data = EXCLUDED.game_data, updated_at = NOW()`,
+    [userId, JSON.stringify(state)]
+  );
+}
+
+async function deleteGame(userId, txClient) {
+  await txClient.query('DELETE FROM solo_blackjack_games WHERE user_id = $1', [userId]);
+}
+
+function publicState(state) {
+  return {
+    bet: state.bet,
+    playerCards: state.playerCards,
+    playerScore: calculateScore(state.playerCards),
+    dealerCard: state.dealerCards[0],
+    dealerHidden: true,
+    gameOver: false,
+  };
+}
+
+async function getBalance(userId) {
+  const { rows } = await query('SELECT balance FROM users WHERE id = $1', [userId]);
+  return rows.length ? Number(rows[0].balance) : null;
+}
+
+async function settleGame(state, userId, socket) {
   let dealerScore = calculateScore(state.dealerCards);
   while (shouldDealerHit(state.dealerCards) && state.deck.length > 0) {
-    const { cards: dealt, deck: newDeck } = dealCards(state.deck, 1);
-    state.dealerCards.push(dealt[0]);
-    state.deck = newDeck;
+    const { cards, deck } = dealCards(state.deck, 1);
+    state.dealerCards.push(cards[0]);
+    state.deck = deck;
     dealerScore = calculateScore(state.dealerCards);
   }
 
-  state.phase = 'finished'; state.over = true;
   const playerScore = calculateScore(state.playerCards);
-  const playerBust = isBust(playerScore);
-  const dealerBust = isBust(dealerScore);
-  const { winnerId, draw } = resolveGame(playerScore, playerBust ? 'bust' : 'stood', dealerScore, dealerBust ? 'bust' : 'stood', userId, 'dealer');
+  const { winnerId, draw } = resolveGame(
+    playerScore,
+    isBust(playerScore) ? 'bust' : 'stood',
+    dealerScore,
+    isBust(dealerScore) ? 'bust' : 'stood',
+    userId,
+    'dealer'
+  );
 
-  let payoutAmt = 0;
-  if (draw) {
-    const r = await payout(userId, state.bet, 'blackjack', null, null, 0);
-    socket.emit('balance:update', { balance: r.balanceAfter });
-    payoutAmt = state.bet;
-  } else if (winnerId === userId) {
-    const win = Math.floor(state.bet * 2 * (1 - HOUSE_EDGE));
-    const r = await payout(userId, win, 'blackjack', null, null, 0);
-    socket.emit('balance:update', { balance: r.balanceAfter });
-    payoutAmt = win;
+  const client = await getClient();
+  let payoutAmount = 0;
+  let balanceAfter = null;
+  try {
+    await client.query('BEGIN');
+    if (draw) {
+      const result = await payout(userId, state.bet, 'blackjack', null, client, 0);
+      payoutAmount = state.bet;
+      balanceAfter = result.balanceAfter;
+    } else if (winnerId === userId) {
+      payoutAmount = Math.ceil(state.bet * 2 * (1 - HOUSE_EDGE));
+      const result = await payout(userId, payoutAmount, 'blackjack', null, client, 0);
+      balanceAfter = result.balanceAfter;
+    }
+    await deleteGame(userId, client);
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
   }
 
-  socket.emit('bj:game_over', {
-    playerCards: state.playerCards, playerScore,
-    dealerCards: state.dealerCards, dealerScore,
-    gameOver: true, winnerId, draw,
-    payout: payoutAmt, bet: state.bet,
+  if (balanceAfter !== null) socket.emit('balance:update', { balance: balanceAfter });
+  return {
+    playerCards: state.playerCards,
+    playerScore,
+    dealerCards: state.dealerCards,
+    dealerScore,
+    gameOver: true,
+    winnerId,
+    draw,
+    payout: payoutAmount,
+    bet: state.bet,
+  };
+}
+
+export function registerSoloBlackjackHandlers(_io, socket) {
+  const { user } = socket.data;
+  const userId = user.id;
+
+  socket.on('bj:resume', async (_payload, ack) => {
+    try {
+      const state = await loadGame(userId);
+      if (!state) return ack?.({ active: false });
+      const balance = await getBalance(userId);
+      ack?.({ active: true, ...publicState(state), balance });
+    } catch (err) {
+      console.error('[bj:resume]', err.message);
+      ack?.({ error: 'Failed to resume game' });
+    }
+  });
+
+  socket.on('bj:start', async (payload, ack) => {
+    const betAmount = parseInt(payload?.betAmount, 10);
+    if (!betAmount || betAmount < MIN_BET) return ack?.({ error: `Minimum bet is ${MIN_BET}` });
+    if (betAmount > MAX_BET) return ack?.({ error: `Maximum bet is ${MAX_BET}` });
+
+    const deck = shuffleDeck(createDeck());
+    const firstDeal = dealCards(deck, 2);
+    const secondDeal = dealCards(firstDeal.deck, 2);
+    const state = {
+      userId,
+      bet: betAmount,
+      deck: secondDeal.deck,
+      playerCards: firstDeal.cards,
+      dealerCards: secondDeal.cards,
+      phase: 'playing',
+    };
+
+    const client = await getClient();
+    try {
+      await client.query('BEGIN');
+      const { rows } = await client.query(
+        'SELECT game_data FROM solo_blackjack_games WHERE user_id = $1 FOR UPDATE',
+        [userId]
+      );
+      if (rows.length) {
+        await client.query('ROLLBACK');
+        const balance = await getBalance(userId);
+        return ack?.({ resumed: true, ...publicState(rows[0].game_data), balance });
+      }
+
+      const held = await holdBet(userId, betAmount, 'blackjack', null, client);
+      const playerScore = calculateScore(state.playerCards);
+      const dealerScore = calculateScore(state.dealerCards);
+
+      if (playerScore === 21) {
+        const { winnerId, draw } = resolveGame(playerScore, 'stood', dealerScore, 'stood', userId, 'dealer');
+        let payoutAmount = 0;
+        let balanceAfter = held.balanceAfter;
+        if (draw) {
+          const result = await payout(userId, betAmount, 'blackjack', null, client, 0);
+          payoutAmount = betAmount;
+          balanceAfter = result.balanceAfter;
+        } else if (winnerId === userId) {
+          payoutAmount = Math.ceil(betAmount * 2.5 * (1 - HOUSE_EDGE));
+          const result = await payout(userId, payoutAmount, 'blackjack', null, client, 0);
+          balanceAfter = result.balanceAfter;
+        }
+        await client.query('COMMIT');
+        socket.emit('balance:update', { balance: balanceAfter });
+        return ack?.({
+          playerCards: state.playerCards,
+          playerScore,
+          dealerCards: state.dealerCards,
+          dealerScore,
+          gameOver: true,
+          winnerId,
+          draw,
+          payout: payoutAmount,
+          bet: betAmount,
+        });
+      }
+
+      await saveGame(userId, state, client);
+      await client.query('COMMIT');
+      socket.emit('balance:update', { balance: held.balanceAfter });
+      ack?.(publicState(state));
+    } catch (err) {
+      await client.query('ROLLBACK');
+      console.error('[bj:start]', err.message);
+      ack?.({ error: err.message || 'Failed to start game' });
+    } finally {
+      client.release();
+    }
+  });
+
+  socket.on('bj:hit', async (_payload, ack) => {
+    try {
+      const state = await loadGame(userId);
+      if (!state || state.phase !== 'playing') return ack?.({ error: 'No active game' });
+
+      const { cards, deck } = dealCards(state.deck, 1);
+      const card = cards[0];
+      state.playerCards.push(card);
+      state.deck = deck;
+      const score = calculateScore(state.playerCards);
+
+      if (isBust(score)) {
+        const client = await getClient();
+        try {
+          await client.query('BEGIN');
+          await deleteGame(userId, client);
+          await client.query('COMMIT');
+        } catch (err) {
+          await client.query('ROLLBACK');
+          throw err;
+        } finally {
+          client.release();
+        }
+        const result = { card, score, bust: true, gameOver: true, playerCards: state.playerCards, dealerCards: state.dealerCards, bet: state.bet };
+        socket.emit('bj:hit_result', result);
+        return ack?.(result);
+      }
+
+      if (score === 21) {
+        const result = await settleGame(state, userId, socket);
+        socket.emit('bj:game_over', result);
+        return ack?.(result);
+      }
+
+      const client = await getClient();
+      try {
+        await client.query('BEGIN');
+        await saveGame(userId, state, client);
+        await client.query('COMMIT');
+      } catch (err) {
+        await client.query('ROLLBACK');
+        throw err;
+      } finally {
+        client.release();
+      }
+      const result = { card, score, bust: false, gameOver: false, playerCards: state.playerCards };
+      socket.emit('bj:hit_result', result);
+      ack?.(result);
+    } catch (err) {
+      console.error('[bj:hit]', err.message);
+      ack?.({ error: err.message || 'Failed' });
+    }
+  });
+
+  socket.on('bj:stand', async (_payload, ack) => {
+    try {
+      const state = await loadGame(userId);
+      if (!state || state.phase !== 'playing') return ack?.({ error: 'No active game' });
+      const result = await settleGame(state, userId, socket);
+      socket.emit('bj:game_over', result);
+      ack?.(result);
+    } catch (err) {
+      console.error('[bj:stand]', err.message);
+      ack?.({ error: err.message || 'Failed' });
+    }
+  });
+
+  socket.on('bj:double', async (_payload, ack) => {
+    try {
+      const state = await loadGame(userId);
+      if (!state || state.phase !== 'playing') return ack?.({ error: 'No active game' });
+      if (state.playerCards.length !== 2) return ack?.({ error: 'Double only on first two cards' });
+
+      const client = await getClient();
+      try {
+        await client.query('BEGIN');
+        const held = await holdBet(userId, state.bet, 'blackjack', null, client);
+        state.bet *= 2;
+        const { cards, deck } = dealCards(state.deck, 1);
+        const card = cards[0];
+        state.playerCards.push(card);
+        state.deck = deck;
+        const score = calculateScore(state.playerCards);
+
+        if (isBust(score)) {
+          await deleteGame(userId, client);
+          await client.query('COMMIT');
+          socket.emit('balance:update', { balance: held.balanceAfter });
+          return ack?.({ card, score, bust: true, gameOver: true, playerCards: state.playerCards, dealerCards: state.dealerCards, bet: state.bet });
+        }
+
+        await saveGame(userId, state, client);
+        await client.query('COMMIT');
+        socket.emit('balance:update', { balance: held.balanceAfter });
+      } catch (err) {
+        await client.query('ROLLBACK');
+        throw err;
+      } finally {
+        client.release();
+      }
+
+      const result = await settleGame(state, userId, socket);
+      socket.emit('bj:game_over', result);
+      ack?.(result);
+    } catch (err) {
+      console.error('[bj:double]', err.message);
+      ack?.({ error: err.message || 'Failed' });
+    }
   });
 }

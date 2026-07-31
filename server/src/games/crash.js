@@ -111,8 +111,6 @@ class CrashEngine {
     if (revealed) {
       this.seedRevealed = revealed.serverSeed;
     }
-    console.log('[crash] doCrash round=' + this.round + ' seed=' + (this.seedRevealed ? this.seedRevealed.slice(0,16) : 'NULL') + ' hash=' + (this.seedHash ? this.seedHash.slice(0,16) : 'NULL'));
-
     this.history.unshift({ crashPoint: this.crashPoint, players: this.players.length });
     if (this.history.length > 20) this.history.pop();
 
@@ -169,8 +167,8 @@ class CrashEngine {
     if (this.phase !== 'flying') return { error: 'Not flying phase' };
 
     const cashoutMult = Math.min(multiplier || this.mult, this.mult);
-    const grossPayout = Math.floor(player.bet * cashoutMult);
-    const netPayout = Math.floor(grossPayout * (1 - this.HOUSE_EDGE));
+    const grossPayout = Math.ceil(player.bet * cashoutMult);
+    const netPayout = Math.ceil(grossPayout * (1 - this.HOUSE_EDGE));
 
     try {
       const { rows } = await query(

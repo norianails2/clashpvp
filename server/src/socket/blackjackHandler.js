@@ -215,68 +215,64 @@ export function registerBlackjackHandlers(io, socket) {
           [`${playerKey}Status`]: bust ? 'bust' : (newScore === 21 ? 'stood' : 'active'),
         };
 
-        if (bust) {
-          const newStatus = updatedData[`${playerKey}Status`];
-          const otherKey = isCreator ? 'opponent' : 'creator';
-          const otherStatus = updatedData[`${otherKey}Status`];
+        const otherKey = isCreator ? 'opponent' : 'creator';
+        const otherStatus = updatedData[`${otherKey}Status`];
+        const newStatus = updatedData[`${playerKey}Status`];
 
-          if (otherStatus === 'bust' || otherStatus === 'stood') {
-            const resolved = resolveGame(
-              updatedData.creatorScore, updatedData.creatorStatus,
-              updatedData.opponentScore, updatedData.opponentStatus,
-              room.creator_id, room.opponent_id
-            );
+        if ((newStatus === 'bust' || newStatus === 'stood') && (otherStatus === 'bust' || otherStatus === 'stood')) {
+          const resolved = resolveGame(
+            updatedData.creatorScore, updatedData.creatorStatus,
+            updatedData.opponentScore, updatedData.opponentStatus,
+            room.creator_id, room.opponent_id
+          );
 
-            if (resolved.draw) {
-              await refund(room.creator_id, room.bet_amount, 'blackjack', room.id, client);
-              await refund(room.opponent_id, room.bet_amount, 'blackjack', room.id, client);
-            } else {
-await payout(resolved.winnerId, room.bet_amount * 2, 'blackjack', room.id, client, HOUSE_EDGE);
+          if (resolved.draw) {
+            await refund(room.creator_id, room.bet_amount, 'blackjack', room.id, client);
+            await refund(room.opponent_id, room.bet_amount, 'blackjack', room.id, client);
+          } else {
+            await payout(resolved.winnerId, room.bet_amount * 2, 'blackjack', room.id, client, HOUSE_EDGE);
           }
 
-            updatedData.winnerId = resolved.winnerId;
-            updatedData.draw = resolved.draw;
-            delete updatedData.deck;
+          updatedData.winnerId = resolved.winnerId;
+          updatedData.draw = resolved.draw;
+          delete updatedData.deck;
 
-            await client.query(
-              `UPDATE rooms
-               SET status = 'FINISHED',
-                   winner_id = $1,
-                   game_data = $2::jsonb
-               WHERE id = $3`,
-              [resolved.winnerId, JSON.stringify(updatedData), room.id]
-            );
+          await client.query(
+            `UPDATE rooms
+             SET status = 'FINISHED',
+                 winner_id = $1,
+                 game_data = $2::jsonb
+             WHERE id = $3`,
+            [resolved.winnerId, JSON.stringify(updatedData), room.id]
+          );
 
-            await client.query('COMMIT');
+          await client.query('COMMIT');
 
-            io.to(`room:${room.id}`).emit('blackjack:card_dealt', {
-              roomId,
-              playerId: user.id,
-              card,
-              hand: updatedCards,
-              score: newScore,
-              bust: true,
-            });
+          io.to(`room:${room.id}`).emit('blackjack:card_dealt', {
+            roomId,
+            playerId: user.id,
+            card,
+            hand: updatedCards,
+            score: newScore,
+            bust,
+          });
 
-            io.to(`room:${room.id}`).emit('blackjack:game_over', {
-              roomId: room.id,
-              winnerId: resolved.winnerId,
-              draw: resolved.draw,
-              creatorCards: updatedData.creatorCards,
-              creatorScore: updatedData.creatorScore,
-              opponentCards: updatedData.opponentCards,
-              opponentScore: updatedData.opponentScore,
-              payout: resolved.draw ? room.bet_amount : Math.floor(room.bet_amount * 2 * (1 - HOUSE_EDGE)),
-            });
+          io.to(`room:${room.id}`).emit('blackjack:game_over', {
+            roomId: room.id,
+            winnerId: resolved.winnerId,
+            draw: resolved.draw,
+            creatorCards: updatedData.creatorCards,
+            creatorScore: updatedData.creatorScore,
+            opponentCards: updatedData.opponentCards,
+            opponentScore: updatedData.opponentScore,
+            payout: resolved.draw ? room.bet_amount : Math.ceil(room.bet_amount * 2 * (1 - HOUSE_EDGE)),
+          });
 
-            broadcastLobbyUpdate(io, 'blackjack');
-            return ack?.({ bust: true, score: newScore });
-          }
-
-          updatedData.currentTurn = room.opponent_id;
-        } else {
-          updatedData.currentTurn = room.opponent_id;
+          broadcastLobbyUpdate(io, 'blackjack');
+          return ack?.({ bust: bust || newScore === 21, score: newScore });
         }
+
+        updatedData.currentTurn = isCreator ? room.opponent_id : room.creator_id;
 
         await client.query(
           `UPDATE rooms
@@ -298,7 +294,7 @@ await payout(resolved.winnerId, room.bet_amount * 2, 'blackjack', room.id, clien
 
         io.to(`room:${room.id}`).emit('blackjack:turn_switched', {
           roomId,
-          currentTurn: room.opponent_id,
+          currentTurn: isCreator ? room.opponent_id : room.creator_id,
         });
 
         ack?.({ card, hand: updatedCards, score: newScore });
@@ -377,7 +373,7 @@ await payout(resolved.winnerId, room.bet_amount * 2, 'blackjack', room.id, clien
             await refund(room.creator_id, room.bet_amount, 'blackjack', room.id, client);
             await refund(room.opponent_id, room.bet_amount, 'blackjack', room.id, client);
           } else {
-await payout(resolved.winnerId, room.bet_amount * 2, 'blackjack', room.id, client, HOUSE_EDGE);
+            await payout(resolved.winnerId, room.bet_amount * 2, 'blackjack', room.id, client, HOUSE_EDGE);
           }
 
             updatedData.winnerId = resolved.winnerId;
@@ -403,14 +399,14 @@ await payout(resolved.winnerId, room.bet_amount * 2, 'blackjack', room.id, clien
               creatorScore: updatedData.creatorScore,
               opponentCards: updatedData.opponentCards,
               opponentScore: updatedData.opponentScore,
-              payout: resolved.draw ? room.bet_amount : Math.floor(room.bet_amount * 2 * (1 - HOUSE_EDGE)),
+              payout: resolved.draw ? room.bet_amount : Math.ceil(room.bet_amount * 2 * (1 - HOUSE_EDGE)),
           });
 
           broadcastLobbyUpdate(io, 'blackjack');
           return ack?.({ stood: true, gameOver: true });
         }
 
-        updatedData.currentTurn = room.opponent_id;
+        updatedData.currentTurn = isCreator ? room.opponent_id : room.creator_id;
 
         await client.query(
           `UPDATE rooms
@@ -423,7 +419,7 @@ await payout(resolved.winnerId, room.bet_amount * 2, 'blackjack', room.id, clien
 
         io.to(`room:${room.id}`).emit('blackjack:turn_switched', {
           roomId,
-          currentTurn: room.opponent_id,
+          currentTurn: isCreator ? room.opponent_id : room.creator_id,
         });
 
         ack?.({ stood: true });

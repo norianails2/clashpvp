@@ -16,6 +16,9 @@ const testHtml = fs.readFileSync(path.join(__dirname, 'test-client.html'), 'utf-
 export function createApp() {
   const app = express();
 
+  // Trust Railway's proxy for correct client IPs (rate limiting)
+  app.set('trust proxy', 1);
+
   // Security headers (relaxed for Telegram WebView)
   app.use(helmet({
     contentSecurityPolicy: false,

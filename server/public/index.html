@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="color-scheme" content="dark">
     <title>ClashPVP</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js?22"></script>
     <script src="/socket.io/socket.io.js"></script>
     <style>
@@ -29,13 +29,13 @@
 
         .balance-block { background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:16px 20px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;gap:16px;box-shadow:0 0 0 1px rgba(251,191,36,0.03); }
         .balance-left { min-width:0;display:flex;flex-direction:column;gap:2px; }
-        .balance-left .label { font-size:9px;color:rgba(255,255,255,0.2);font-weight:700;letter-spacing:1.8px;font-family:'Nunito',sans-serif;text-transform:uppercase;display:flex;align-items:center;gap:6px; }
+        .balance-left .label { font-size:9px;color:rgba(255,255,255,0.2);font-weight:700;letter-spacing:1.8px;font-family:'Fredoka',sans-serif;text-transform:uppercase;display:flex;align-items:center;gap:6px; }
         .balance-left .label::before { content:'✦';font-size:7px;color:#fbbf24;opacity:0.4; }
         .balance-row { display:flex;align-items:baseline;gap:8px; }
         .balance-row .amount { font-family:'Fredoka',sans-serif;font-size:32px;font-weight:800;color:#fbbf24;white-space:nowrap;letter-spacing:-0.5px;line-height:1;text-shadow:0 0 30px rgba(251,191,36,0.12); }
         .balance-row .currency { font-size:12px;font-weight:700;color:rgba(255,255,255,0.2);letter-spacing:0.3px; }
         .balance-actions { display:flex;gap:8px;flex-shrink:0; }
-        .bal-btn { padding:9px 18px;border-radius:12px;border:none;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all 0.15s;white-space:nowrap;letter-spacing:0.3px; }
+        .bal-btn { padding:9px 18px;border-radius:12px;border:none;font-family:'Fredoka',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all 0.15s;white-space:nowrap;letter-spacing:0.3px; }
         .bal-btn:active { transform:scale(0.95); }
         .bal-btn.deposit { background:#fbbf24;color:#1a0a2e;box-shadow:0 4px 16px rgba(251,191,36,0.2); }
         .bal-btn.dev-add { background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.3);font-size:9px;padding:4px 10px;border-radius:8px; }
@@ -82,7 +82,7 @@
         .game-info { flex:1;min-width:0;position:relative;z-index:1; }
         .game-info .name { font-family:'Fredoka',sans-serif;font-size:17px;font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:-0.2px; }
         .game-info .sub { font-size:11px;color:rgba(255,255,255,0.55);margin-top:2px; }
-        .game-badge { padding:4px 12px;border-radius:9999px;font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;flex-shrink:0;position:relative;z-index:1;letter-spacing:0.3px; }
+        .game-badge { padding:4px 12px;border-radius:9999px;font-family:'Fredoka',sans-serif;font-size:10px;font-weight:800;flex-shrink:0;position:relative;z-index:1;letter-spacing:0.3px; }
         .game-badge.new { background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1a0a2e;box-shadow:0 2px 10px rgba(251,191,36,0.3); }
         .game-badge.updated { background:linear-gradient(135deg,#ff6b81,#e84393);color:#fff;box-shadow:0 2px 10px rgba(255,107,129,0.3); }
         .game-arrow { font-size:22px;color:rgba(255,255,255,0.2);flex-shrink:0;position:relative;z-index:1;transition:all 0.3s ease; }
@@ -123,20 +123,20 @@
         .pvp-create { margin-bottom:12px;border-radius:20px;padding:14px 16px 16px;background:linear-gradient(145deg,rgba(30,15,55,0.95),rgba(20,10,40,0.98));backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.08);position:relative;overflow:hidden; }
         .pvp-create::before { content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:conic-gradient(from 0deg,transparent,rgba(251,191,36,0.04),transparent,rgba(184,74,42,0.04),transparent);animation:rotate 8s linear infinite;pointer-events:none; }
         .pvp-create::after { content:'';position:absolute;inset:1px;background:linear-gradient(145deg,rgba(30,15,55,0.95),rgba(20,10,40,0.98));border-radius:19px;pointer-events:none; }
-        .pvc-label { font-family:'Nunito',sans-serif;font-size:9px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:8px;position:relative;z-index:1; }
+        .pvc-label { font-family:'Fredoka',sans-serif;font-size:9px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:8px;position:relative;z-index:1; }
         .pvc-row { display:flex;align-items:center;gap:8px;margin-bottom:8px;position:relative;z-index:1; }
         .pvc-input-wrap { flex:1;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:6px 14px;max-width:140px; }
         .pvc-input-wrap .pvc-star { font-size:14px;flex-shrink:0;opacity:0.5; }
         .pvc-input-wrap input { flex:1;background:none;border:none;outline:none;padding:0;font-family:'Fredoka',sans-serif;font-size:16px;font-weight:700;color:#fff;min-width:0;line-height:1; }
-        .pvc-input-wrap .pvc-currency { font-family:'Nunito',sans-serif;font-size:10px;color:rgba(255,255,255,0.25);font-weight:600;white-space:nowrap; }
+        .pvc-input-wrap .pvc-currency { font-family:'Fredoka',sans-serif;font-size:10px;color:rgba(255,255,255,0.25);font-weight:600;white-space:nowrap; }
         .pvc-adj { display:flex;gap:4px; }
-        .pvc-adj button { padding:6px 10px;border-radius:9999px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.4);font-family:'Nunito',sans-serif;font-size:9px;font-weight:800;cursor:pointer;transition:all 0.15s;letter-spacing:0.5px; }
+        .pvc-adj button { padding:6px 10px;border-radius:9999px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.4);font-family:'Fredoka',sans-serif;font-size:9px;font-weight:800;cursor:pointer;transition:all 0.15s;letter-spacing:0.5px; }
         .pvc-adj button:hover { border-color:rgba(251,191,36,0.2);color:#fbbf24;background:rgba(251,191,36,0.04); }
         .pvc-adj button:active { transform:scale(0.93); }
-        .pvp-create-btn { width:100%;padding:12px;border:none;border-radius:9999px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1a0a2e;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all 0.25s;text-transform:uppercase;letter-spacing:1px;position:relative;z-index:1;box-shadow:0 4px 20px rgba(251,191,36,0.25); }
+        .pvp-create-btn { width:100%;padding:12px;border:none;border-radius:9999px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1a0a2e;font-family:'Fredoka',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all 0.25s;text-transform:uppercase;letter-spacing:1px;position:relative;z-index:1;box-shadow:0 4px 20px rgba(251,191,36,0.25); }
         .pvp-create-btn:hover { box-shadow:0 6px 25px rgba(251,191,36,0.4);transform:translateY(-1px); }
         .pvp-create-btn:active { transform:scale(0.97); }
-        .pvp-join { padding:8px 18px;border-radius:9999px;border:none;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1a0a2e;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;box-shadow:0 4px 15px rgba(251,191,36,0.2);position:relative;z-index:1; }
+        .pvp-join { padding:8px 18px;border-radius:9999px;border:none;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1a0a2e;font-family:'Fredoka',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;box-shadow:0 4px 15px rgba(251,191,36,0.2);position:relative;z-index:1; }
         .pvp-join:hover { transform:translateY(-2px) scale(1.03);box-shadow:0 8px 25px rgba(251,191,36,0.35); }
         .pvp-join:active { transform:scale(0.94); }
         .pvp-join.cancel { background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.6);box-shadow:none;border:1px solid rgba(255,255,255,0.08);padding:8px 14px;font-size:14px; }
@@ -151,7 +151,7 @@
         .pvp-room:hover .pv-avatar { border-color:rgba(251,191,36,0.2); }
         .pv-avatar-img { width:100%;height:100%;object-fit:cover;border-radius:50%; }
         .pv-info { flex:1;min-width:0; }
-        .pv-name { font-size:14px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Nunito',sans-serif; }
+        .pv-name { font-size:14px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Fredoka',sans-serif; }
         .pv-desc { font-size:11px;color:rgba(255,255,255,0.3);margin-top:2px; }
         .pv-bet-block { display:flex;align-items:center;gap:4px;background:rgba(251,191,36,0.1);padding:4px 10px 4px 8px;border-radius:9999px;border:1px solid rgba(251,191,36,0.1);flex-shrink:0; }
         .pv-bet { font-size:14px;font-weight:800;color:#fbbf24;font-family:'Fredoka',sans-serif;white-space:nowrap; }
@@ -187,7 +187,7 @@
         .rps-choice-card::before { content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,0.15) 0%,transparent 100%);opacity:0.4;pointer-events:none; }
         .rps-choice-card .card-icon { font-size:42px;margin-bottom:8px;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);filter:drop-shadow(0 4px 10px rgba(0,0,0,0.3)); }
         .rps-choice-card .card-title { font-family:'Fredoka',sans-serif;font-size:12px;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:2px; }
-        .rps-choice-card .card-sub { font-size:9px;color:rgba(255,255,255,0.6);font-weight:600;font-family:'Nunito',sans-serif;white-space:nowrap; }
+        .rps-choice-card .card-sub { font-size:9px;color:rgba(255,255,255,0.6);font-weight:600;font-family:'Fredoka',sans-serif;white-space:nowrap; }
 
         /* Custom Card Gradients & Neons */
         .rps-choice-card.rock { background:linear-gradient(135deg,#4f46e5 0%,#3b82f6 100%);border-color:rgba(99,102,241,0.4);box-shadow:0 8px 25px rgba(79,70,229,0.35); }
@@ -203,7 +203,7 @@
         .rps-choice-card:hover .card-icon { transform:scale(1.18) rotate(-5deg); }
 
         /* Choice Status Label */
-        .rps-status-text { font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:rgba(255,255,255,0.7);text-align:center;letter-spacing:0.5px;min-height:22px;margin-top:4px; }
+        .rps-status-text { font-family:'Fredoka',sans-serif;font-size:13px;font-weight:800;color:rgba(255,255,255,0.7);text-align:center;letter-spacing:0.5px;min-height:22px;margin-top:4px; }
 
         /* 3. DUEL & OPPONENTS BLOCK */
         .rps-duel-block { width:100%;max-width:380px;margin:0 auto;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);backdrop-filter:blur(16px);border-radius:24px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 12px 32px rgba(0,0,0,0.3);position:relative;overflow:hidden; }
@@ -213,13 +213,13 @@
         .rps-player-avatar { width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 12px rgba(0,0,0,0.2);position:relative;overflow:hidden; }
         .rps-player-avatar img { width:100%;height:100%;object-fit:cover; }
         .rps-player-name { font-family:'Fredoka',sans-serif;font-size:12px;font-weight:700;color:#fff;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
-        .rps-player-status { font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;padding:3px 8px;border-radius:9999px;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.08);display:inline-flex;align-items:center;gap:4px;white-space:nowrap; }
+        .rps-player-status { font-family:'Fredoka',sans-serif;font-size:10px;font-weight:800;padding:3px 8px;border-radius:9999px;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.08);display:inline-flex;align-items:center;gap:4px;white-space:nowrap; }
         .rps-player-status.thinking { color:#fbbf24;border-color:rgba(251,191,36,0.2);background:rgba(251,191,36,0.08); }
         .rps-player-status.ready { color:#22c55e;border-color:rgba(34,197,94,0.2);background:rgba(34,197,94,0.08); }
 
         /* Bank Center Badge */
         .rps-bank-badge { display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 14px;background:linear-gradient(135deg,rgba(251,191,36,0.15),rgba(245,158,11,0.05));border:1px solid rgba(251,191,36,0.3);border-radius:16px;box-shadow:0 0 20px rgba(251,191,36,0.15);position:relative;z-index:1; }
-        .rps-bank-title { font-family:'Nunito',sans-serif;font-size:9px;font-weight:800;color:rgba(255,255,255,0.4);letter-spacing:1px;text-transform:uppercase; }
+        .rps-bank-title { font-family:'Fredoka',sans-serif;font-size:9px;font-weight:800;color:rgba(255,255,255,0.4);letter-spacing:1px;text-transform:uppercase; }
         .rps-bank-val { font-family:'Fredoka',sans-serif;font-size:16px;font-weight:800;color:#fbbf24;display:flex;align-items:center;gap:4px;text-shadow:0 0 10px rgba(251,191,36,0.3); }
 
         /* Keyframes */
@@ -235,7 +235,7 @@
         @keyframes diceRollAnim { 0% { transform:rotateZ(0) scale(1); } 20% { transform:rotateZ(90deg) scale(1.15); } 40% { transform:rotateZ(180deg) scale(1); } 60% { transform:rotateZ(270deg) scale(1.15); } 80% { transform:rotateZ(340deg) scale(1); } 100% { transform:rotateZ(360deg) scale(1); } }
         .pvp-dice-box.win { border-color:#22c55e;box-shadow:0 0 30px rgba(34,197,94,0.3); }
         .pvp-dice-box.lose { border-color:#ef4444;box-shadow:0 0 30px rgba(239,68,68,0.3); }
-        .pvp-dice-btn { padding:10px 28px;border-radius:9999px;border:none;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1a0a2e;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;transition:all 0.25s;box-shadow:0 4px 20px rgba(251,191,36,0.25); }
+        .pvp-dice-btn { padding:10px 28px;border-radius:9999px;border:none;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1a0a2e;font-family:'Fredoka',sans-serif;font-size:14px;font-weight:800;cursor:pointer;transition:all 0.25s;box-shadow:0 4px 20px rgba(251,191,36,0.25); }
         .pvp-dice-btn:active { transform:scale(0.95); }
         .pvp-dice-btn:disabled { opacity:0.3;cursor:not-allowed;transform:none!important;box-shadow:none!important; }
 
@@ -251,7 +251,7 @@
         .pvp-coin-arrow { font-size:16px;color:rgba(255,255,255,0.12); }
         .pvp-coin-flip.fp { animation:coinFlipAnim 0.9s ease; }
         @keyframes coinFlipAnim { 0% { transform:rotateY(0) scale(1); } 20% { transform:rotateY(90deg) scale(1.15); } 40% { transform:rotateY(180deg) scale(1); } 60% { transform:rotateY(270deg) scale(1.15); } 80% { transform:rotateY(340deg) scale(1); } 100% { transform:rotateY(360deg) scale(1); } }
-        .pvp-coin-btn { padding:10px 24px;border-radius:9999px;border:2px solid rgba(255,255,255,0.08);background:linear-gradient(145deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,0.6);cursor:pointer;transition:all 0.25s; }
+        .pvp-coin-btn { padding:10px 24px;border-radius:9999px;border:2px solid rgba(255,255,255,0.08);background:linear-gradient(145deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));font-family:'Fredoka',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,0.6);cursor:pointer;transition:all 0.25s; }
         .pvp-coin-btn:hover { border-color:#fbbf24;color:#fbbf24;transform:translateY(-2px);box-shadow:0 6px 20px rgba(251,191,36,0.15); }
         .pvp-coin-btn.sel { border-color:#fbbf24;background:rgba(251,191,36,0.12);color:#fbbf24;box-shadow:0 0 20px rgba(251,191,36,0.2); }
         .pvp-coin-btn:disabled { opacity:0.3;cursor:not-allowed;transform:none!important; }
@@ -278,7 +278,7 @@
         @keyframes dealCard { from { transform:translateY(-20px) scale(0.8);opacity:0; } to { transform:translateY(0) scale(1);opacity:1; } }
         .pvp-bj-vs { font-size:13px;color:rgba(255,255,255,0.2);font-weight:700;flex-shrink:0; }
         .pvp-bj-actions { display:flex;gap:10px;justify-content:center;margin-top:6px; }
-        .pvp-bj-btn { padding:8px 20px;border-radius:9999px;border:none;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s; }
+        .pvp-bj-btn { padding:8px 20px;border-radius:9999px;border:none;font-family:'Fredoka',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s; }
         .pvp-bj-btn:active { transform:scale(0.95); }
         .pvp-bj-btn.hit { background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.12); }
         .pvp-bj-btn.stand { background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1a0a2e;box-shadow:0 4px 15px rgba(251,191,36,0.2); }
@@ -299,7 +299,7 @@
 
 
 
-        .toast { position:absolute;bottom:100px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:9999px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:#fff;display:none;z-index:30;white-space:nowrap;pointer-events:none; }
+        .toast { position:absolute;bottom:100px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:9999px;font-family:'Fredoka',sans-serif;font-size:14px;font-weight:700;color:#fff;display:none;z-index:30;white-space:nowrap;pointer-events:none; }
         .toast.show { display:block;animation:toastAnim 2.2s ease forwards; }
         @keyframes toastAnim { 0% { opacity:0;transform:translateX(-50%) translateY(20px); } 12% { opacity:1;transform:translateX(-50%) translateY(0); } 82% { opacity:1;transform:translateX(-50%) translateY(0); } 100% { opacity:0;transform:translateX(-50%) translateY(-20px); } }
         .toast.success { background:linear-gradient(135deg,#22c55e,#16a34a);box-shadow:0 4px 20px rgba(34,197,94,0.4); }
@@ -318,23 +318,23 @@
         .modal-overlay { position:absolute;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:20;padding:24px; }
         .modal-overlay.show { display:flex; }
         .modal-box { background:linear-gradient(180deg,#2a1a4e,#1a0a2e);border:2px solid rgba(255,255,255,0.12);border-radius:28px;padding:28px;width:100%;max-width:320px;max-height:90vh;overflow-y:auto;animation:fadeIn 0.25s ease; }
-        .modal-box h2 { font-family:'Nunito',sans-serif;font-size:22px;font-weight:800;color:#fff;text-align:center;margin-bottom:4px; }
+        .modal-box h2 { font-family:'Fredoka',sans-serif;font-size:22px;font-weight:800;color:#fff;text-align:center;margin-bottom:4px; }
         .modal-box p { text-align:center;color:rgba(255,255,255,0.5);font-size:13px;margin-bottom:16px; }
         .modal-input { width:100%;padding:14px 18px;border-radius:16px;border:2px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:#fff;font-family:'Fredoka',sans-serif;font-size:20px;font-weight:600;outline:none;text-align:center;margin-bottom:12px;transition:border-color 0.2s; }
         .modal-input:focus { border-color:#fbbf24; }
         .modal-input.error { border-color:#ef4444; }
-        .modal-error { font-size:11px;color:#ef4444;text-align:center;margin-bottom:8px;font-family:'Nunito',sans-serif;display:none; }
+        .modal-error { font-size:11px;color:#ef4444;text-align:center;margin-bottom:8px;font-family:'Fredoka',sans-serif;display:none; }
         .modal-error.show { display:block; }
         .modal-btns { display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:14px; }
-        .modal-btns .chip { padding:8px 16px;border-radius:9999px;border:2px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.6);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.15s; }
+        .modal-btns .chip { padding:8px 16px;border-radius:9999px;border:2px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.6);font-family:'Fredoka',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.15s; }
         .modal-btns .chip:active { transform:scale(0.95); }
         .modal-btns .chip.sel { border-color:#fbbf24;background:rgba(251,191,36,0.12);color:#fbbf24; }
-        .modal-confirm { width:100%;padding:14px;border-radius:9999px;border:none;font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;cursor:pointer;transition:transform 0.1s,box-shadow 0.2s;margin-bottom:10px; }
+        .modal-confirm { width:100%;padding:14px;border-radius:9999px;border:none;font-family:'Fredoka',sans-serif;font-size:16px;font-weight:800;cursor:pointer;transition:transform 0.1s,box-shadow 0.2s;margin-bottom:10px; }
         .modal-confirm:active { transform:scale(0.95); }
         .modal-confirm.dep { background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1a0a2e;box-shadow:0 4px 15px rgba(251,191,36,0.3); }
         .modal-confirm.wd { background:linear-gradient(135deg,#ff6b81,#e84393);color:#fff; }
         .modal-confirm.history { background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.1); }
-        .modal-cancel { background:none;border:none;color:rgba(255,255,255,0.4);font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;cursor:pointer;width:100%;padding:8px; }
+        .modal-cancel { background:none;border:none;color:rgba(255,255,255,0.4);font-family:'Fredoka',sans-serif;font-size:14px;font-weight:600;cursor:pointer;width:100%;padding:8px; }
         .modal-cancel:active { color:rgba(255,255,255,0.6); }
 
         .history-list { max-height:200px;overflow-y:auto;margin-bottom:12px; }
@@ -359,13 +359,13 @@
         @keyframes slideIn { from { opacity:0;transform:translateX(-20px); } to { opacity:1;transform:translateX(0); } }
         .bottom-nav { position:absolute;bottom:0;left:0;right:0;height:85px;background:#0d0d14;border-top:2px solid rgba(255,255,255,0.08);display:flex;justify-content:space-around;align-items:center;padding:8px 8px 14px;z-index:10;padding-bottom:max(14px, env(safe-area-inset-bottom,14px)); }
         .compliance-footer { position:absolute;bottom:85px;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:12px;padding:6px 16px;background:rgba(255,255,255,0.02);border-top:1px solid rgba(255,255,255,0.03); }
-        .compliance-footer span { font-size:9px;color:rgba(255,255,255,0.15);font-family:'Nunito',sans-serif;font-weight:700;letter-spacing:0.5px;cursor:pointer;transition:color 0.15s; }
+        .compliance-footer span { font-size:9px;color:rgba(255,255,255,0.15);font-family:'Fredoka',sans-serif;font-weight:700;letter-spacing:0.5px;cursor:pointer;transition:color 0.15s; }
         .compliance-footer span:hover { color:rgba(255,255,255,0.3); }
         .compliance-footer span:first-child { color:rgba(255,255,255,0.08);cursor:default; }
         .nav-item { text-align:center;cursor:pointer;transition:all 0.15s;padding:6px 10px;border-radius:16px;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:52px; }
         .nav-item:active { transform:scale(0.92); }
         .nav-item .icon { font-size:24px;display:block;filter:grayscale(1) brightness(0.5);transition:all 0.15s; }
-        .nav-item .label { font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;font-weight:600;font-family:'Nunito',sans-serif;transition:all 0.15s; }
+        .nav-item .label { font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;font-weight:600;font-family:'Fredoka',sans-serif;transition:all 0.15s; }
         .nav-item.active { background:rgba(251,191,36,0.15); }
         .nav-item.active .icon { filter:none; }
         .nav-item.active .label { color:#fbbf24; }
@@ -373,18 +373,17 @@
         @keyframes flicker { 0%{height:10px;opacity:0.7} 100%{height:14px;opacity:1} }
 
         /* === CYBER ARENA CRASH STYLE === */
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@500;600;700&display=swap');
         .crash-game { display:flex;flex-direction:column;flex:1;background:#0a0a14;position:relative;overflow:hidden; }
         .crash-game::before { content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 30%,rgba(139,92,246,0.08),rgba(236,72,153,0.04),transparent);pointer-events:none; }
 
         .crash-header { display:flex;justify-content:space-between;align-items:center;padding:10px 16px;position:relative;z-index:2;border-bottom:1px solid rgba(255,255,255,0.04); }
-        .crash-header .c-round { font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;letter-spacing:1.5px;color:rgba(255,255,255,0.35);text-transform:uppercase;display:flex;align-items:center;gap:6px; }
+        .crash-header .c-round { font-family:'Fredoka',sans-serif;font-size:10px;font-weight:800;letter-spacing:1.5px;color:rgba(255,255,255,0.35);text-transform:uppercase;display:flex;align-items:center;gap:6px; }
         .crash-header .c-round .r-num { color:#a78bfa; }
         .crash-header .c-countdown { display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.04);padding:4px 12px;border-radius:9999px;border:1px solid rgba(139,92,246,0.15); }
         .crash-header .c-countdown .c-c-num { font-family:'Fredoka',sans-serif;font-size:18px;font-weight:700;color:#a78bfa;min-width:22px;text-align:center; }
         .crash-header .c-countdown .c-c-num.danger { color:#f43f5e;text-shadow:0 0 15px rgba(244,63,94,0.4); }
         .crash-header .c-countdown .c-c-num.live { color:#22c55e;text-shadow:0 0 15px rgba(34,197,94,0.4);font-size:14px; }
-        .crash-header .c-countdown .c-c-label { font-family:'Nunito',sans-serif;font-size:9px;font-weight:700;color:rgba(255,255,255,0.25);letter-spacing:1px;text-transform:uppercase; }
+        .crash-header .c-countdown .c-c-label { font-family:'Fredoka',sans-serif;font-size:9px;font-weight:700;color:rgba(255,255,255,0.25);letter-spacing:1px;text-transform:uppercase; }
 
         .crash-mult-area { display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 16px 0;min-height:80px; }
         .crash-mult-area .c-mult { font-family:'Fredoka',sans-serif;font-size:68px;font-weight:900;letter-spacing:-3px;line-height:1;z-index:2;transition:all 0.2s;text-shadow:0 0 60px rgba(139,92,246,0.3),0 0 120px rgba(139,92,246,0.15);display:inline-block; }
@@ -392,8 +391,8 @@
         .crash-mult-area .c-mult.safe { color:#4ade80;text-shadow:0 0 40px rgba(74,222,128,0.4); }
         .crash-mult-area .c-mult.warn { color:#fb923c;text-shadow:0 0 40px rgba(251,146,60,0.4); }
         .crash-mult-area .c-mult.crashed { color:#f43f5e;text-shadow:0 0 40px rgba(244,63,94,0.5); }
-        .crash-mult-area .c-player-count { font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;color:rgba(255,255,255,0.3);margin-top:4px;z-index:2; }
-        .crash-mult-area .c-status { font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:9999px;margin-top:4px;z-index:2;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.3); }
+        .crash-mult-area .c-player-count { font-family:'Fredoka',sans-serif;font-size:11px;font-weight:700;color:rgba(255,255,255,0.3);margin-top:4px;z-index:2; }
+        .crash-mult-area .c-status { font-family:'Fredoka',sans-serif;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:9999px;margin-top:4px;z-index:2;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.3); }
         .crash-mult-area .c-status.live { color:#a78bfa;border-color:rgba(139,92,246,0.25);background:rgba(139,92,246,0.08);animation:badgePulse 2s ease infinite; }
         .crash-mult-area .c-status.crashed { color:#f43f5e;border-color:rgba(244,63,94,0.25);background:rgba(244,63,94,0.08); }
 
@@ -403,24 +402,24 @@
 
         .crash-history-bar { display:flex;gap:6px;padding:6px 16px;overflow-x:auto;flex-shrink:0;scrollbar-width:none; }
         .crash-history-bar::-webkit-scrollbar { display:none; }
-        .c-hist-chip { flex-shrink:0;padding:4px 12px;border-radius:9999px;font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;letter-spacing:0.3px; }
+        .c-hist-chip { flex-shrink:0;padding:4px 12px;border-radius:9999px;font-family:'Fredoka',sans-serif;font-size:10px;font-weight:800;letter-spacing:0.3px; }
         .c-hist-chip.green { color:#22c55e;border:1px solid rgba(34,197,94,0.2);background:rgba(34,197,94,0.08); }
         .c-hist-chip.yellow { color:#fb923c;border:1px solid rgba(251,146,60,0.2);background:rgba(251,146,60,0.08); }
         .c-hist-chip.red { color:#f43f5e;border:1px solid rgba(244,63,94,0.2);background:rgba(244,63,94,0.08); }
         .c-hist-chip.purple { color:#a78bfa;border:1px solid rgba(167,139,250,0.25);background:rgba(167,139,250,0.1);text-shadow:0 0 8px rgba(167,139,250,0.3); }
 
         .crash-bet-panel { margin:0 12px 8px;border-radius:20px;padding:12px 14px 14px;flex-shrink:0;background:rgba(15,15,30,0.95);border:1px solid rgba(139,92,246,0.12);position:relative;overflow:hidden; }
-        .c-bet-label { font-family:'Nunito',sans-serif;font-size:9px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:8px;position:relative;z-index:1; }
+        .c-bet-label { font-family:'Fredoka',sans-serif;font-size:9px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:8px;position:relative;z-index:1; }
         .c-bet-row { display:flex;align-items:center;gap:8px;margin-bottom:8px;position:relative;z-index:1; }
         .c-bet-input-wrap { flex:1;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:6px 14px;max-width:130px; }
         .c-bet-input-wrap input { flex:1;background:none;border:none;outline:none;padding:0;font-family:'Fredoka',sans-serif;font-size:15px;font-weight:700;color:#fff;min-width:0;line-height:1; }
         .c-bet-adj { display:flex;gap:4px; }
-        .c-bet-adj button { padding:6px 10px;border-radius:9999px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.5);font-family:'Nunito',sans-serif;font-size:9px;font-weight:800;cursor:pointer;transition:all 0.15s; }
+        .c-bet-adj button { padding:6px 10px;border-radius:9999px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.5);font-family:'Fredoka',sans-serif;font-size:9px;font-weight:800;cursor:pointer;transition:all 0.15s; }
         .c-bet-adj button:hover { border-color:rgba(139,92,246,0.3);color:#a78bfa; }
         .c-bet-adj button:active { transform:scale(0.93); }
 
         .c-auto-row { display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;position:relative;z-index:1; }
-        .c-auto-label { font-family:'Nunito',sans-serif;font-size:10px;font-weight:700;color:rgba(255,255,255,0.3);letter-spacing:1px;display:flex;align-items:center;gap:6px; }
+        .c-auto-label { font-family:'Fredoka',sans-serif;font-size:10px;font-weight:700;color:rgba(255,255,255,0.3);letter-spacing:1px;display:flex;align-items:center;gap:6px; }
         .c-toggle-switch { width:38px;height:22px;border-radius:11px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.06);cursor:pointer;position:relative;transition:all 0.3s;flex-shrink:0; }
         .c-toggle-switch.active { background:rgba(184,74,42,0.15);border-color:#b84a2a;box-shadow:0 0 12px rgba(184,74,42,0.1); }
         .c-toggle-switch .c-knob { width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,0.15);position:absolute;top:2px;left:2px;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1); }
@@ -429,7 +428,7 @@
         .c-auto-input:focus { border-color:rgba(184,74,42,0.2); }
 
         .c-action-row { display:flex;gap:8px;position:relative;z-index:1; }
-        .c-main-btn { flex:1;padding:14px;border:none;border-radius:9999px;background:linear-gradient(135deg,#b84a2a,#d97706);color:#fff;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all 0.25s;text-transform:uppercase;letter-spacing:1px;position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(184,74,42,0.3); }
+        .c-main-btn { flex:1;padding:14px;border:none;border-radius:9999px;background:linear-gradient(135deg,#b84a2a,#d97706);color:#fff;font-family:'Fredoka',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all 0.25s;text-transform:uppercase;letter-spacing:1px;position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(184,74,42,0.3); }
         .c-main-btn:hover { box-shadow:0 6px 25px rgba(184,74,42,0.4);transform:translateY(-1px); }
         .c-main-btn:active { transform:scale(0.97); }
         .c-main-btn.cashout { background:linear-gradient(135deg,#ff4757,#ff6b81);box-shadow:0 4px 20px rgba(255,71,87,0.3);animation:cBtnPulse 1s ease infinite; }
@@ -442,22 +441,22 @@
         .c-sec-btn:active { transform:scale(0.92); }
 
         .crash-social { margin:0 16px 12px;padding-top:6px;flex:1;overflow:hidden;display:flex;flex-direction:column; }
-        .crash-social-title { display:flex;justify-content:space-between;align-items:center;padding:0 2px 6px;font-family:'Nunito',sans-serif;font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.2);border-bottom:1px solid rgba(255,255,255,0.03); }
+        .crash-social-title { display:flex;justify-content:space-between;align-items:center;padding:0 2px 6px;font-family:'Fredoka',sans-serif;font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.2);border-bottom:1px solid rgba(255,255,255,0.03); }
         .crash-participant { display:flex;align-items:center;gap:8px;padding:5px 8px;font-size:12px;border-radius:12px;animation:partInRG 0.25s ease backwards;margin-bottom:2px; }
         .crash-participant:hover { background:rgba(255,255,255,0.03); }
         .crash-part-avatar { width:24px;height:24px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:12px;background:rgba(255,255,255,0.03);flex-shrink:0; }
-        .crash-part-name { flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:700;color:rgba(255,255,255,0.5);font-family:'Nunito',sans-serif; }
+        .crash-part-name { flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:700;color:rgba(255,255,255,0.5);font-family:'Fredoka',sans-serif; }
         .crash-participant.me { background:linear-gradient(90deg,rgba(251,191,36,0.08),transparent);border:1px solid rgba(251,191,36,0.12);border-radius:12px;margin-bottom:3px; }
-        .crash-part-bet { font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;color:rgba(255,255,255,0.3); }
-        .crash-part-cashout { font-family:'Nunito',sans-serif;font-size:10px;font-weight:800;color:#22c55e; }
+        .crash-part-bet { font-family:'Fredoka',sans-serif;font-size:10px;font-weight:800;color:rgba(255,255,255,0.3); }
+        .crash-part-cashout { font-family:'Fredoka',sans-serif;font-size:10px;font-weight:800;color:#22c55e; }
         .crash-part-cashout.lose { color:#ff4757; }
         @keyframes partInRG { from{opacity:0;transform:translateY(4px);} to{opacity:1;transform:translateY(0);} }
 
         /* Provably Fair Badge */
-        .crash-fair-badge { display:flex;align-items:center;gap:6px;padding:5px 10px;background:rgba(255,255,255,0.03);border-radius:8px;margin:3px 12px;font-family:'Nunito',sans-serif;font-size:9px; }
+        .crash-fair-badge { display:flex;align-items:center;gap:6px;padding:5px 10px;background:rgba(255,255,255,0.03);border-radius:8px;margin:3px 12px;font-family:'Fredoka',sans-serif;font-size:9px; }
         .cf-icon { font-size:10px; }
         .cf-hash { color:rgba(255,255,255,0.2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;font-family:monospace;font-size:7px; }
-        .cf-verify { background:rgba(251,191,36,0.1);color:#fbbf24;border:1px solid rgba(251,191,36,0.2);border-radius:9999px;padding:2px 7px;font-size:7px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'Nunito',sans-serif; }
+        .cf-verify { background:rgba(251,191,36,0.1);color:#fbbf24;border:1px solid rgba(251,191,36,0.2);border-radius:9999px;padding:2px 7px;font-size:7px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'Fredoka',sans-serif; }
         .cf-verify:hover { background:rgba(251,191,36,0.2); }
         /* Verify Modal */
         .cf-modal-overlay { position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:10000;display:none;justify-content:center;align-items:center; }
@@ -466,12 +465,133 @@
         .cf-modal-title { font-family:'Fredoka',sans-serif;font-size:16px;font-weight:600;color:#fbbf24;margin-bottom:12px;display:flex;align-items:center;gap:8px; }
         .cf-modal-close { position:absolute;top:12px;right:12px;background:none;border:none;color:rgba(255,255,255,0.3);font-size:18px;cursor:pointer; }
         .cf-field { margin-bottom:10px; }
-        .cf-field-label { font-family:'Nunito',sans-serif;font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px; }
+        .cf-field-label { font-family:'Fredoka',sans-serif;font-size:9px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px; }
         .cf-field-value { font-family:monospace;font-size:10px;color:rgba(255,255,255,0.7);word-break:break-all;background:rgba(0,0,0,0.3);border-radius:6px;padding:6px 8px; }
         .cf-field-value.success { color:#22c55e; }
-        .cf-verify-btn { width:100%;padding:10px;border:none;border-radius:9999px;background:linear-gradient(135deg,#b84a2a,#d97706);color:#fff;font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;cursor:pointer;margin-top:8px; }
+        .cf-verify-btn { width:100%;padding:10px;border:none;border-radius:9999px;background:linear-gradient(135deg,#b84a2a,#d97706);color:#fff;font-family:'Fredoka',sans-serif;font-size:11px;font-weight:700;cursor:pointer;margin-top:8px; }
         .cf-verify-btn:hover { opacity:0.9; }
         .cf-result { margin-top:8px;padding:8px;border-radius:8px;text-align:center;font-size:11px;font-weight:700;display:none; }
+
+        /* === CYBER ARENA THEME — applies the crash ("Ракетка") style to all games === */
+        .game-overlay { background:radial-gradient(ellipse 70% 45% at 50% -5%,rgba(139,92,246,0.14),rgba(236,72,153,0.05),transparent 70%),#0a0a14; }
+        .game-header { border-bottom:1px solid rgba(139,92,246,0.12); }
+        .game-header h2 { font-family:'Fredoka',sans-serif;letter-spacing:0.5px; }
+        .game-header .back { border:1px solid rgba(139,92,246,0.15);background:rgba(139,92,246,0.08);color:#a78bfa; }
+        .game-header .back:hover { background:rgba(139,92,246,0.16);border-color:rgba(167,139,250,0.35);color:#fff; }
+        .game-header .balance { background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.25);box-shadow:0 0 18px rgba(139,92,246,0.12); }
+        .game-header .rules-btn { color:rgba(167,139,250,0.5); }
+
+        /* Preview block */
+        .game-preview::after { background:linear-gradient(90deg,#a78bfa,transparent);opacity:0.4; }
+        .pv-icon-wrap .pv-icon-bg.rps { background:linear-gradient(135deg,#4c1d95,rgba(76,29,149,0.35)); } .pv-icon-wrap .pv-icon-bg.rps::before { background:#a78bfa; }
+        .pv-icon-wrap .pv-icon-bg.dice { background:linear-gradient(135deg,#7c3aed,rgba(124,58,237,0.35)); } .pv-icon-wrap .pv-icon-bg.dice::before { background:#c4b5fd; }
+        .pv-icon-wrap .pv-icon-bg.coin { background:linear-gradient(135deg,#b45309,rgba(180,83,9,0.35)); } .pv-icon-wrap .pv-icon-bg.coin::before { background:#fbbf24; }
+        .pv-icon-wrap .pv-icon-bg.mines { background:linear-gradient(135deg,#db2777,rgba(219,39,119,0.35)); } .pv-icon-wrap .pv-icon-bg.mines::before { background:#f9a8d4; }
+        .pv-icon-wrap .pv-icon-bg.blackjack { background:linear-gradient(135deg,#7c3aed,rgba(124,58,237,0.35)); } .pv-icon-wrap .pv-icon-bg.blackjack::before { background:#a78bfa; }
+        .pv-icon-wrap .pv-icon-bg.crash { background:linear-gradient(135deg,#b91c1c,rgba(185,28,28,0.35)); } .pv-icon-wrap .pv-icon-bg.crash::before { background:#fca5a5; }
+        .pv-title-text { font-family:'Fredoka',sans-serif;letter-spacing:0.5px; }
+
+        /* Lobby & create room */
+        .pvp-title { color:#a78bfa;font-family:'Fredoka',sans-serif;letter-spacing:2px; }
+        .pvp-title .live { background:#a78bfa;box-shadow:0 0 10px rgba(167,139,250,0.8); }
+        .pvp-create { background:linear-gradient(145deg,rgba(15,15,30,0.97),rgba(10,10,20,0.99));border:1px solid rgba(139,92,246,0.15);box-shadow:0 0 25px rgba(139,92,246,0.06); }
+        .pvp-create::before { background:conic-gradient(from 0deg,transparent,rgba(139,92,246,0.06),transparent,rgba(236,72,153,0.06),transparent); }
+        .pvp-create::after { background:linear-gradient(145deg,rgba(15,15,30,0.97),rgba(10,10,20,0.99)); }
+        .pvc-label { color:rgba(167,139,250,0.45); }
+        .pvc-input-wrap { border:1px solid rgba(139,92,246,0.18);background:rgba(139,92,246,0.05); }
+        .pvc-input-wrap input { font-size:16px; }
+        .pvc-adj button { border-color:rgba(139,92,246,0.15);color:rgba(167,139,250,0.6); }
+        .pvc-adj button:hover { border-color:rgba(167,139,250,0.4);color:#c4b5fd;background:rgba(139,92,246,0.1); }
+        .pvp-create-btn { background:linear-gradient(135deg,#b84a2a,#d97706);color:#fff;box-shadow:0 4px 20px rgba(184,74,42,0.35);letter-spacing:1.5px;font-family:'Fredoka',sans-serif;font-size:11px; }
+        .pvp-create-btn:hover { box-shadow:0 6px 30px rgba(184,74,42,0.5); }
+        .pvp-join { background:linear-gradient(135deg,#b84a2a,#d97706);color:#fff;box-shadow:0 4px 15px rgba(184,74,42,0.3); }
+        .pvp-join:hover { box-shadow:0 8px 25px rgba(184,74,42,0.45); }
+        .pvp-room { background:linear-gradient(145deg,rgba(15,15,30,0.95),rgba(10,10,20,0.98));border:1px solid rgba(139,92,246,0.12);box-shadow:0 4px 20px rgba(0,0,0,0.25); }
+        .pvp-room::after { background:linear-gradient(145deg,rgba(15,15,30,0.95),rgba(10,10,20,0.98)); }
+        .pvp-room:hover { border-color:rgba(167,139,250,0.25);box-shadow:0 8px 30px rgba(139,92,246,0.12); }
+        .pv-avatar { border-color:rgba(139,92,246,0.2);background:rgba(139,92,246,0.08); }
+        .pvp-room:hover .pv-avatar { border-color:rgba(167,139,250,0.4); }
+        .pv-name { font-family:'Fredoka',sans-serif;font-size:12px;letter-spacing:0.3px; }
+        .pv-bet-block { background:rgba(139,92,246,0.12);border-color:rgba(139,92,246,0.25); }
+        .pv-bet { color:#c4b5fd;font-size:14px; }
+
+        /* RPS duel — neon cards, cyber palette */
+        .rps-timer-badge { border-color:rgba(139,92,246,0.2);background:rgba(139,92,246,0.08);box-shadow:0 0 15px rgba(139,92,246,0.2); }
+        .rps-timer-badge .time-text { color:#a78bfa; }
+        .rps-progress-bar { background:linear-gradient(90deg,#8b5cf6,#ec4899,#f43f5e);box-shadow:0 0 10px rgba(139,92,246,0.5); }
+        .rps-choice-card { border-color:rgba(139,92,246,0.2);background:rgba(139,92,246,0.04);box-shadow:0 8px 24px rgba(0,0,0,0.3); }
+        .rps-choice-card .card-title { font-family:'Fredoka',sans-serif;letter-spacing:1.2px;font-size:10px; }
+        .rps-choice-card.rock { background:linear-gradient(135deg,#4c1d95 0%,#7c3aed 100%);border-color:rgba(167,139,250,0.4);box-shadow:0 8px 25px rgba(76,29,149,0.4); }
+        .rps-choice-card.rock:hover, .rps-choice-card.rock.selected { border-color:#c4b5fd;box-shadow:0 0 30px rgba(167,139,250,0.7),0 12px 35px rgba(124,58,237,0.5); }
+        .rps-choice-card.paper { background:linear-gradient(135deg,#db2777 0%,#ec4899 100%);border-color:rgba(236,72,153,0.4);box-shadow:0 8px 25px rgba(219,39,119,0.4); }
+        .rps-choice-card.paper:hover, .rps-choice-card.paper.selected { border-color:#fbcfe8;box-shadow:0 0 30px rgba(236,72,153,0.7),0 12px 35px rgba(219,39,119,0.5); }
+        .rps-choice-card.scissors { background:linear-gradient(135deg,#b91c1c 0%,#f43f5e 100%);border-color:rgba(244,63,94,0.4);box-shadow:0 8px 25px rgba(185,28,28,0.4); }
+        .rps-choice-card.scissors:hover, .rps-choice-card.scissors.selected { border-color:#fda4af;box-shadow:0 0 30px rgba(244,63,94,0.7),0 12px 35px rgba(185,28,28,0.5); }
+        .rps-duel-block { background:rgba(139,92,246,0.05);border-color:rgba(139,92,246,0.15);box-shadow:0 12px 32px rgba(0,0,0,0.35); }
+        .rps-duel-block::before { background:radial-gradient(circle at 50% 50%,rgba(139,92,246,0.1),transparent 70%); }
+        .rps-player-avatar { border-color:rgba(139,92,246,0.25);background:rgba(139,92,246,0.1); }
+        .rps-player-name { font-family:'Fredoka',sans-serif;font-size:10px;letter-spacing:0.5px; }
+        .rps-player-status.thinking { color:#c4b5fd;border-color:rgba(167,139,250,0.25);background:rgba(139,92,246,0.1); }
+        .rps-player-status.ready { color:#22c55e;border-color:rgba(34,197,94,0.25);background:rgba(34,197,94,0.1); }
+        .rps-bank-badge { background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(236,72,153,0.08));border-color:rgba(167,139,250,0.35);box-shadow:0 0 20px rgba(139,92,246,0.2); }
+        .rps-bank-val { color:#c4b5fd;text-shadow:0 0 10px rgba(167,139,250,0.4);font-size:16px; }
+        .rps-status-text { color:rgba(196,181,253,0.8); }
+
+        /* Dice */
+        .pvp-dice-screen { display:flex;flex-direction:column;justify-content:space-between;height:100%;min-height:480px;padding:8px 4px;gap:14px;box-sizing:border-box; }
+        .pvp-dice-duo { display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:4px; }
+        .pvp-dice-side { text-align:center; }
+        .pvp-dice-box { position:relative;width:76px;height:76px;border-radius:20px;background:linear-gradient(145deg,rgba(139,92,246,0.28),rgba(139,92,246,0.08));border:2px solid rgba(167,139,250,0.35);display:flex;align-items:center;justify-content:center;font-size:42px;box-shadow:0 8px 28px rgba(139,92,246,0.25),inset 0 1px 0 rgba(255,255,255,0.15);transition:all 0.3s;overflow:hidden; }
+        .pvp-dice-box::before { content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,0.2),transparent 60%);opacity:0.5;pointer-events:none; }
+        .pvp-dice-box.opp { background:linear-gradient(145deg,rgba(139,92,246,0.14),rgba(139,92,246,0.04)); }
+        .pvp-dice-box.rolling { animation:diceRollAnim 0.7s ease; }
+        .pvp-dice-box.win { border-color:#22c55e;box-shadow:0 0 34px rgba(34,197,94,0.45); }
+        .pvp-dice-box.lose { border-color:#ef4444;box-shadow:0 0 30px rgba(239,68,68,0.35); }
+        .pvp-dice-btn { padding:12px 34px;border-radius:9999px;border:none;background:linear-gradient(135deg,#b84a2a,#d97706);color:#fff;box-shadow:0 6px 24px rgba(184,74,42,0.4);font-family:'Fredoka',sans-serif;letter-spacing:1px;font-size:13px;font-weight:800;cursor:pointer;transition:all 0.25s; }
+        .pvp-dice-btn:hover { transform:translateY(-2px);box-shadow:0 10px 30px rgba(217,119,6,0.5); }
+        .pvp-dice-btn:active { transform:scale(0.95); }
+        .pvp-dice-btn:disabled { opacity:0.3;cursor:not-allowed;transform:none!important;box-shadow:none!important; }
+        .pvp-dice-label { color:rgba(167,139,250,0.6);font-family:'Fredoka',sans-serif;letter-spacing:1px;font-size:11px;font-weight:700;margin-top:6px;text-transform:uppercase; }
+        .pvp-dice-vs { color:rgba(139,92,246,0.3);font-family:'Fredoka',sans-serif;font-weight:800;font-size:14px; }
+        .pvp-dice-status { font-family:'Fredoka',sans-serif;font-size:13px;font-weight:800;color:rgba(196,181,253,0.8);text-align:center;letter-spacing:0.5px;min-height:20px; }
+
+        /* Coin */
+        .pvp-coin-screen { display:flex;flex-direction:column;justify-content:space-between;height:100%;min-height:480px;padding:8px 4px;gap:14px;box-sizing:border-box; }
+        .pvp-coin-stage { display:flex;flex-direction:column;align-items:center;gap:16px; }
+        .pvp-coin-flip { width:92px;height:92px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fbbf24,#b45309 60%,#78350f);display:flex;align-items:center;justify-content:center;font-size:48px;box-shadow:0 10px 40px rgba(184,74,42,0.45),inset 0 -6px 14px rgba(0,0,0,0.35),inset 0 2px 4px rgba(255,255,255,0.3);transition:all 0.3s;border:3px solid rgba(251,191,36,0.5); }
+        .pvp-coin-flip.fp { animation:coinFlipAnim 0.9s ease; }
+        .pvp-coin-cards { display:grid;grid-template-columns:repeat(2,1fr);gap:14px;width:100%;max-width:340px;margin:0 auto; }
+        .pvp-coin-btn { position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 8px;border-radius:22px;border:1.5px solid rgba(167,139,250,0.25);background:linear-gradient(145deg,rgba(139,92,246,0.16),rgba(139,92,246,0.05));font-family:'Fredoka',sans-serif;letter-spacing:0.5px;font-size:12px;font-weight:800;color:rgba(196,181,253,0.85);cursor:pointer;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.25); }
+        .pvp-coin-btn::before { content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,0.15),transparent 100%);opacity:0.4;pointer-events:none; }
+        .pvp-coin-btn .coin-icon { font-size:40px;margin-bottom:8px;filter:drop-shadow(0 4px 10px rgba(0,0,0,0.3));transition:transform 0.3s; }
+        .pvp-coin-btn:hover { border-color:#c4b5fd;transform:translateY(-4px);box-shadow:0 0 26px rgba(139,92,246,0.35); }
+        .pvp-coin-btn:hover .coin-icon { transform:scale(1.15) rotate(-6deg); }
+        .pvp-coin-btn.sel { border-color:#c4b5fd;background:rgba(139,92,246,0.25);color:#fff;box-shadow:0 0 26px rgba(139,92,246,0.4);transform:translateY(-4px); }
+        .pvp-coin-btn:disabled { opacity:0.3;cursor:not-allowed;transform:none!important;box-shadow:none!important; }
+        .pvp-coin-status { font-family:'Fredoka',sans-serif;font-size:13px;font-weight:800;color:rgba(196,181,253,0.8);text-align:center;letter-spacing:0.5px;min-height:20px; }
+        .pvp-coin-choice-label { color:rgba(167,139,250,0.5);font-family:'Fredoka',sans-serif; }
+
+        /* Mines */
+        .pvp-mine-cell { border-color:rgba(139,92,246,0.15);background:linear-gradient(145deg,rgba(139,92,246,0.06),rgba(139,92,246,0.02));box-shadow:0 2px 10px rgba(0,0,0,0.15); }
+        .pvp-mine-cell:hover { border-color:rgba(167,139,250,0.35);background:rgba(139,92,246,0.1);box-shadow:0 4px 20px rgba(139,92,246,0.12); }
+        .pvp-mine-cell.diamond { border-color:#c4b5fd;background:linear-gradient(145deg,rgba(139,92,246,0.2),rgba(139,92,246,0.08));box-shadow:0 0 20px rgba(139,92,246,0.25); }
+        .pvp-mine-info { color:#c4b5fd;font-family:'Fredoka',sans-serif; }
+        .c-auto-label { color:rgba(167,139,250,0.5);font-family:'Fredoka',sans-serif;letter-spacing:1.5px; }
+        .c-auto-input { border-color:rgba(139,92,246,0.15);font-family:'Fredoka',sans-serif; }
+
+        /* Blackjack */
+        .pvp-bj-table { background:linear-gradient(145deg,rgba(139,92,246,0.08),rgba(236,72,153,0.03));border-color:rgba(139,92,246,0.15); }
+        .pvp-bj-col .bj-score { color:#c4b5fd;font-size:20px; }
+        .pvp-bj-hand .bjc.back { background:linear-gradient(145deg,#7c3aed,#a78bfa);border-color:#7c3aed;box-shadow:0 0 12px rgba(139,92,246,0.3); }
+        .bj-hand .bjc.hidden { background:linear-gradient(145deg,#7c3aed,#4834d4);border-color:#7c3aed;box-shadow:0 0 12px rgba(139,92,246,0.25); }
+        .pvp-bj-btn.stand { background:linear-gradient(135deg,#b84a2a,#d97706);color:#fff;box-shadow:0 4px 15px rgba(184,74,42,0.3);font-family:'Fredoka',sans-serif;font-size:12px;letter-spacing:1px; }
+        .bj-solo-table { background:linear-gradient(160deg,#160f2e,#0a0a18);border-color:rgba(139,92,246,0.2);box-shadow:inset 0 2px 20px rgba(0,0,0,0.4),0 4px 20px rgba(0,0,0,0.3); }
+        .bj-solo-table::after { border-color:rgba(167,139,250,0.1); }
+        .bj-score { color:#c4b5fd;text-shadow:0 0 10px rgba(139,92,246,0.25);font-size:22px; }
+        .bj-label { color:rgba(167,139,250,0.5); }
+
+        /* Status text in games */
+        .pvp-timer { font-family:'Fredoka',sans-serif;letter-spacing:1px; }
 
     </style>
 </head>
@@ -497,7 +617,7 @@
             </div>
         </div>
 
-        <div class="section-title">🎮 Все игры <span style="margin-left:auto;font-size:11px;color:rgba(255,255,255,0.25);font-family:'Nunito',sans-serif;font-weight:700;letter-spacing:1px;">6 ИГР</span></div>
+        <div class="section-title">🎮 Все игры <span style="margin-left:auto;font-size:11px;color:rgba(255,255,255,0.25);font-family:'Fredoka',sans-serif;font-weight:700;letter-spacing:1px;">6 ИГР</span></div>
 
         <div class="game-card c1" data-game="rps"><div class="glow"></div><div class="game-icon">✊</div><div class="game-info"><div class="name">Камень-Ножницы-Бумага</div><div class="sub">Дуэль на ставки</div></div><span class="game-arrow">›</span></div>
         <div class="game-card c2" data-game="dice"><div class="glow"></div><div class="game-icon">🎲</div><div class="game-info"><div class="name">Кости</div><div class="sub">Больше/меньше/ровно</div></div><span class="game-arrow">›</span></div>
@@ -816,6 +936,8 @@ function pvpJoinRoom(roomId) {
 
     socket.emit(event, payload, (res) => {
         if (res?.error) return showToast('⚠️ ' + res.error, 'warn');
+        balance -= room.bet;
+        updateBalance();
         currentRoom = { id: roomId, game_type: room.game_type, status: 'IN_PROGRESS', bet_amount: room.bet, creator_id: room.creator_id };
         _pvpGameStarted = true;
         playSound('bet');
@@ -828,7 +950,7 @@ function pvpJoinRoom(roomId) {
             window._resultHandled = true;
             pvpStopTimer();
             const isWin = res.winnerId === myUserId;
-            const amount = Math.floor(room.bet * 2 * 0.90);
+            const amount = Math.ceil(room.bet * 2 * 0.90);
             handleGameResult(room.game_type, res.draw || false, isWin, amount, res);
         }
         // Blackjack: set initial cards from join ack
@@ -1041,15 +1163,68 @@ function pvpRPSPick(idx) {
 }
 
 function pvpShowDice(area, r) {
-    area.innerHTML = '<div class="pvp-timer" id="pvpTimer" style="display:none;font-size:11px;color:rgba(255,255,255,0.4);font-weight:700;text-align:center;padding:4px 0;">⏱ 30с</div><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;"><div class="pvp-dice-duo"><div class="pvp-dice-side"><div class="pvp-dice-box" id="diceBox">🎲</div><div class="pvp-dice-label">Ты</div></div><div class="pvp-dice-vs">VS</div><div class="pvp-dice-side"><div class="pvp-dice-box opp" id="diceBoxOpp">🎲</div><div class="pvp-dice-label">Соперник</div></div></div><button class="pvp-dice-btn" id="diceBtn" onclick="pvpDiceRoll()">🎲 Бросить</button><div style="font-size:11px;color:rgba(255,255,255,0.35);min-height:18px;" id="diceStatus">Нажми, чтобы бросить</div></div>';
+    const totalBank = (r && r.bet) ? r.bet * 2 : 100;
+    area.innerHTML = `
+        <div class="pvp-dice-screen">
+            <div class="rps-timer-wrapper">
+                <div class="rps-timer-badge">
+                    <span class="icon">⏱</span>
+                    <span class="time-text" id="pvpTimer">30с</span>
+                </div>
+                <div class="rps-progress-container">
+                    <div class="rps-progress-bar" id="pvpProgressBar"></div>
+                </div>
+            </div>
+
+            <div class="pvp-dice-duo">
+                <div class="pvp-dice-side">
+                    <div class="pvp-dice-box" id="diceBox">🎲</div>
+                    <div class="pvp-dice-label">Ты</div>
+                </div>
+                <div class="pvp-dice-vs">VS</div>
+                <div class="pvp-dice-side">
+                    <div class="pvp-dice-box opp" id="diceBoxOpp">🎲</div>
+                    <div class="pvp-dice-label">Соперник</div>
+                </div>
+            </div>
+
+            <div class="rps-duel-block">
+                <div class="rps-player-box">
+                    <div class="rps-player-avatar">👤</div>
+                    <div class="rps-player-name">ВЫ</div>
+                    <div class="rps-player-status thinking" id="myDiceStatus">Ожидание</div>
+                </div>
+                <div class="rps-bank-badge">
+                    <span class="rps-bank-title">Банк</span>
+                    <span class="rps-bank-val">${totalBank} ⭐</span>
+                </div>
+                <div class="rps-player-box">
+                    <div class="rps-player-avatar">👤</div>
+                    <div class="rps-player-name">СОПЕРНИК</div>
+                    <div class="rps-player-status thinking" id="oppDiceStatus">Ожидание</div>
+                </div>
+            </div>
+
+            <button class="pvp-dice-btn" id="diceBtn" onclick="pvpDiceRoll()">🎲 Бросить</button>
+            <div class="pvp-dice-status" id="diceStatus">Нажми, чтобы бросить</div>
+        </div>
+    `;
 }
 function pvpDiceRoll() {
     document.getElementById('diceBtn').disabled = true;
     document.getElementById('diceStatus').textContent = '⏳ Бросок...';
+    const myStatus = document.getElementById('myDiceStatus');
+    if (myStatus) {
+        myStatus.textContent = 'Бросил ✅';
+        myStatus.className = 'rps-player-status ready';
+    }
     socket?.emit('dice:roll', { roomId: currentRoom?.id }, (res) => {
         if (res?.error) return showToast('❌ ' + res.error, 'error');
         const f = ['⚀','⚁','⚂','⚃','⚄','⚅'];
-        document.getElementById('diceBox').textContent = f[res.roll - 1];
+        const box = document.getElementById('diceBox');
+        box.textContent = f[res.roll - 1];
+        box.classList.add('rolling');
+        setTimeout(() => box.classList.remove('rolling'), 800);
         if (res.gameOver) {
             document.getElementById('diceStatus').textContent = '🎲 Результат на сервере...';
         } else {
@@ -1059,11 +1234,62 @@ function pvpDiceRoll() {
 }
 
 function pvpShowCoin(area, r) {
-    area.innerHTML = '<div class="pvp-timer" id="pvpTimer" style="display:none;font-size:11px;color:rgba(255,255,255,0.4);font-weight:700;text-align:center;padding:4px 0;">⏱ 30с</div><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;"><div class="pvp-coin-flip" id="coinFlip">🪙</div><div style="display:flex;gap:10px;justify-content:center;"><button class="pvp-coin-btn" onclick="pvpCoinPick(0)">🦅 Орёл</button><button class="pvp-coin-btn" onclick="pvpCoinPick(1)">🪙 Решка</button></div><div style="font-size:11px;color:rgba(255,255,255,0.35);min-height:18px;" id="coinStatus">Выбери сторону</div></div>';
+    const totalBank = (r && r.bet) ? r.bet * 2 : 100;
+    area.innerHTML = `
+        <div class="pvp-coin-screen">
+            <div class="rps-timer-wrapper">
+                <div class="rps-timer-badge">
+                    <span class="icon">⏱</span>
+                    <span class="time-text" id="pvpTimer">30с</span>
+                </div>
+                <div class="rps-progress-container">
+                    <div class="rps-progress-bar" id="pvpProgressBar"></div>
+                </div>
+            </div>
+
+            <div class="pvp-coin-stage">
+                <div class="pvp-coin-flip" id="coinFlip">🪙</div>
+                <div class="pvp-coin-cards">
+                    <button class="pvp-coin-btn" onclick="pvpCoinPick(0)">
+                        <span class="coin-icon">🦅</span>
+                        <span>Орёл</span>
+                    </button>
+                    <button class="pvp-coin-btn" onclick="pvpCoinPick(1)">
+                        <span class="coin-icon">🪙</span>
+                        <span>Решка</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="rps-duel-block">
+                <div class="rps-player-box">
+                    <div class="rps-player-avatar">👤</div>
+                    <div class="rps-player-name">ВЫ</div>
+                    <div class="rps-player-status thinking" id="myCoinStatus">Ожидание</div>
+                </div>
+                <div class="rps-bank-badge">
+                    <span class="rps-bank-title">Банк</span>
+                    <span class="rps-bank-val">${totalBank} ⭐</span>
+                </div>
+                <div class="rps-player-box">
+                    <div class="rps-player-avatar">👤</div>
+                    <div class="rps-player-name">СОПЕРНИК</div>
+                    <div class="rps-player-status thinking" id="oppCoinStatus">Ожидание</div>
+                </div>
+            </div>
+
+            <div class="pvp-coin-status" id="coinStatus">Выбери сторону</div>
+        </div>
+    `;
 }
 function pvpCoinPick(side) {
-    document.querySelectorAll('.pvp-coin-btn').forEach(b => b.disabled = true);
+    document.querySelectorAll('.pvp-coin-btn').forEach(b => { b.disabled = true; if (b.onclick.toString().includes('pvpCoinPick(' + side + ')')) b.classList.add('sel'); });
     document.getElementById('coinStatus').textContent = '⏳ Ждём соперника...';
+    const myStatus = document.getElementById('myCoinStatus');
+    if (myStatus) {
+        myStatus.textContent = 'Выбрал ✅';
+        myStatus.className = 'rps-player-status ready';
+    }
     socket?.emit('coin:pick', { roomId: currentRoom?.id, choice: side === 0 ? 'heads' : 'tails' }, (res) => {
         if (res?.error) return showToast('❌ ' + res.error, 'error');
         if (res.gameOver) {
@@ -1213,7 +1439,7 @@ function renderCrash(area) {
       '<input type="number" id="crBetInput" value="10" min="1"><span class="c-usd">★</span></div>' +
       '<div class="c-bet-adj"><button onclick="crAdjBet(\'min\')">MIN</button><button onclick="crAdjBet(\'half\')">½</button><button onclick="crAdjBet(\'double\')">2×</button><button onclick="crAdjBet(\'max\')">MAX</button></div></div>' +
       '<div class="c-auto-row"><span class="c-auto-label">🚀 АВТОВЫВОД</span>' +
-      '<div style="display:flex;align-items:center;gap:4px;"><input class="c-auto-input" id="crAutoInput" type="number" value="2.0" step="0.1" min="1.1"><span style="font-family:\'Nunito\',sans-serif;font-size:9px;font-weight:700;color:rgba(255,255,255,0.2);">x</span>' +
+      '<div style="display:flex;align-items:center;gap:4px;"><input class="c-auto-input" id="crAutoInput" type="number" value="2.0" step="0.1" min="1.1"><span style="font-family:\'Fredoka\',sans-serif;font-size:9px;font-weight:700;color:rgba(255,255,255,0.2);">x</span>' +
       '<div class="c-toggle-switch" id="crAutoToggle"><div class="c-knob"></div></div></div></div>' +
       '<div class="c-action-row"><button class="c-main-btn" id="crMainBtn" onclick="crMainAction()">★ СТАВКА</button></div></div>' +
       '<div class="crash-social"><div class="crash-social-title"><span>✦ УЧАСТНИКИ</span><span id="crSocialCount">0</span></div>' +
@@ -1516,7 +1742,7 @@ function crUpdateSocial(state) {
     displayPlayers.push(...otherPlayers.slice(0, myEntry ? 19 : 20));
 
     if (!displayPlayers.length) {
-        const emptyMsg = '<div style="padding:10px 6px;font-size:10px;color:rgba(255,255,255,0.1);font-family:\'Nunito\',sans-serif;font-weight:700;letter-spacing:1px;">ОЖИДАНИЕ ИГРОКОВ...</div>';
+        const emptyMsg = '<div style="padding:10px 6px;font-size:10px;color:rgba(255,255,255,0.1);font-family:\'Fredoka\',sans-serif;font-weight:700;letter-spacing:1px;">ОЖИДАНИЕ ИГРОКОВ...</div>';
         if (list.innerHTML !== emptyMsg) list.innerHTML = emptyMsg;
         return;
     }
@@ -1528,7 +1754,7 @@ function crUpdateSocial(state) {
         const busted = p.status === 'busted';
         let s = '';
         if (state.phase === 'crashed' || cashed) {
-            if (cashed) s = '<span class="crash-part-cashout">+' + (p.payout || Math.floor(p.bet * p.cashedAt)) + '</span>';
+            if (cashed) s = '<span class="crash-part-cashout">+' + (p.payout || Math.ceil(p.bet * p.cashedAt)) + '</span>';
             else if (busted || (!cashed && state.phase === 'crashed')) s = '<span class="crash-part-cashout lose">-' + p.bet + '</span>';
             else s = '<span class="crash-part-bet">' + p.bet + ' ★</span>';
         } else {
@@ -1571,13 +1797,13 @@ function crUpdateBtn(state) {
             btn.textContent = '◆ ЗАБРАТЬ ' + (state.mult||1).toFixed(2) + 'x';
             btn.className = 'c-main-btn cashout';
         } else if (cashed) {
-            btn.textContent = '✓ +' + (myBet?.payout || Math.floor((myBet?.bet||0) * (myBet?.cashedAt||1)));
+            btn.textContent = '✓ +' + (myBet?.payout || Math.ceil((myBet?.bet||0) * (myBet?.cashedAt||1)));
             btn.className = 'c-main-btn cashed';
         } else {
             btn.textContent = '— НАБЛЮДАЮ'; btn.className = 'c-main-btn disabled';
         }
     } else if (state.phase === 'crashed') {
-        if (cashed) btn.textContent = '✓ ВЫИГРЫШ +' + (myBet?.payout || Math.floor((myBet?.bet||0) * (myBet?.cashedAt||1))); else btn.textContent = '💥 КРАШ';
+        if (cashed) btn.textContent = '✓ ВЫИГРЫШ +' + (myBet?.payout || Math.ceil((myBet?.bet||0) * (myBet?.cashedAt||1))); else btn.textContent = '💥 КРАШ';
         btn.className = 'c-main-btn ' + (cashed ? 'cashed' : 'disabled');
     } else {
         btn.textContent = '★ СТАВКА'; btn.className = 'c-main-btn disabled';
@@ -1596,7 +1822,7 @@ function crMainAction() {
         socket.emit('crash:cashout', { multiplier: gs.mult }, (res) => {
             if (res?.error) showToast('❌ ' + res.error, 'error');
             else {
-                const won = Math.floor((myBet?.bet||0) * gs.mult);
+                const won = Math.ceil((myBet?.bet||0) * gs.mult);
                 showToast('✅ ВЫИГРЫШ +' + won + ' ★', 'success');
                 socket.emit('balance:get', {}, (r) => { if (r?.balance !== undefined) { balance = r.balance; updateBalance(); } });
             }
@@ -1851,7 +2077,7 @@ function minesCashout() {
     var payoutMult = parseFloat(document.getElementById('minesMult')?.textContent || '1');
     document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => c.style.pointerEvents = 'none');
     document.getElementById('minesCashoutBtn').style.display = 'none';
-    document.getElementById('minesStatus').innerHTML = '+' + Math.floor(payoutBet * payoutMult * 0.9) + ' <i class="tg-s"></i> (x' + payoutMult.toFixed(2) + ')';
+    document.getElementById('minesStatus').innerHTML = '+' + Math.ceil(payoutBet * payoutMult * 0.9) + ' <i class="tg-s"></i> (x' + payoutMult.toFixed(2) + ')';
     _minesGame = null;
     setTimeout(function() { var btn = document.getElementById('minesStartBtn'); if (btn) { btn.style.display = ''; btn.disabled = false; btn.textContent = '💣 СТАРТ'; } }, 2000);
     // Send server request (will correct balance)
@@ -2010,6 +2236,8 @@ document.addEventListener('click', function(e) {
                 else if (act === 'cashout') minesCashout();
                 break;
             }
+            if (el.id === 'bjHitBtn') { bjHit(); break; }
+            if (el.id === 'bjStandBtn') { bjStand(); break; }
             if (el.classList && el.classList.contains('bj-adj-btn')) { bjAdjBet(el.getAttribute('data-adj')); break; }
             el = el.parentElement;
         }
@@ -2027,6 +2255,8 @@ document.addEventListener('click', function(e) {
                 else if (act === 'cashout') minesCashout();
                 break;
             }
+            if (el.id === 'bjHitBtn') { bjHit(); break; }
+            if (el.id === 'bjStandBtn') { bjStand(); break; }
             if (el.classList && el.classList.contains('bj-adj-btn')) { bjAdjBet(el.getAttribute('data-adj')); break; }
             el = el.parentElement;
         }
@@ -2069,6 +2299,12 @@ function renderSoloBJ(area) {
     document.getElementById('bjAdjHalf').onclick = function(){bjAdjBet('half');};
     document.getElementById('bjAdjDbl').onclick = function(){bjAdjBet('double');};
     document.getElementById('bjAdjMax').onclick = function(){bjAdjBet('max');};
+    socket?.emit('bj:resume', {}, function(res) {
+        if (!res?.active || res.error) return;
+        if (res.balance !== undefined) { balance = res.balance; updateBalance(); }
+        if (res.bet !== undefined) document.getElementById('bjBetInput').value = res.bet;
+        bjOnStartResult(res);
+    });
 }
 function bjAdjBet(type) {
     const inp = document.getElementById('bjBetInput'); if (!inp) return;
@@ -2082,13 +2318,30 @@ function bjStart() {
     if (bet > balance) return showToast('❌ Недостаточно ★', 'error');
     document.getElementById('bjStatus').textContent = '⏳ Раздача...';
     balance -= bet; updateBalance();
-    socket?.emit('bj:start', { betAmount: bet });
+    socket?.emit('bj:start', { betAmount: bet }, (res) => {
+        if (typeof bjOnStartResult === 'function') bjOnStartResult(res);
+        else if (res?.error) showToast('❌ ' + res.error, 'error');
+    });
 }
-function bjHit() { try { showToast('⚡ ХИТ', 'info'); socket?.emit('bj:hit', {}); } catch(e) { showToast('❌ bjHit: ' + e.message, 'error'); } }
-function bjStand() { try { showToast('✋ СТОП', 'info'); socket?.emit('bj:stand', {}); } catch(e) { showToast('❌ bjStand: ' + e.message, 'error'); } }
+function bjHit() {
+    try {
+        var st = document.getElementById('bjStatus'); if (st) st.textContent = '⚡ ХИТ...';
+        if (typeof socket === 'undefined' || !socket) { if (st) st.textContent = '❌ Нет socket'; return; }
+        socket.emit('bj:hit', {}, (res) => { if (typeof bjOnHitResult === 'function') bjOnHitResult(res); });
+    } catch(e) { showToast('❌ bjHit: ' + e.message, 'error'); }
+}
+function bjStand() {
+    try {
+        var st = document.getElementById('bjStatus'); if (st) st.textContent = '✋ СТОП...';
+        if (typeof socket === 'undefined' || !socket) { if (st) st.textContent = '❌ Нет socket'; return; }
+        socket.emit('bj:stand', {}, (res) => { if (typeof bjOnStandResult === 'function') bjOnStandResult(res); });
+    } catch(e) { showToast('❌ bjStand: ' + e.message, 'error'); }
+}
 
 function bjOnStartResult(res) {
     if (res?.error) { balance += parseInt(document.getElementById('bjBetInput')?.value) || 0; updateBalance(); return showToast('❌ ' + res.error, 'error'); }
+    if (res?.balance !== undefined) { balance = res.balance; updateBalance(); }
+    if (res?.resumed && res.bet !== undefined) document.getElementById('bjBetInput').value = res.bet;
     document.getElementById('bjStartBtn').style.display = 'none';
     document.getElementById('bjHitBtn').style.display = '';
     document.getElementById('bjStandBtn').style.display = '';
@@ -2363,7 +2616,15 @@ function connectSocket(initData) {
         if (window._resultHandled) { window._resultHandled = false; return; }
         const isDraw = data.draw;
         const isWin = data.winnerId === myUserId;
-        const netPayout = data.draw ? currentRoom?.bet_amount : Math.floor((currentRoom?.bet_amount || 0) * 2 * 0.90);
+        const netPayout = data.payout || (isDraw ? (currentRoom?.bet_amount || 0) : Math.ceil((currentRoom?.bet_amount || 0) * 2 * 0.90));
+        const rolls = data.rolls || {};
+        const f = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+        const myRoll = rolls[myUserId];
+        const oppId = Object.keys(rolls).find(id => id !== myUserId);
+        const myBox = document.getElementById('diceBox');
+        const oppBox = document.getElementById('diceBoxOpp');
+        if (myBox && myRoll) { myBox.textContent = f[myRoll - 1]; myBox.classList.add('rolling'); setTimeout(() => myBox.classList.remove('rolling'), 800); }
+        if (oppBox && oppId && rolls[oppId]) { oppBox.textContent = f[rolls[oppId] - 1]; oppBox.classList.add('rolling'); setTimeout(() => oppBox.classList.remove('rolling'), 800); }
         handleGameResult('dice', isDraw, isWin, netPayout, data);
     });
 
@@ -2378,7 +2639,17 @@ function connectSocket(initData) {
         if (window._resultHandled) { window._resultHandled = false; return; }
         const isDraw = data.draw || (data.winnerId === null);
         const isWin = data.winnerId === myUserId;
-        const netPayout = data.payout || (isDraw ? (currentRoom?.bet_amount || 0) : Math.floor((currentRoom?.bet_amount || 0) * 2 * 0.90));
+        const netPayout = data.payout || (isDraw ? (currentRoom?.bet_amount || 0) : Math.ceil((currentRoom?.bet_amount || 0) * 2 * 0.90));
+        const cf = document.getElementById('coinFlip');
+        if (cf) {
+            cf.classList.add('fp');
+            cf.textContent = data.flip === 0 ? '🦅' : '🪙';
+            const opp = document.getElementById('oppCoinStatus');
+            if (opp && data.winnerId) {
+                opp.textContent = isWin ? 'Проиграл 💔' : 'Победил 🏆';
+                opp.className = 'rps-player-status ' + (isWin ? '' : 'ready');
+            }
+        }
         handleGameResult('coin', isDraw, isWin, netPayout, data);
     });
 
@@ -2389,7 +2660,7 @@ function connectSocket(initData) {
     socket.on('mines:game_over', (data) => {
         const isDraw = data.isDraw || false;
         const isWin = data.winnerId === myUserId;
-        const netPayout = isDraw ? 0 : Math.floor((currentRoom?.bet_amount || 0) * 2 * 0.90);
+        const netPayout = isDraw ? 0 : Math.ceil((currentRoom?.bet_amount || 0) * 2 * 0.90);
         handleGameResult('mines', isDraw, isWin, netPayout, data);
     });
 
@@ -2430,7 +2701,7 @@ function connectSocket(initData) {
     socket.on('blackjack:game_over', (data) => {
         const isDraw = data.draw;
         const isWin = data.winnerId === myUserId;
-        const netPayout = data.payout || Math.floor((currentRoom?.bet_amount || 0) * 2 * 0.90);
+        const netPayout = data.payout || Math.ceil((currentRoom?.bet_amount || 0) * 2 * 0.90);
         handleGameResult('blackjack', isDraw, isWin, netPayout, data);
     });
 
@@ -2459,15 +2730,15 @@ function connectSocket(initData) {
         setTimeout(function() { var sb = document.getElementById('minesStartBtn'); if (sb) { sb.style.display = ''; sb.disabled = false; sb.textContent = '💣 СТАРТ'; } }, 2000);
     });
     socket.on('bj:start_result', (res) => { if (typeof bjOnStartResult === 'function') bjOnStartResult(res); });
-    socket.on('bj:hit_result', (res) => { bjOnResult(res); });
-    socket.on('bj:stand_result', (res) => { bjOnResult(res); });
-    socket.on('bj:game_over', (res) => { if (_bjState) { bjUpdateUI(res); bjFinishNew(res); } });
+    socket.on('bj:hit_result', (res) => { if (typeof bjOnHitResult === 'function') bjOnHitResult(res); });
+    socket.on('bj:stand_result', (res) => { if (typeof bjOnStandResult === 'function') bjOnStandResult(res); });
+    socket.on('bj:game_over', (res) => { if (typeof bjGameOver === 'function') bjGameOver(res); });
 }
 
 function handleGameOver(data) {
     const isDraw = data.draw;
     const isWin = data.winnerId === myUserId;
-    const netPayout = data.payouts?.amount || Math.floor((currentRoom?.bet_amount || 0) * 2 * 0.90);
+    const netPayout = data.payouts?.amount || Math.ceil((currentRoom?.bet_amount || 0) * 2 * 0.90);
     handleGameResult('rps', isDraw, isWin, netPayout, data);
 }
 
@@ -2480,6 +2751,7 @@ function handleGameResult(game, isDraw, isWin, netPayout, data) {
         statusEl.innerHTML = isDraw ? '🤝 НИЧЬЯ!' : (isWin ? '🏆 +' + netPayout + ' <i class="tg-s"></i>' : '💔 −' + (currentRoom?.bet_amount || '') + ' <i class="tg-s"></i>');
     }
     showGameResult(game, isDraw, isWin, netPayout);
+    socket?.emit('balance:get', {}, (r) => { if (r?.balance !== undefined) { balance = r.balance; updateBalance(); } });
     setTimeout(() => { if (!document.hidden) closeGame(); }, 3000);
 }
 
