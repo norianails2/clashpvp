@@ -9,7 +9,7 @@
     "migrate": "node src/db/migrate.js",
     "backup": "node scripts/backup.js",
     "check:ops": "node scripts/ops-check.js",
-    "test": "node --test"
+    "test": "node --test --test-concurrency=1"
   },
   "dependencies": {
     "cors": "^2.8.5",
