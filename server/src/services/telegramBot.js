@@ -142,6 +142,10 @@ export function initBot(server) {
       const starsAmount = payment.total_amount;
       const payload = JSON.parse(payment.invoice_payload || '{}');
 
+      if (payment.currency !== 'XTR' || !Number.isSafeInteger(starsAmount) || starsAmount < 1) {
+        throw new Error('Invalid Stars payment');
+      }
+
       // Old withdrawal invoices are refunded without changing the game balance.
       if (payload.action === 'withdraw' && payload.telegramId) {
         try {
@@ -151,6 +155,7 @@ export function initBot(server) {
         }
         return;
       }
+      if (payload.action !== 'deposit') throw new Error('Invalid payment action');
 
       const client = await getClient();
       let user;
