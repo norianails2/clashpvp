@@ -22,6 +22,13 @@ export function initBot(server) {
     console.log('[telegramBot] Polling mode (production)');
   }
 
+  bot.on('polling_error', (err) => {
+    console.error('[telegramBot] polling error:', err.message);
+  });
+  bot.on('error', (err) => {
+    console.error('[telegramBot] client error:', err.message);
+  });
+
   // --- Commands ---
 
   bot.onText(/\/start/, async (msg) => {
