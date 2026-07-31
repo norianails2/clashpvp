@@ -3,6 +3,8 @@ import test from 'node:test';
 import { calculateScore, resolveGame } from '../src/games/blackjack.js';
 import { calculateMultiplier, TOTAL_CELLS } from '../src/games/mines.js';
 import { ProvablyFairService } from '../src/services/provablyFairService.js';
+import { resolveDice } from '../src/games/dice.js';
+import { resolveCoin } from '../src/games/coin.js';
 
 test('blackjack scores aces correctly', () => {
   assert.equal(calculateScore(['Ah', '9d']), 20);
@@ -42,4 +44,16 @@ test('Crash proof does not expose an unrevealed seed or crash point', () => {
   service.rounds.get(7).revealed = true;
   assert.equal(service.getRoundInfo(7).serverSeed, 'secret');
   assert.equal(service.getRoundInfo(7).crashPoint, 12.34);
+});
+
+test('dice resolves higher roll and ties correctly', () => {
+  assert.equal(resolveDice(6, 2, 'a', 'b').winnerId, 'a');
+  assert.equal(resolveDice(1, 5, 'a', 'b').winnerId, 'b');
+  assert.equal(resolveDice(4, 4, 'a', 'b').draw, true);
+});
+
+test('coin resolves opposing choices and protects against matching picks', () => {
+  assert.equal(resolveCoin('heads', 'heads', 'tails', 'a', 'b').winnerId, 'a');
+  assert.equal(resolveCoin('tails', 'heads', 'tails', 'a', 'b').winnerId, 'b');
+  assert.equal(resolveCoin('heads', 'heads', 'heads', 'a', 'b').draw, true);
 });
