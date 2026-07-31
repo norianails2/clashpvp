@@ -141,15 +141,18 @@ class ProvablyFairService {
   getRoundInfo(roundNum) {
     const round = this.rounds.get(roundNum);
     if (!round) return null;
-    return {
+    const info = {
       round: round.round,
       serverSeedHash: round.serverSeedHash,
-      serverSeed: round.serverSeed,
       clientSeed: round.clientSeed,
       nonce: round.nonce,
-      crashPoint: round.crashPoint,
       revealed: round.revealed,
     };
+    if (round.revealed) {
+      info.serverSeed = round.serverSeed;
+      info.crashPoint = round.crashPoint;
+    }
+    return info;
   }
 }
 
