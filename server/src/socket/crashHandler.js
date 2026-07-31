@@ -1,6 +1,30 @@
 import crashEngine from '../games/crash.js';
 import provablyFair from '../services/provablyFairService.js';
 import { broadcastLobbyUpdate } from './lobbyHandler.js';
+import { getClient, query } from '../db/pool.js';
+import { refund } from '../services/balanceService.js';
+
+async function refundInterruptedCrashBets() {
+  const { rows } = await query('SELECT round_number, user_id FROM crash_bets WHERE status = \'active\'');
+  for (const bet of rows) {
+    const client = await getClient();
+    try {
+      await client.query('BEGIN');
+      const result = await client.query(
+        `UPDATE crash_bets SET status = 'refunded', settled_at = NOW()
+         WHERE round_number = $1 AND user_id = $2 AND status = 'active' RETURNING amount`,
+        [bet.round_number, bet.user_id]
+      );
+      if (result.rowCount) await refund(bet.user_id, Number(result.rows[0].amount), 'crash', null, client);
+      await client.query('COMMIT');
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
+  }
+}
 
 export function registerCrashHandlers(io, socket) {
   const { user } = socket.data;
@@ -63,6 +87,7 @@ export function registerCrashHandlers(io, socket) {
 // Start the crash engine when the server starts
 export async function startCrashEngine() {
   await provablyFair.load();
+  await refundInterruptedCrashBets();
   await provablyFair.refillSeeds();
   // Sync round counter with provablyFair (survives server restarts)
   crashEngine.round = provablyFair.currentRound;

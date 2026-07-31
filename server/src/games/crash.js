@@ -1,5 +1,6 @@
 import provablyFair from '../services/provablyFairService.js';
 import { holdBet, payout, refund } from '../services/balanceService.js';
+import { getClient, query } from '../db/pool.js';
 
 class CrashEngine {
   constructor() {
@@ -118,6 +119,11 @@ class CrashEngine {
     } catch (err) {
       console.error('[crash] failed to reveal round:', err.message);
     }
+    await query(
+      `UPDATE crash_bets SET status = 'busted', settled_at = NOW()
+       WHERE round_number = $1 AND status = 'active'`,
+      [this.round]
+    );
     this.history.unshift({ crashPoint: this.crashPoint, players: this.players.length });
     if (this.history.length > 20) this.history.pop();
 
@@ -148,10 +154,23 @@ class CrashEngine {
     this.pendingBets.add(userId);
     this.pendingBetCount++;
     try {
-      const { balanceAfter } = await holdBet(userId, betAmount, 'crash', null, null);
-      if (this.phase !== 'betting') {
-        await refund(userId, betAmount, 'crash', null, null);
-        return { error: 'Betting phase has ended' };
+      const client = await getClient();
+      let balanceAfter;
+      try {
+        await client.query('BEGIN');
+        ({ balanceAfter } = await holdBet(userId, betAmount, 'crash', null, client));
+        if (this.phase !== 'betting') throw new Error('Betting phase has ended');
+        await client.query(
+          `INSERT INTO crash_bets (round_number, user_id, username, amount, auto_cashout_at)
+           VALUES ($1, $2, $3, $4, $5)`,
+          [this.round, userId, username, betAmount, autoCashoutAt || null]
+        );
+        await client.query('COMMIT');
+      } catch (err) {
+        await client.query('ROLLBACK');
+        throw err;
+      } finally {
+        client.release();
       }
 
       this.players.push({
@@ -182,7 +201,24 @@ class CrashEngine {
     this.pendingCashoutCount++;
 
     try {
-      const { balanceAfter, netAmount } = await payout(userId, grossPayout, 'crash', null, null, this.HOUSE_EDGE);
+      const client = await getClient();
+      let balanceAfter, netAmount;
+      try {
+        await client.query('BEGIN');
+        ({ balanceAfter, netAmount } = await payout(userId, grossPayout, 'crash', null, client, this.HOUSE_EDGE));
+        const { rowCount } = await client.query(
+          `UPDATE crash_bets SET status = 'cashed', cashout_at = $1, payout = $2, settled_at = NOW()
+           WHERE round_number = $3 AND user_id = $4 AND status = 'active'`,
+          [cashoutMult, netAmount, this.round, userId]
+        );
+        if (rowCount !== 1) throw new Error('Bet is already settled');
+        await client.query('COMMIT');
+      } catch (err) {
+        await client.query('ROLLBACK');
+        throw err;
+      } finally {
+        client.release();
+      }
 
       player.cashedAt = cashoutMult;
       player.payout = netAmount;
@@ -213,7 +249,24 @@ class CrashEngine {
     const unsettled = this.players.filter(player => !player.cashedAt && !player.cashingOut);
     const refunds = await Promise.allSettled(
       unsettled.map(async (player) => {
-        const { balanceAfter } = await refund(player.userId, player.bet, 'crash', null, null);
+        const client = await getClient();
+        let balanceAfter;
+        try {
+          await client.query('BEGIN');
+          const result = await client.query(
+            `UPDATE crash_bets SET status = 'refunded', settled_at = NOW()
+             WHERE round_number = $1 AND user_id = $2 AND status = 'active' RETURNING amount`,
+            [this.round, player.userId]
+          );
+          if (result.rowCount !== 1) throw new Error('Bet is already settled');
+          ({ balanceAfter } = await refund(player.userId, Number(result.rows[0].amount), 'crash', null, client));
+          await client.query('COMMIT');
+        } catch (err) {
+          await client.query('ROLLBACK');
+          throw err;
+        } finally {
+          client.release();
+        }
         player.refunded = true;
         return balanceAfter;
       })
