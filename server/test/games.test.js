@@ -5,6 +5,7 @@ import { calculateMultiplier, TOTAL_CELLS } from '../src/games/mines.js';
 import { ProvablyFairService } from '../src/services/provablyFairService.js';
 import { resolveDice } from '../src/games/dice.js';
 import { resolveCoin } from '../src/games/coin.js';
+import { resolve as resolveRps } from '../src/games/rps.js';
 
 test('blackjack scores aces correctly', () => {
   assert.equal(calculateScore(['Ah', '9d']), 20);
@@ -56,4 +57,12 @@ test('coin resolves opposing choices and protects against matching picks', () =>
   assert.equal(resolveCoin('heads', 'heads', 'tails', 'a', 'b').winnerId, 'a');
   assert.equal(resolveCoin('tails', 'heads', 'tails', 'a', 'b').winnerId, 'b');
   assert.equal(resolveCoin('heads', 'heads', 'heads', 'a', 'b').draw, true);
+});
+
+test('RPS resolves every winning pair and a draw', () => {
+  assert.equal(resolveRps('rock', 'scissors').winnerIndex, 0);
+  assert.equal(resolveRps('paper', 'rock').winnerIndex, 0);
+  assert.equal(resolveRps('scissors', 'paper').winnerIndex, 0);
+  assert.equal(resolveRps('rock', 'paper').winnerIndex, 1);
+  assert.equal(resolveRps('rock', 'rock').draw, true);
 });
