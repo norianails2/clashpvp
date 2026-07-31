@@ -62,6 +62,7 @@ export function registerCrashHandlers(io, socket) {
 
 // Start the crash engine when the server starts
 export async function startCrashEngine() {
+  await provablyFair.load();
   await provablyFair.refillSeeds();
   // Sync round counter with provablyFair (survives server restarts)
   crashEngine.round = provablyFair.currentRound;

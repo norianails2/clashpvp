@@ -99,20 +99,24 @@ class CrashEngine {
       });
 
       if (this.mult >= this.crashPoint || this.mult >= 100) {
-        this.doCrash();
+          void this.doCrash();
       }
     }, 50);
   }
 
-  doCrash() {
+  async doCrash() {
     if (this.phase === 'crashed') return;
     this.phase = 'crashed';
     if (this.timers.main) { clearInterval(this.timers.main); this.timers.main = null; }
     if (this.timers.countdown) { clearInterval(this.timers.countdown); this.timers.countdown = null; }
 
-    const revealed = provablyFair.revealRound(this.round);
-    if (revealed) {
-      this.seedRevealed = revealed.serverSeed;
+    try {
+      const revealed = await provablyFair.revealRound(this.round);
+      if (revealed) {
+        this.seedRevealed = revealed.serverSeed;
+      }
+    } catch (err) {
+      console.error('[crash] failed to reveal round:', err.message);
     }
     this.history.unshift({ crashPoint: this.crashPoint, players: this.players.length });
     if (this.history.length > 20) this.history.pop();

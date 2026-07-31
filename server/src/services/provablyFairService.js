@@ -1,11 +1,8 @@
 import crypto from 'crypto';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { query } from '../db/pool.js';
 
 const RANDOM_ORG_URL = 'https://www.random.org/cgi-bin/randbyte?format=f&nbytes=32';
 const HOUSE_EDGE = 0.10;
-const STATE_FILE = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'crash_state.json');
 
 class ProvablyFairService {
   constructor() {
@@ -15,33 +12,30 @@ class ProvablyFairService {
     this.currentRound = 0;
     this.rounds = new Map();
     this.clientSeed = crypto.randomBytes(16).toString('hex');
-    this._load();
   }
 
-  _save() {
-    try {
-      const data = JSON.stringify({
-        currentRound: this.currentRound,
-        clientSeed: this.clientSeed,
-        seeds: this.seeds.slice(0, 100),
-        rounds: Array.from(this.rounds.entries()).slice(-50).map(([k, v]) => [k, { ...v }]),
+  async load() {
+    const { rows } = await query(
+      `SELECT round_number, server_seed_hash, server_seed, client_seed, nonce, crash_point, revealed
+       FROM crash_rounds
+       ORDER BY round_number DESC
+       LIMIT 50`
+    );
+
+    this.rounds.clear();
+    for (const row of rows.reverse()) {
+      const round = Number(row.round_number);
+      this.rounds.set(round, {
+        round,
+        serverSeedHash: row.server_seed_hash,
+        serverSeed: row.server_seed,
+        clientSeed: row.client_seed,
+        nonce: Number(row.nonce),
+        crashPoint: Number(row.crash_point),
+        revealed: row.revealed,
       });
-      fs.writeFileSync(STATE_FILE, data, 'utf8');
-    } catch {}
-  }
-
-  _load() {
-    try {
-      if (fs.existsSync(STATE_FILE)) {
-        const data = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
-        this.currentRound = data.currentRound || 0;
-        this.clientSeed = data.clientSeed || this.clientSeed;
-        if (Array.isArray(data.seeds)) this.seeds = data.seeds;
-        if (Array.isArray(data.rounds)) {
-          this.rounds = new Map(data.rounds.filter(([k]) => k > this.currentRound - 50));
-        }
-      }
-    } catch {}
+      this.currentRound = Math.max(this.currentRound, round);
+    }
   }
 
   async refillSeeds() {
@@ -100,8 +94,13 @@ class ProvablyFairService {
     };
 
     round.crashPoint = this._crashPointFromSeed(entry.serverSeed, this.clientSeed, nonce);
+    await query(
+      `INSERT INTO crash_rounds
+       (round_number, server_seed_hash, server_seed, client_seed, nonce, crash_point)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [round.round, round.serverSeedHash, round.serverSeed, round.clientSeed, round.nonce, round.crashPoint]
+    );
     this.rounds.set(this.currentRound, round);
-    this._save();
 
     return {
       round: this.currentRound,
@@ -112,11 +111,16 @@ class ProvablyFairService {
     };
   }
 
-  revealRound(roundNum) {
+  async revealRound(roundNum) {
     const round = this.rounds.get(roundNum);
     if (!round) return null;
+    await query(
+      `UPDATE crash_rounds
+       SET revealed = TRUE, revealed_at = NOW()
+       WHERE round_number = $1`,
+      [roundNum]
+    );
     round.revealed = true;
-    this._save();
     return round;
   }
 
