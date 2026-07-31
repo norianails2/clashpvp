@@ -83,6 +83,10 @@ export function registerDiceHandlers(io, socket) {
         if (roomRows.length === 0) { await client.query('ROLLBACK'); return ack?.({ error: 'Room not found' }); }
         const room = roomRows[0];
         if (room.status !== 'IN_PROGRESS') { await client.query('ROLLBACK'); return ack?.({ error: 'Game not in progress' }); }
+        if (user.id !== room.creator_id && user.id !== room.opponent_id) {
+          await client.query('ROLLBACK');
+          return ack?.({ error: 'You are not part of this room' });
+        }
 
         const gd = room.game_data || {};
         if (gd.rolls?.[user.id]) { await client.query('ROLLBACK'); return ack?.({ error: 'Already rolled' }); }
@@ -99,7 +103,7 @@ export function registerDiceHandlers(io, socket) {
 
           if (draw) {
             await refund(room.creator_id, room.bet_amount, 'dice', room.id, client);
-            await refund(user.id, room.bet_amount, 'dice', room.id, client);
+            await refund(room.opponent_id, room.bet_amount, 'dice', room.id, client);
           } else {
             await payout(winnerId, pot, 'dice', room.id, client, HOUSE_EDGE);
           }

@@ -79,6 +79,10 @@ export function registerCoinHandlers(io, socket) {
         if (roomRows.length === 0) { await client.query('ROLLBACK'); return ack?.({ error: 'Room not found' }); }
         const room = roomRows[0];
         if (room.status !== 'IN_PROGRESS') { await client.query('ROLLBACK'); return ack?.({ error: 'Game not in progress' }); }
+        if (user.id !== room.creator_id && user.id !== room.opponent_id) {
+          await client.query('ROLLBACK');
+          return ack?.({ error: 'You are not part of this room' });
+        }
 
         const gd = room.game_data || {};
         if (gd.picks?.[user.id] !== undefined) { await client.query('ROLLBACK'); return ack?.({ error: 'Already picked' }); }
