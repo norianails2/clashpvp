@@ -72,7 +72,7 @@ class ProvablyFairService {
   }
 
   async getNextRound() {
-    this.currentRound++;
+    const nextRound = this.currentRound + 1;
     if (this.seeds.length <= this.refillThreshold) {
       this.refillSeeds();
     }
@@ -82,9 +82,9 @@ class ProvablyFairService {
       entry = { serverSeed: seed, hash: crypto.createHash('sha256').update(seed).digest('hex') };
     }
 
-    const nonce = this.currentRound;
+    const nonce = nextRound;
     const round = {
-      round: this.currentRound,
+      round: nextRound,
       serverSeedHash: entry.hash,
       serverSeed: entry.serverSeed,
       clientSeed: this.clientSeed,
@@ -94,16 +94,24 @@ class ProvablyFairService {
     };
 
     round.crashPoint = this._crashPointFromSeed(entry.serverSeed, this.clientSeed, nonce);
-    await query(
-      `INSERT INTO crash_rounds
-       (round_number, server_seed_hash, server_seed, client_seed, nonce, crash_point)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [round.round, round.serverSeedHash, round.serverSeed, round.clientSeed, round.nonce, round.crashPoint]
-    );
-    this.rounds.set(this.currentRound, round);
+    try {
+      await query(
+        `INSERT INTO crash_rounds
+         (round_number, server_seed_hash, server_seed, client_seed, nonce, crash_point)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [round.round, round.serverSeedHash, round.serverSeed, round.clientSeed, round.nonce, round.crashPoint]
+      );
+    } catch (err) {
+      if (err.code !== '23505') throw err;
+      this.seeds.unshift(entry);
+      await this.load();
+      return this.getNextRound();
+    }
+    this.currentRound = nextRound;
+    this.rounds.set(nextRound, round);
 
     return {
-      round: this.currentRound,
+      round: nextRound,
       serverSeedHash: entry.hash,
       clientSeed: this.clientSeed,
       nonce,
