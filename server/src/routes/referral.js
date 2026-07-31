@@ -18,7 +18,7 @@ router.get('/stats', async (req, res, next) => {
 // Get referral link
 router.get('/link', async (req, res, next) => {
   try {
-    const botUsername = process.env.BOT_USERNAME || 'your_bot';
+    const botUsername = process.env.BOT_USERNAME || 'ClashPVPbot';
     const link = generateReferralLink(req.userId, botUsername);
     res.json({ link, botUsername });
   } catch (err) {
