@@ -138,8 +138,8 @@ export function registerSoloBlackjackHandlers(_io, socket) {
   });
 
   socket.on('bj:start', async (payload, ack) => {
-    const betAmount = parseInt(payload?.betAmount, 10);
-    if (!betAmount || betAmount < MIN_BET) return ack?.({ error: `Minimum bet is ${MIN_BET}` });
+    const betAmount = payload?.betAmount;
+    if (!Number.isSafeInteger(betAmount) || betAmount < MIN_BET) return ack?.({ error: `Minimum bet is ${MIN_BET}` });
     if (betAmount > MAX_BET) return ack?.({ error: `Maximum bet is ${MAX_BET}` });
 
     const deck = shuffleDeck(createDeck());
