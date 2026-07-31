@@ -34,6 +34,7 @@ import { registerBlackjackHandlers } from './blackjackHandler.js';
 import { registerSoloBlackjackHandlers } from './soloBlackjackHandler.js';
 import { registerCrashHandlers, startCrashEngine } from './crashHandler.js';
 import https from 'https';
+import { randomUUID } from 'crypto';
 import { query } from '../db/pool.js';
 import crashEngine from '../games/crash.js';
 import { getBot } from '../services/telegramBot.js';
@@ -171,11 +172,17 @@ export function initSocket(httpServer) {
         return ack?.({ error: 'Invalid amount' });
       }
       try {
+        const invoiceId = randomUUID();
+        await query(
+          `INSERT INTO star_invoices (id, user_id, telegram_id, amount)
+           VALUES ($1, $2, $3, $4)`,
+          [invoiceId, user.id, user.telegram_id, amount]
+        );
         const botToken = config.telegram.botToken;
         const body = JSON.stringify({
           title: `Clash PVP — ${amount} Stars`,
           description: `Пополнение игрового баланса`,
-          payload: JSON.stringify({ amount, userId: user.id }),
+          payload: JSON.stringify({ action: 'deposit', invoiceId }),
           currency: 'XTR',
           prices: JSON.stringify([{ label: 'Stars', amount }]),
         });

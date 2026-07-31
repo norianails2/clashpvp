@@ -113,7 +113,8 @@ export function initBot(server) {
   bot.on('pre_checkout_query', async (query_) => {
     try {
       const payload = JSON.parse(query_.invoice_payload || '{}');
-      if (query_.currency !== 'XTR' || !Number.isInteger(payload.amount) || payload.amount !== query_.total_amount || !payload.userId) {
+      const { rows } = await query('SELECT amount, telegram_id FROM star_invoices WHERE id = $1 AND status = $2', [payload.invoiceId, 'pending']);
+      if (query_.currency !== 'XTR' || rows.length !== 1 || Number(rows[0].amount) !== query_.total_amount || rows[0].telegram_id !== String(query_.from.id)) {
         throw new Error('Invalid invoice payload');
       }
       await bot.answerPreCheckoutQuery(query_.id, true);
@@ -131,7 +132,9 @@ export function initBot(server) {
       let payload = {};
       try {
         payload = JSON.parse(payment.invoice_payload);
-        if (payload.amount && payload.amount !== starsAmount) throw new Error('Invoice amount mismatch');
+        const { rows: invoiceRows } = await query('SELECT user_id, amount FROM star_invoices WHERE id = $1 AND status = $2', [payload.invoiceId, 'pending']);
+        if (invoiceRows.length !== 1 || Number(invoiceRows[0].amount) !== starsAmount) throw new Error('Invalid or paid invoice');
+        payload.userId = invoiceRows[0].user_id;
       } catch {}
 
       // Old withdrawal invoices are refunded without changing the game balance.
@@ -146,8 +149,8 @@ export function initBot(server) {
 
       // Deposit flow: add stars to balance (existing behavior)
       const { rows } = await query(
-        `UPDATE users SET balance = balance + $1 WHERE telegram_id = $2 RETURNING id, balance`,
-        [starsAmount, telegramId]
+        `UPDATE users SET balance = balance + $1 WHERE id = $2 RETURNING id, balance`,
+        [starsAmount, payload.userId]
       );
 
       if (rows.length === 0) {
@@ -156,6 +159,7 @@ export function initBot(server) {
       }
 
       const user = rows[0];
+      await query(`UPDATE star_invoices SET status = 'paid', telegram_charge_id = $1, paid_at = NOW() WHERE id = $2`, [payment.telegram_payment_charge_id, payload.invoiceId]);
       await query(
         `INSERT INTO transactions (user_id, type, amount, balance_before, balance_after, metadata)
          VALUES ($1, 'deposit', $2, $3, $4, $5)`,
