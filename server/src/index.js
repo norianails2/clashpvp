@@ -7,11 +7,26 @@ import { runMigrations } from './db/migrate.js';
 import { query } from './db/pool.js';
 import crashEngine from './games/crash.js';
 
+const INVOICE_EXPIRY_CHECK_MS = 60 * 60 * 1000;
+
+async function expireStaleStarInvoices() {
+  const result = await query(
+    `UPDATE star_invoices
+     SET status = 'expired'
+     WHERE status = 'pending'
+       AND expires_at < NOW() - INTERVAL '24 hours'`
+  );
+  if (result.rowCount > 0) {
+    console.log(`[payments] Expired ${result.rowCount} stale Star invoice(s)`);
+  }
+}
+
 async function main() {
   const app = createApp();
   const server = http.createServer(app);
 
   await runMigrations();
+  await expireStaleStarInvoices();
 
   initSocket(server);
   const telegramBot = initBot(server);
@@ -41,6 +56,13 @@ async function main() {
 
   // Keep Neon database alive (prevent cold starts on free tier)
   setInterval(() => { query('SELECT 1').catch(() => {}); }, 15000);
+
+  const invoiceExpiryInterval = setInterval(() => {
+    expireStaleStarInvoices().catch((err) => {
+      console.error('[payments] Invoice expiry check failed:', err.message);
+    });
+  }, INVOICE_EXPIRY_CHECK_MS);
+  invoiceExpiryInterval.unref();
 
   server.listen(config.port, () => {
     console.log(`[server] Clash PVP backend running on port ${config.port}`);
