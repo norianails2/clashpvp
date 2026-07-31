@@ -2,6 +2,7 @@ import { query, getClient } from '../db/pool.js';
 import { holdBet, refund, payout, HOUSE_EDGE } from './balanceService.js';
 
 const MIN_BET = 1;
+const MAX_BET = 100000;
 
 // ---------------------------------------------------------------------------
 // Вспомогательные функции
@@ -54,9 +55,9 @@ export async function listWaitingRooms(gameType, limit = 50) {
  * @returns {object} созданная комната
  */
 export async function createRoom(userId, gameType, betAmount, gameData = null) {
-  if (!betAmount || betAmount < MIN_BET) {
+  if (!Number.isSafeInteger(betAmount) || betAmount < MIN_BET || betAmount > MAX_BET) {
     throw Object.assign(
-      new Error(`Minimum bet is ${MIN_BET}`),
+      new Error(`Bet must be between ${MIN_BET} and ${MAX_BET}`),
       { status: 400 }
     );
   }
