@@ -154,14 +154,14 @@ export function initBot(server) {
         if (!rows.length) throw new Error('Payment user not found');
         user = rows[0];
         await client.query(`UPDATE star_invoices SET status = 'paid', telegram_charge_id = $1, paid_at = NOW() WHERE id = $2`, [payment.telegram_payment_charge_id, payload.invoiceId]);
+        await client.query(
+          `INSERT INTO transactions (user_id, type, amount, balance_before, balance_after, metadata)
+           VALUES ($1, 'deposit', $2, $3, $4, $5)`,
+          [user.id, starsAmount, Number(user.balance) - starsAmount, Number(user.balance),
+           JSON.stringify({ telegramPayment: true, currency: payment.currency, payload: payment.invoice_payload })]
+        );
         await client.query('COMMIT');
       } catch (err) { await client.query('ROLLBACK'); throw err; } finally { client.release(); }
-      await query(
-        `INSERT INTO transactions (user_id, type, amount, balance_before, balance_after, metadata)
-         VALUES ($1, 'deposit', $2, $3, $4, $5)`,
-        [user.id, starsAmount, Number(user.balance) - starsAmount, Number(user.balance),
-         JSON.stringify({ telegramPayment: true, currency: payment.currency, payload: payment.invoice_payload })]
-      );
 
       console.log(`[telegramBot] Deposit: user=${user.id} amount=${starsAmount} total=${user.balance}`);
     } catch (err) {
