@@ -11,11 +11,7 @@ async function main() {
   const app = createApp();
   const server = http.createServer(app);
 
-  try {
-    await runMigrations();
-  } catch (err) {
-    console.warn('[server] Migration skipped:', err.message);
-  }
+  await runMigrations();
 
   initSocket(server);
   const telegramBot = initBot(server);
