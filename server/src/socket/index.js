@@ -38,6 +38,7 @@ import { randomUUID } from 'crypto';
 import { query } from '../db/pool.js';
 import crashEngine from '../games/crash.js';
 import { getBot } from '../services/telegramBot.js';
+import { cleanupExpiredRooms } from '../services/roomService.js';
 
 let io;
 
@@ -259,6 +260,19 @@ export function initSocket(httpServer) {
 
   // Start crash engine
   startCrashEngine().catch(err => console.error('[crash] engine start error:', err.message));
+
+  const cleanupRooms = async () => {
+    try {
+      const refunds = await cleanupExpiredRooms();
+      for (const refund of refunds) {
+        io.to(`user:${refund.userId}`).emit('balance:update', { balance: refund.balance });
+      }
+    } catch (err) {
+      console.error('[rooms] cleanup error:', err.message);
+    }
+  };
+  cleanupRooms();
+  setInterval(cleanupRooms, 60_000).unref();
 
   console.log('[socket] Initialized');
   return io;

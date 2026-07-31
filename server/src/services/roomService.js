@@ -274,6 +274,45 @@ export async function cancelRoom(userId, roomId) {
   }
 }
 
+export async function cleanupExpiredRooms() {
+  const { rows: candidates } = await query(
+    `SELECT id FROM rooms
+     WHERE (status = 'WAITING' AND updated_at < NOW() - INTERVAL '15 minutes')
+        OR (status = 'IN_PROGRESS' AND updated_at < NOW() - INTERVAL '30 minutes')`
+  );
+  const refunds = [];
+
+  for (const { id } of candidates) {
+    const client = await getClient();
+    try {
+      await client.query('BEGIN');
+      const { rows } = await client.query(
+        `SELECT * FROM rooms WHERE id = $1 AND (
+           (status = 'WAITING' AND updated_at < NOW() - INTERVAL '15 minutes') OR
+           (status = 'IN_PROGRESS' AND updated_at < NOW() - INTERVAL '30 minutes')
+         ) FOR UPDATE`,
+        [id]
+      );
+      if (!rows.length) { await client.query('ROLLBACK'); continue; }
+      const room = rows[0];
+      const creatorRefund = await refund(room.creator_id, room.bet_amount, room.game_type, room.id, client);
+      refunds.push({ userId: room.creator_id, balance: creatorRefund.balanceAfter });
+      if (room.status === 'IN_PROGRESS' && room.opponent_id) {
+        const opponentRefund = await refund(room.opponent_id, room.bet_amount, room.game_type, room.id, client);
+        refunds.push({ userId: room.opponent_id, balance: opponentRefund.balanceAfter });
+      }
+      await client.query(`UPDATE rooms SET status = 'CANCELLED' WHERE id = $1`, [room.id]);
+      await client.query('COMMIT');
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
+  }
+  return refunds;
+}
+
 // ---------------------------------------------------------------------------
 // 4. SET GAME MOVE
 // ---------------------------------------------------------------------------
