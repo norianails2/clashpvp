@@ -17,7 +17,23 @@ async function main() {
   }
 
   initSocket(server);
-  initBot(server);
+  const telegramBot = initBot(server);
+
+  let shuttingDown = false;
+  const shutdown = (signal) => {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    console.log(`[server] ${signal} received, shutting down`);
+
+    Promise.resolve(telegramBot?.stopPolling())
+      .catch((err) => console.warn('[telegramBot] Failed to stop polling:', err.message))
+      .finally(() => server.close(() => process.exit(0)));
+
+    setTimeout(() => process.exit(1), 10_000).unref();
+  };
+
+  process.once('SIGTERM', () => shutdown('SIGTERM'));
+  process.once('SIGINT', () => shutdown('SIGINT'));
 
   // Keep Neon database alive (prevent cold starts on free tier)
   setInterval(() => { query('SELECT 1').catch(() => {}); }, 15000);
