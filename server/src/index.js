@@ -2,7 +2,7 @@ import http from 'http';
 import { config } from './config.js';
 import { createApp } from './app.js';
 import { initSocket } from './socket/index.js';
-import { initBot } from './services/telegramBot.js';
+import { initBot, startBotPolling, stopBotPolling } from './services/telegramBot.js';
 import { runMigrations } from './db/migrate.js';
 import { query } from './db/pool.js';
 import crashEngine from './games/crash.js';
@@ -23,7 +23,7 @@ async function main() {
     console.log(`[server] ${signal} received, shutting down`);
 
     Promise.allSettled([
-      telegramBot?.stopPolling(),
+      stopBotPolling(),
       crashEngine.stopForShutdown(),
     ])
       .then((results) => {
@@ -45,6 +45,9 @@ async function main() {
   server.listen(config.port, () => {
     console.log(`[server] Clash PVP backend running on port ${config.port}`);
     console.log(`[server] Environment: ${config.nodeEnv}`);
+    startBotPolling().catch((err) => {
+      console.error('[telegramBot] initial polling start failed:', err.message);
+    });
   });
 }
 

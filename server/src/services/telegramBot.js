@@ -4,6 +4,31 @@ import { config } from '../config.js';
 import express from 'express';
 
 let bot;
+let pollingRestartTimer;
+
+const POLLING_CONFLICT_RETRY_MS = 10_000;
+
+function isPollingConflict(err) {
+  const status = err?.response?.status ?? err?.response?.statusCode;
+  return status === 409 || /409 Conflict.*getUpdates/i.test(err?.message || '');
+}
+
+function restartPollingAfterConflict() {
+  if (pollingRestartTimer || !bot) return;
+
+  console.warn(`[telegramBot] polling conflict; retrying in ${POLLING_CONFLICT_RETRY_MS / 1000}s`);
+  pollingRestartTimer = setTimeout(async () => {
+    pollingRestartTimer = undefined;
+    try {
+      await bot.startPolling();
+      console.log('[telegramBot] polling resumed');
+    } catch (err) {
+      console.error('[telegramBot] polling restart failed:', err.message);
+      restartPollingAfterConflict();
+    }
+  }, POLLING_CONFLICT_RETRY_MS);
+  pollingRestartTimer.unref?.();
+}
 
 export function initBot(server) {
   const token = config.telegram.botToken;
@@ -12,18 +37,17 @@ export function initBot(server) {
     return null;
   }
 
-  if (config.isDev) {
-    // Development: use polling
-    bot = new TelegramBot(token, { polling: true });
-    console.log('[telegramBot] Polling mode (dev)');
-  } else {
-    // Production: also use polling (webhook requires Express app access)
-    bot = new TelegramBot(token, { polling: true });
-    console.log('[telegramBot] Polling mode (production)');
-  }
+  // Starting after HTTP is listening makes startup and shutdown ordering explicit.
+  bot = new TelegramBot(token, { polling: { autoStart: false } });
+  console.log(`[telegramBot] Polling mode (${config.isDev ? 'dev' : 'production'})`);
 
   bot.on('polling_error', (err) => {
-    console.error('[telegramBot] polling error:', err.message);
+    if (!isPollingConflict(err)) {
+      console.error('[telegramBot] polling error:', err.message);
+      return;
+    }
+
+    void bot.stopPolling({ cancel: true }).finally(restartPollingAfterConflict);
   });
   bot.on('error', (err) => {
     console.error('[telegramBot] client error:', err.message);
@@ -184,4 +208,18 @@ export function initBot(server) {
 
 export function getBot() {
   return bot;
+}
+
+export async function startBotPolling() {
+  if (!bot) return;
+  await bot.startPolling();
+  console.log('[telegramBot] polling started');
+}
+
+export async function stopBotPolling() {
+  if (pollingRestartTimer) {
+    clearTimeout(pollingRestartTimer);
+    pollingRestartTimer = undefined;
+  }
+  await bot?.stopPolling({ cancel: true });
 }
