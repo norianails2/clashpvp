@@ -36,8 +36,8 @@ router.post('/apply', async (req, res, next) => {
     }
 
     const { applyReferral } = await import('../services/referralService.js');
-    await applyReferral(req.userId, referrerId);
-    res.json({ success: true });
+    const result = await applyReferral(req.userId, referrerId);
+    res.json({ success: true, ...result });
   } catch (err) {
     next(err);
   }

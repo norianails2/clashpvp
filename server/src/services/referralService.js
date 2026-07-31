@@ -4,17 +4,17 @@ import { query, getClient } from '../db/pool.js';
 const REFERRAL_BONUS = 50;
 
 export async function applyReferral(userId, referrerId) {
-  if (!referrerId || referrerId === userId) return;
+  if (!referrerId || referrerId === userId) return { applied: false };
   const client = await getClient();
   try {
     await client.query('BEGIN');
     const { rows: refs } = await client.query('SELECT id FROM users WHERE id = $1 FOR UPDATE', [referrerId]);
-    if (!refs.length) { await client.query('ROLLBACK'); return; }
+    if (!refs.length) { await client.query('ROLLBACK'); return { applied: false }; }
     const { rows: referred } = await client.query(
       `UPDATE users SET referrer_id = $1 WHERE id = $2 AND referrer_id IS NULL RETURNING id`,
       [referrerId, userId]
     );
-    if (!referred.length) { await client.query('ROLLBACK'); return; }
+    if (!referred.length) { await client.query('ROLLBACK'); return { applied: false }; }
     const { rows: [refUser] } = await client.query(
       'UPDATE users SET balance = balance + $1 WHERE id = $2 RETURNING balance',
       [REFERRAL_BONUS, referrerId]
@@ -26,6 +26,7 @@ export async function applyReferral(userId, referrerId) {
        JSON.stringify({ referredUserId: userId, bonus: REFERRAL_BONUS })]
     );
     await client.query('COMMIT');
+    return { applied: true };
   } catch (err) {
     await client.query('ROLLBACK');
     throw err;
@@ -37,7 +38,7 @@ export async function applyReferral(userId, referrerId) {
 export async function getReferralStats(userId) {
   const { rows } = await query(
     `SELECT COUNT(*)::int AS total_referrals,
-            SUM(CASE WHEN u2.created_at < NOW() - INTERVAL '7 days' THEN 1 ELSE 0 END)::int AS recent_referrals
+            SUM(CASE WHEN u.created_at >= NOW() - INTERVAL '7 days' THEN 1 ELSE 0 END)::int AS recent_referrals
      FROM users u WHERE u.referrer_id = $1`,
     [userId]
   );
