@@ -654,6 +654,7 @@
         .bj-actions .pvp-bj-btn { flex:1; min-height:46px; border-radius:8px; }
         .bj-actions .pvp-bj-btn.hit { background:#27303a; border-color:rgba(255,255,255,0.14); }
         .bj-actions .pvp-bj-btn.stand { background:#f59e0b; color:#1c1917; box-shadow:0 8px 20px rgba(245,158,11,0.2); }
+        .bj-actions .pvp-bj-btn.double { background:#8b5cf6; color:#fff; border-color:rgba(196,181,253,0.35); }
         .bj-status { width:100%; min-height:28px!important; padding:7px 10px; background:rgba(255,255,255,0.035); border-radius:7px; color:#fef08a!important; font-size:12px!important; text-align:center; }
 
     </style>
@@ -2194,6 +2195,11 @@ function renderSoloBJ(area) {
     hBtn.textContent = '➕ Ещё'; hBtn.style.display = 'none';
     hBtn.onclick = soloBjHit;
     ac.appendChild(hBtn);
+    var dBtn = document.createElement('button');
+    dBtn.id = 'bjDoubleBtn'; dBtn.className = 'pvp-bj-btn double';
+    dBtn.textContent = '2X'; dBtn.style.display = 'none';
+    dBtn.onclick = soloBjDouble;
+    ac.appendChild(dBtn);
     var stBtn = document.createElement('button');
     stBtn.id = 'bjStandBtn'; stBtn.className = 'pvp-bj-btn stand';
     stBtn.textContent = '✋ Хватит'; stBtn.style.display = 'none';
@@ -2243,6 +2249,15 @@ function soloBjStand() {
     } catch(e) { showToast('❌ bjStand: ' + e.message, 'error'); }
 }
 
+function soloBjDouble() {
+    const button = document.getElementById('bjDoubleBtn');
+    if (button) button.disabled = true;
+    socket?.emit('bj:double', {}, (res) => {
+        if (button) button.disabled = false;
+        if (typeof bjOnStandResult === 'function') bjOnStandResult(res);
+    });
+}
+
 function bjOnStartResult(res) {
     if (res?.error) { balance += parseInt(document.getElementById('bjBetInput')?.value) || 0; updateBalance(); return showToast('❌ ' + res.error, 'error'); }
     if (res?.balance !== undefined) { balance = res.balance; updateBalance(); }
@@ -2250,6 +2265,7 @@ function bjOnStartResult(res) {
     document.getElementById('bjStartBtn').style.display = 'none';
     document.getElementById('bjHitBtn').style.display = '';
     document.getElementById('bjStandBtn').style.display = '';
+    document.getElementById('bjDoubleBtn').style.display = res?.playerCards?.length === 2 ? '' : 'none';
     // Set onclick AFTER buttons are visible
     document.getElementById('bjHitBtn').onclick = soloBjHit;
     document.getElementById('bjStandBtn').onclick = soloBjStand;
@@ -2259,6 +2275,8 @@ function bjOnStartResult(res) {
     if (res.gameOver) bjGameOver(res);
 }
 function bjOnHitResult(res) {
+    const doubleButton = document.getElementById('bjDoubleBtn');
+    if (doubleButton) doubleButton.style.display = 'none';
     if (res?.error) { showToast('❌ ' + res.error, 'error'); return; }
     updateBJHands(res);
     if (res.gameOver) { bjGameOver(res); }
@@ -2272,6 +2290,7 @@ function bjOnStandResult(res) {
 function bjGameOver(res) {
     document.getElementById('bjHitBtn').style.display = 'none';
     document.getElementById('bjStandBtn').style.display = 'none';
+    document.getElementById('bjDoubleBtn').style.display = 'none';
     bjSetTableState('ROUND OVER', false);
     if (res.draw) document.getElementById('bjStatus').textContent = '🤝 Ничья!';
     else if (res.winnerId === 'dealer' || res.winnerId === null || res.winnerId === undefined) document.getElementById('bjStatus').innerHTML = '−' + (document.getElementById('bjBetInput')?.value || '') + ' <i class="tg-s"></i>';
