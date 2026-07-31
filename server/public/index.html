@@ -667,23 +667,6 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="withdrawModal">
-        <div class="modal-box">
-            <h2>💸 Вывод</h2>
-            <div id="withdrawStars">
-                <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px;">Списание <i class="tg-s"></i> Stars</p>
-                <div style="display:flex;justify-content:space-between;font-size:12px;margin:8px 0;padding:6px 8px;background:rgba(255,255,255,0.03);border-radius:8px;">
-                    <span style="color:rgba(255,255,255,0.3);"><i class="tg-s"></i> Твои Звёзды:</span>
-                    <span style="color:#22c55e;font-weight:700;" id="wdStarsBalance">0 <i class="tg-s"></i></span>
-                </div>
-                <input class="modal-input" type="number" id="withdrawAmount" value="10" placeholder="Сумма в <i class="tg-s"></i>" min="1">
-                <div class="modal-error" id="withdrawError"></div>
-                <button class="modal-confirm wd" onclick="withdrawStars()">💸 Вывести</button>
-            </div>
-            <button class="modal-cancel" onclick="closeModal('withdrawModal')">Закрыть</button>
-        </div>
-    </div>
-
     <div class="modal-overlay" id="historyModal">
         <div class="modal-box">
             <h2>📜 История</h2>
@@ -834,7 +817,7 @@ function showHistory() {
         const sign = t.amount > 0 ? '+' : '';
         return '<div class="history-item"><span class="h-icon">' + t.icon + '</span><div class="h-info"><div class="h-title">' + t.title + '</div><div class="h-date">' + t.date + '</div></div><span class="h-amount ' + cls + '">' + sign + t.amount + ' <i class="tg-s"></i></span></div>';
     }).join('');
-    closeModal('depositModal'); closeModal('withdrawModal'); document.getElementById('historyModal').classList.add('show');
+    closeModal('depositModal'); document.getElementById('historyModal').classList.add('show');
 }
 function showToast(msg, type) {
     const t = document.getElementById('toast'); t.innerHTML = msg; t.className = 'toast';
@@ -2299,35 +2282,6 @@ window.buyStars = function(amount) {
             }
         } else {
             showToast('✅ Инвойс: ' + (res.url || 'готов'), 'info');
-        }
-    });
-};
-window.withdrawStars = function() {
-    const amt = parseInt(document.getElementById('withdrawAmount').value) || 0, err = document.getElementById('withdrawError');
-    if (amt <= 0) { err.textContent = '⚠️ Введи сумму больше 0'; err.classList.add('show'); return; }
-    if (amt > balance) { err.innerHTML = '❌ Недостаточно. Доступно: ' + balance.toFixed(0) + ' <i class="tg-s"></i>'; err.classList.add('show'); return; }
-    if (amt < 1) { err.innerHTML = '⚠️ Минимум 1 <i class="tg-s"></i>'; err.classList.add('show'); return; }
-    err.classList.remove('show');
-    if (!socket?.connected) { showToast('❌ Нет соединения', 'error'); return; }
-    const tg = window.Telegram?.WebApp;
-    if (!tg || !tg.initData) {
-        // Dev mode: simulate
-        balance -= amt; updateBalance(); closeModal('withdrawModal');
-        addHistory('withdraw', -amt); showToast('💸 Списано ' + amt + ' <i class="tg-s"></i> (dev)', 'info');
-        return;
-    }
-    showToast('⏳ Создание инвойса...', 'info');
-    socket.emit('stars:withdraw', { amount: amt }, async (res) => {
-        if (res?.error) return showToast('❌ ' + res.error, 'error');
-        if (res?.url && tg?.openInvoice) {
-            try {
-                await tg.openInvoice(res.url);
-                showToast('✅ Вывод оформлен! Stars возвращены', 'success');
-                closeModal('withdrawModal');
-                socket.emit('balance:get', {}, (r) => { if (r?.balance !== undefined) { balance = r.balance; updateBalance(); } });
-            } catch (e) {
-                showToast('❌ Вывод отменён', 'error');
-            }
         }
     });
 };
