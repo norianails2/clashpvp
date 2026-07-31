@@ -1,7 +1,6 @@
 import { Router } from 'express';
-import { query } from '../db/pool.js';
+import { query, getClient } from '../db/pool.js';
 import { adminAuth } from '../middleware/adminAuth.js';
-import { config } from '../config.js';
 
 const router = Router();
 
@@ -52,25 +51,37 @@ router.post('/users/:id/balance', async (req, res, next) => {
     const { id } = req.params;
     const { amount, reason } = req.body;
 
-    if (!amount || typeof amount !== 'number') {
+    if (!Number.isSafeInteger(amount) || amount === 0) {
       return res.status(400).json({ error: 'Amount is required (positive or negative)' });
     }
 
-    const { rows } = await query(
-      `UPDATE users SET balance = GREATEST(0, balance + $1) WHERE id = $2 RETURNING id, username, balance`,
-      [amount, id]
-    );
-
-    if (rows.length === 0) return res.status(404).json({ error: 'User not found' });
-
-    await query(
-      `INSERT INTO transactions (user_id, type, amount, balance_before, balance_after, metadata)
-       VALUES ($1, 'admin', $2, $3, $4, $5)`,
-      [id, amount, Number(rows[0].balance) - amount, Number(rows[0].balance),
-       JSON.stringify({ reason: reason || 'admin adjustment', adminAction: true })]
-    );
-
-    res.json({ user: rows[0] });
+    const client = await getClient();
+    try {
+      await client.query('BEGIN');
+      const { rows: users } = await client.query(
+        'SELECT id, username, balance FROM users WHERE id = $1 FOR UPDATE',
+        [id]
+      );
+      if (!users.length) { await client.query('ROLLBACK'); return res.status(404).json({ error: 'User not found' }); }
+      const user = users[0];
+      const balanceBefore = Number(user.balance);
+      const balanceAfter = Math.max(0, balanceBefore + amount);
+      const appliedAmount = balanceAfter - balanceBefore;
+      await client.query('UPDATE users SET balance = $1 WHERE id = $2', [balanceAfter, id]);
+      await client.query(
+        `INSERT INTO transactions (user_id, type, amount, balance_before, balance_after, metadata)
+         VALUES ($1, 'admin', $2, $3, $4, $5)`,
+        [id, appliedAmount, balanceBefore, balanceAfter,
+         JSON.stringify({ reason: reason || 'admin adjustment', adminAction: true, requestedAmount: amount })]
+      );
+      await client.query('COMMIT');
+      res.json({ user: { id: user.id, username: user.username, balance: balanceAfter } });
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
   } catch (err) {
     next(err);
   }
