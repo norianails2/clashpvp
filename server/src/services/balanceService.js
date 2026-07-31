@@ -52,8 +52,8 @@ async function checkUserBalance(client, userId, minAmount) {
 // 1. ХОЛД (списание ставки)
 // ---------------------------------------------------------------------------
 export async function holdBet(userId, amount, gameType, roomId, txClient) {
-  const _amount = parseInt(amount, 10);
-  if (!userId || !_amount || _amount < 1) {
+  const _amount = amount;
+  if (!userId || typeof _amount !== 'number' || !Number.isSafeInteger(_amount) || _amount < 1) {
     throw Object.assign(new Error('Invalid bet params'), { status: 400 });
   }
 
@@ -80,8 +80,8 @@ export async function holdBet(userId, amount, gameType, roomId, txClient) {
 //    Для PvP игр передавайте HOUSE_EDGE (0.10 → 10%).
 // ---------------------------------------------------------------------------
 export async function payout(userId, grossAmount, gameType, roomId, txClient, commission = 0) {
-  const _gross = parseInt(grossAmount, 10);
-  if (!userId || !_gross || _gross < 1) {
+  const _gross = grossAmount;
+  if (!userId || typeof _gross !== 'number' || !Number.isSafeInteger(_gross) || _gross < 1) {
     throw Object.assign(new Error('Invalid payout params'), { status: 400 });
   }
 
@@ -109,8 +109,8 @@ export async function payout(userId, grossAmount, gameType, roomId, txClient, co
 // 3. ВОЗВРАТ (отмена игры, ничья, техническая ошибка)
 // ---------------------------------------------------------------------------
 export async function refund(userId, amount, gameType, roomId, txClient) {
-  const _amount = parseInt(amount, 10);
-  if (!userId || !_amount || _amount < 1) {
+  const _amount = amount;
+  if (!userId || typeof _amount !== 'number' || !Number.isSafeInteger(_amount) || _amount < 1) {
     throw Object.assign(new Error('Invalid refund params'), { status: 400 });
   }
 

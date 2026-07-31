@@ -25,3 +25,10 @@ test('hold, ceil payout, and refund preserve balance', async () => {
 test('hold rejects insufficient balance', async () => {
   await assert.rejects(() => holdBet('u', 101, 'mines', null, client(100)), /Insufficient balance/);
 });
+
+test('balance operations reject fractional and string amounts', async () => {
+  const c = client(100);
+  await assert.rejects(() => holdBet('u', 1.5, 'mines', null, c), /Invalid bet params/);
+  await assert.rejects(() => payout('u', '10', 'mines', null, c), /Invalid payout params/);
+  await assert.rejects(() => refund('u', 2.5, 'mines', null, c), /Invalid refund params/);
+});
