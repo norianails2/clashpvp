@@ -33,8 +33,10 @@ router.get('/stats', async (req, res, next) => {
 // List users
 router.get('/users', async (req, res, next) => {
   try {
-    const limit = Math.min(parseInt(req.query.limit) || 50, 200);
-    const offset = parseInt(req.query.offset) || 0;
+    const requestedLimit = Number.parseInt(req.query.limit, 10);
+    const requestedOffset = Number.parseInt(req.query.offset, 10);
+    const limit = Number.isInteger(requestedLimit) ? Math.min(Math.max(requestedLimit, 1), 200) : 50;
+    const offset = Number.isInteger(requestedOffset) ? Math.max(requestedOffset, 0) : 0;
     const { rows } = await query(
       `SELECT id, telegram_id, username, balance, created_at FROM users ORDER BY balance DESC LIMIT $1 OFFSET $2`,
       [limit, offset]
