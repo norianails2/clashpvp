@@ -5,6 +5,7 @@ import { initSocket } from './socket/index.js';
 import { initBot } from './services/telegramBot.js';
 import { runMigrations } from './db/migrate.js';
 import { query } from './db/pool.js';
+import crashEngine from './games/crash.js';
 
 async function main() {
   const app = createApp();
@@ -25,8 +26,15 @@ async function main() {
     shuttingDown = true;
     console.log(`[server] ${signal} received, shutting down`);
 
-    Promise.resolve(telegramBot?.stopPolling())
-      .catch((err) => console.warn('[telegramBot] Failed to stop polling:', err.message))
+    Promise.allSettled([
+      telegramBot?.stopPolling(),
+      crashEngine.stopForShutdown(),
+    ])
+      .then((results) => {
+        for (const result of results) {
+          if (result.status === 'rejected') console.warn('[server] Shutdown task failed:', result.reason?.message);
+        }
+      })
       .finally(() => server.close(() => process.exit(0)));
 
     setTimeout(() => process.exit(1), 10_000).unref();

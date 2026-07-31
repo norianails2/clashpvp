@@ -10,6 +10,8 @@ class CrashEngine {
     this.crashPoint = 0;
     this.players = [];
     this.pendingBets = new Set();
+    this.pendingBetCount = 0;
+    this.pendingCashoutCount = 0;
     this.history = [];
     this.timers = { main: null, countdown: null };
     this.HOUSE_EDGE = 0;
@@ -140,6 +142,7 @@ class CrashEngine {
     }
 
     this.pendingBets.add(userId);
+    this.pendingBetCount++;
     try {
       const { balanceAfter } = await holdBet(userId, betAmount, 'crash', null, null);
       if (this.phase !== 'betting') {
@@ -158,6 +161,7 @@ class CrashEngine {
       return { error: err.message };
     } finally {
       this.pendingBets.delete(userId);
+      this.pendingBetCount--;
     }
   }
 
@@ -171,6 +175,7 @@ class CrashEngine {
     const cashoutMult = Math.min(requestedMultiplier, this.mult);
     const grossPayout = Math.ceil(player.bet * cashoutMult);
     player.cashingOut = true;
+    this.pendingCashoutCount++;
 
     try {
       const { balanceAfter, netAmount } = await payout(userId, grossPayout, 'crash', null, null, this.HOUSE_EDGE);
@@ -184,7 +189,36 @@ class CrashEngine {
       return { error: err.message };
     } finally {
       player.cashingOut = false;
+      this.pendingCashoutCount--;
     }
+  }
+
+  async stopForShutdown() {
+    if (this.phase === 'stopped') return;
+    this.phase = 'stopped';
+    if (this.timers.main) clearInterval(this.timers.main);
+    if (this.timers.countdown) clearInterval(this.timers.countdown);
+    this.timers.main = null;
+    this.timers.countdown = null;
+
+    const deadline = Date.now() + 8000;
+    while ((this.pendingBetCount > 0 || this.pendingCashoutCount > 0) && Date.now() < deadline) {
+      await new Promise(resolve => setTimeout(resolve, 50));
+    }
+
+    const unsettled = this.players.filter(player => !player.cashedAt && !player.cashingOut);
+    const refunds = await Promise.allSettled(
+      unsettled.map(async (player) => {
+        const { balanceAfter } = await refund(player.userId, player.bet, 'crash', null, null);
+        player.refunded = true;
+        return balanceAfter;
+      })
+    );
+    const failedRefunds = refunds.filter(result => result.status === 'rejected');
+    if (failedRefunds.length) {
+      console.error(`[crash] ${failedRefunds.length} shutdown refunds failed`);
+    }
+    return { refunded: unsettled.length - failedRefunds.length };
   }
 
   getState() {
