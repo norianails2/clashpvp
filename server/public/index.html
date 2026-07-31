@@ -1988,6 +1988,20 @@ function renderSoloMines(area) {
             else if (act === 'cashout') minesCashout();
         });
     });
+    socket?.emit('mines:resume', {}, function(res) {
+        if (!res?.active || res.error) return;
+        _minesGame = { bet: res.betAmount };
+        document.getElementById('minesBetInput').value = res.betAmount;
+        document.getElementById('minesCountInput').value = res.minesCount;
+        document.getElementById('minesStartBtn').style.display = 'none';
+        document.getElementById('minesCashoutBtn').style.display = res.safeOpenedCount ? '' : 'none';
+        document.getElementById('minesMult').textContent = Number(res.multiplier).toFixed(2);
+        document.getElementById('minesStatus').textContent = '💎 Игра восстановлена';
+        (res.openedCells || []).forEach(function(idx) {
+            var cell = document.querySelector('#minesGrid .pvp-mine-cell[data-idx="' + idx + '"]');
+            if (cell) { cell.classList.add('safe'); cell.style.pointerEvents = 'none'; }
+        });
+    });
 }
 function minesAdjBet(type) {
     const inp = document.getElementById('minesBetInput');
@@ -2093,7 +2107,7 @@ function minesCashout() {
 // Solo Blackjack PvE
 var _bjState = null; // client-side game state
 
-function renderSoloBJ(area) {
+function renderSoloBJLegacy(area) {
     document.getElementById('gameTitle').textContent = '🃏 Блекджек PvE';
     _bjState = null;
     area.innerHTML =
