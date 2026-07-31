@@ -146,13 +146,14 @@ export async function getBalance(userId) {
 // 5. ИСТОРИЯ ТРАНЗАКЦИЙ
 // ---------------------------------------------------------------------------
 export async function getTransactionHistory(userId, limit = 30) {
+  const safeLimit = Number.isSafeInteger(limit) ? Math.min(Math.max(limit, 1), 100) : 30;
   const { rows } = await query(
     `SELECT id, type, amount, balance_before, balance_after, game_type, room_id, metadata, created_at
      FROM transactions
      WHERE user_id = $1
      ORDER BY created_at DESC
      LIMIT $2`,
-    [userId, limit]
+    [userId, safeLimit]
   );
   return rows;
 }
