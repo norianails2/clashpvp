@@ -2,6 +2,8 @@ import crypto from 'crypto';
 import { config } from '../config.js';
 import { query } from '../db/pool.js';
 
+const MAX_INIT_DATA_AGE_SECONDS = 24 * 60 * 60;
+
 /**
  * Verifies Telegram WebApp initData and looks up / creates the user.
  * Attaches `user` (id, telegram_id, username, balance) to socket.data.
@@ -35,6 +37,11 @@ export async function verifyConnection(socket, next) {
     const sp = new URLSearchParams(raw);
     const hash = sp.get('hash');
     if (!hash) return next(new Error('Missing hash'));
+    const authDate = Number(sp.get('auth_date'));
+    const now = Date.now() / 1000;
+    if (!Number.isInteger(authDate) || authDate > now + 300 || now - authDate > MAX_INIT_DATA_AGE_SECONDS) {
+      return next(new Error('Expired Telegram initData'));
+    }
 
     sp.delete('hash');
 
@@ -53,7 +60,7 @@ export async function verifyConnection(socket, next) {
       .update(dataCheckString)
       .digest('hex');
 
-    if (computedHash !== hash) {
+    if (hash.length !== computedHash.length || !crypto.timingSafeEqual(Buffer.from(computedHash), Buffer.from(hash))) {
       return next(new Error('Invalid initData signature'));
     }
 
