@@ -6,6 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { config } from './config.js';
+import { query } from './db/pool.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import adminRoutes from './routes/admin.js';
 import referralRoutes from './routes/referral.js';
@@ -73,8 +74,14 @@ export function createApp() {
   app.use('/api/referral', referralRoutes);
 
   // Health check
-  app.get('/health', (_req, res) => {
-    res.json({ status: 'ok', uptime: process.uptime() });
+  app.get('/health', async (_req, res) => {
+    try {
+      await query('SELECT 1');
+      res.json({ status: 'ok', uptime: process.uptime(), database: 'ok' });
+    } catch (err) {
+      console.error('[health] Database check failed:', err.message);
+      res.status(503).json({ status: 'degraded', database: 'unavailable' });
+    }
   });
 
   // Test client (dev only)
