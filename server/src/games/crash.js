@@ -1,6 +1,6 @@
 import provablyFair from '../services/provablyFairService.js';
 import { holdBet, payout, refund } from '../services/balanceService.js';
-import { getClient, query } from '../db/pool.js';
+import { getClient } from '../db/pool.js';
 
 class CrashEngine {
   constructor() {
@@ -112,18 +112,29 @@ class CrashEngine {
     if (this.timers.countdown) { clearInterval(this.timers.countdown); this.timers.countdown = null; }
 
     try {
-      const revealed = await provablyFair.revealRound(this.round);
+      const client = await getClient();
+      let revealed;
+      try {
+        await client.query('BEGIN');
+        revealed = await provablyFair.revealRound(this.round, client);
+        await client.query(
+          `UPDATE crash_bets SET status = 'busted', settled_at = NOW()
+           WHERE round_number = $1 AND status = 'active'`,
+          [this.round]
+        );
+        await client.query('COMMIT');
+      } catch (err) {
+        await client.query('ROLLBACK');
+        throw err;
+      } finally {
+        client.release();
+      }
       if (revealed) {
         this.seedRevealed = revealed.serverSeed;
       }
     } catch (err) {
       console.error('[crash] failed to reveal round:', err.message);
     }
-    await query(
-      `UPDATE crash_bets SET status = 'busted', settled_at = NOW()
-       WHERE round_number = $1 AND status = 'active'`,
-      [this.round]
-    );
     this.history.unshift({ crashPoint: this.crashPoint, players: this.players.length });
     if (this.history.length > 20) this.history.pop();
 

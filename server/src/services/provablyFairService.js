@@ -111,10 +111,11 @@ class ProvablyFairService {
     };
   }
 
-  async revealRound(roundNum) {
+  async revealRound(roundNum, txClient = null) {
     const round = this.rounds.get(roundNum);
     if (!round) return null;
-    await query(
+    const client = txClient || { query };
+    await client.query(
       `UPDATE crash_rounds
        SET revealed = TRUE, revealed_at = NOW()
        WHERE round_number = $1`,
