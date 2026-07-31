@@ -71,7 +71,7 @@ export async function verifyConnection(socket, next) {
     try {
       tgUser = JSON.parse(userJson);
     } catch (e) {
-      console.error('[auth] JSON parse error:', e.message, userJson.slice(0, 100));
+      console.error('[auth] JSON parse error:', e.message);
       return next(new Error('Invalid user JSON in initData'));
     }
     const telegramId = String(tgUser.id);
@@ -94,13 +94,13 @@ export async function verifyConnection(socket, next) {
       rows = result.rows;
     } catch (dbErr) {
       console.error('[auth] User upsert DB error:', dbErr.message, dbErr.code);
-      return next(new Error('DB upsert: ' + (dbErr.message || dbErr.code)));
+      return next(new Error('Authentication temporarily unavailable'));
     }
 
     socket.data.user = rows[0];
     next();
   } catch (err) {
     console.error('[socket:auth] FULL ERROR:', err.message, err.stack?.slice(0, 500));
-    next(new Error('Auth: ' + (err.message || 'unknown')));
+    next(new Error('Authentication failed'));
   }
 }
