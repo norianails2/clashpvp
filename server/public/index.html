@@ -602,35 +602,6 @@
         /* Status text in games */
         .pvp-timer { font-family:'Fredoka',sans-serif;letter-spacing:1px; }
 
-        /* Crash and Blackjack game surfaces */
-        .crash-game { background:#101116; gap:0; }
-        .crash-game::before { background:radial-gradient(ellipse 90% 45% at 50% 16%,rgba(244,114,182,0.13),transparent 68%); }
-        .crash-header { padding:12px 16px; border-bottom-color:rgba(255,255,255,0.08); }
-        .crash-header .c-round { color:rgba(255,255,255,0.55); }
-        .crash-header .c-round .r-num { color:#fb7185; }
-        .crash-header .c-countdown { background:rgba(255,255,255,0.06); border-color:rgba(251,113,133,0.25); }
-        .crash-header .c-countdown .c-c-num { color:#fda4af; }
-        .crash-mult-area { min-height:112px; padding-top:12px; }
-        .crash-stage-label { font-size:9px; font-weight:800; letter-spacing:1.8px; color:rgba(255,255,255,0.35); margin-bottom:6px; }
-        .crash-mult-area .c-mult { font-size:62px; letter-spacing:0; text-shadow:0 0 40px rgba(244,114,182,0.32); }
-        .crash-mult-area .c-status { margin-top:8px; border-radius:7px; letter-spacing:1.4px; }
-        .crash-graph-area { height:190px; margin:0 16px; border:1px solid rgba(255,255,255,0.08); border-radius:10px; background:rgba(255,255,255,0.018); }
-        .crash-graph-area canvas { border-radius:10px; }
-        .crash-history-bar { padding:10px 16px 6px; gap:7px; }
-        .c-hist-chip { border-radius:7px; padding:5px 9px; }
-        .crash-fair-badge { margin:2px 16px 10px; border:1px solid rgba(255,255,255,0.07); border-radius:8px; background:rgba(255,255,255,0.025); }
-        .crash-bet-panel { margin:0 16px 10px; padding:14px; border-radius:10px; background:#18191f; border-color:rgba(251,113,133,0.22); box-shadow:0 10px 28px rgba(0,0,0,0.22); }
-        .c-bet-label { color:rgba(255,255,255,0.52); }
-        .c-bet-input-wrap { max-width:none; border-radius:8px; background:#101116; border-color:rgba(255,255,255,0.13); padding:9px 12px; }
-        .c-bet-adj { gap:5px; }
-        .c-bet-adj button { border-radius:7px; padding:7px 9px; }
-        .c-auto-row { padding:10px 0; margin:4px 0 10px; border-top:1px solid rgba(255,255,255,0.07); border-bottom:1px solid rgba(255,255,255,0.07); }
-        .c-toggle-switch.active { background:rgba(251,113,133,0.2); border-color:#fb7185; }
-        .c-toggle-switch.active .c-knob { background:#fb7185; }
-        .c-main-btn { border-radius:8px; background:#f43f5e; box-shadow:0 8px 22px rgba(244,63,94,0.25); }
-        .c-main-btn.cashout { background:#22c55e; box-shadow:0 8px 22px rgba(34,197,94,0.25); }
-        .crash-social { margin:0 16px 14px; }
-
         .bj-solo { width:100%; max-width:430px; gap:12px!important; padding:2px 4px 18px!important; }
         .bj-solo-topline { width:100%; display:flex; justify-content:space-between; align-items:center; color:rgba(255,255,255,0.48); font-size:10px; font-weight:800; letter-spacing:1.2px; }
         .bj-solo-state { padding:4px 7px; color:#4ade80; background:rgba(74,222,128,0.1); border:1px solid rgba(74,222,128,0.18); border-radius:6px; }
@@ -1473,7 +1444,7 @@ function renderCrash(area) {
     area.innerHTML = '<div class="crash-game" id="crashGame">' +
       '<div class="crash-header"><div class="c-round">✦ РАУНД <span class="r-num" id="crRound">#1</span></div>' +
       '<div class="c-countdown" id="crCountdown"><span class="c-c-num" id="crCountNum">10</span><span class="c-c-label" id="crCountLabel">сек</span></div></div>' +
-      '<div class="crash-mult-area"><div class="crash-stage-label">LIVE MULTIPLIER</div><div class="c-mult" id="crMult">1.00<span class="x-sfx">x</span></div>' +
+      '<div class="crash-mult-area"><div class="c-mult" id="crMult">1.00<span class="x-sfx">x</span></div>' +
       '<div class="c-status" id="crStatus">⏳ ЗАПУСК...</div>' +
       '<div class="c-player-count" id="crPlayerCount">👥 0 ИГРОКОВ</div></div>' +
       '<div class="crash-graph-area" id="crGraphArea"><canvas id="crCanvas"></canvas></div>' +
@@ -1760,8 +1731,6 @@ function crUpdateGraph(state) {
     }
 }
 function crUpdateRound(state) {
-    const stage = document.querySelector('.crash-stage-label');
-    if (stage) stage.textContent = state.phase === 'flying' ? 'LIVE MULTIPLIER' : state.phase === 'crashed' ? 'ROUND RESULT' : 'NEXT ROUND';
     const rn = document.getElementById('crRound');
     if (rn) rn.textContent = '#' + state.round;
     const cn = document.getElementById('crCountNum');
