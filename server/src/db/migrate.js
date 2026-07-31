@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import pool from './pool.js';
 
@@ -12,26 +13,35 @@ export async function runMigrations() {
   await pool.query(
     `CREATE TABLE IF NOT EXISTS schema_migrations (
        filename TEXT PRIMARY KEY,
-       applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+       applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+       checksum TEXT
      )`
   );
+  await pool.query('ALTER TABLE schema_migrations ADD COLUMN IF NOT EXISTS checksum TEXT');
 
   for (const file of files) {
     if (!file.endsWith('.sql')) continue;
+    const sql = fs.readFileSync(path.join(dir, file), 'utf8').trim();
+    if (!sql) continue;
+    const checksum = crypto.createHash('sha256').update(sql).digest('hex');
     const { rows: applied } = await pool.query(
-      'SELECT 1 FROM schema_migrations WHERE filename = $1',
+      'SELECT checksum FROM schema_migrations WHERE filename = $1',
       [file]
     );
     if (applied.length) {
+      if (applied[0].checksum && applied[0].checksum !== checksum) {
+        throw new Error(`Migration checksum mismatch: ${file}`);
+      }
+      if (!applied[0].checksum) {
+        await pool.query('UPDATE schema_migrations SET checksum = $1 WHERE filename = $2', [checksum, file]);
+      }
       console.log(`[migrate] ${file} skipped (already applied)`);
       continue;
     }
-    const sql = fs.readFileSync(path.join(dir, file), 'utf8').trim();
-    if (!sql) continue;
 
     try {
       await pool.query(sql);
-      await pool.query('INSERT INTO schema_migrations (filename) VALUES ($1)', [file]);
+      await pool.query('INSERT INTO schema_migrations (filename, checksum) VALUES ($1, $2)', [file, checksum]);
       console.log(`[migrate] ${file} done.`);
     } catch (err) {
       // Allow ADD VALUE IF NOT EXISTS failures
