@@ -10,3 +10,10 @@ test('production rejects Socket.IO clients without Telegram initData', async () 
   });
   assert.match(result, /Telegram initData/i);
 });
+
+test('production referral API rejects a caller-provided user ID', async () => {
+  const response = await fetch('https://clashpvp.app/api/referral/stats', {
+    headers: { 'x-user-id': 'attacker-controlled-id' },
+  });
+  assert.equal(response.status, 401);
+});
