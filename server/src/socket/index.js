@@ -174,8 +174,8 @@ export function initSocket(httpServer) {
       try {
         const invoiceId = randomUUID();
         await query(
-          `INSERT INTO star_invoices (id, user_id, telegram_id, amount)
-           VALUES ($1, $2, $3, $4)`,
+          `INSERT INTO star_invoices (id, user_id, telegram_id, amount, expires_at)
+           VALUES ($1, $2, $3, $4, NOW() + INTERVAL '30 minutes')`,
           [invoiceId, user.id, user.telegram_id, amount]
         );
         const botToken = config.telegram.botToken;

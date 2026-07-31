@@ -113,7 +113,11 @@ export function initBot(server) {
   bot.on('pre_checkout_query', async (query_) => {
     try {
       const payload = JSON.parse(query_.invoice_payload || '{}');
-      const { rows } = await query('SELECT amount, telegram_id FROM star_invoices WHERE id = $1 AND status = $2', [payload.invoiceId, 'pending']);
+      const { rows } = await query(
+        `SELECT amount, telegram_id FROM star_invoices
+         WHERE id = $1 AND status = $2 AND expires_at > NOW()`,
+        [payload.invoiceId, 'pending']
+      );
       if (query_.currency !== 'XTR' || rows.length !== 1 || Number(rows[0].amount) !== query_.total_amount || rows[0].telegram_id !== String(query_.from.id)) {
         throw new Error('Invalid invoice payload');
       }
@@ -146,7 +150,10 @@ export function initBot(server) {
       try {
         await client.query('BEGIN');
         const { rows: invoices } = await client.query(
-          `SELECT user_id FROM star_invoices WHERE id = $1 AND telegram_id = $2 AND amount = $3 AND status = 'pending' FOR UPDATE`,
+          `SELECT user_id FROM star_invoices
+           WHERE id = $1 AND telegram_id = $2 AND amount = $3
+             AND status = 'pending' AND expires_at > NOW()
+           FOR UPDATE`,
           [payload.invoiceId, telegramId, starsAmount]
         );
         if (invoices.length !== 1) { await client.query('ROLLBACK'); return; }
