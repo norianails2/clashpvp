@@ -1,7 +1,7 @@
 import pool, { query } from '../src/db/pool.js';
 
 try {
-  const [activeCrashBets, expiredRooms, expiredInvoices] = await Promise.all([
+  const [activeCrashBets, expiredRooms, recentExpiredInvoices, staleExpiredInvoices] = await Promise.all([
     query(`SELECT COUNT(*)::int AS count FROM crash_bets WHERE status = 'active'`),
     query(
       `SELECT COUNT(*)::int AS count
@@ -12,14 +12,23 @@ try {
     query(
       `SELECT COUNT(*)::int AS count
        FROM star_invoices
-       WHERE status = 'pending' AND expires_at <= NOW()`
+       WHERE status = 'pending'
+         AND expires_at <= NOW()
+         AND expires_at >= NOW() - INTERVAL '24 hours'`
+    ),
+    query(
+      `SELECT COUNT(*)::int AS count
+       FROM star_invoices
+       WHERE status = 'pending'
+         AND expires_at < NOW() - INTERVAL '24 hours'`
     ),
   ]);
 
   console.log(JSON.stringify({
     activeCrashBets: activeCrashBets.rows[0].count,
     expiredRooms: expiredRooms.rows[0].count,
-    expiredPendingInvoices: expiredInvoices.rows[0].count,
+    recentExpiredPendingInvoices: recentExpiredInvoices.rows[0].count,
+    staleExpiredPendingInvoices: staleExpiredInvoices.rows[0].count,
   }));
 } finally {
   await pool.end();
