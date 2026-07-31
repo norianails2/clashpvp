@@ -9,12 +9,15 @@ router.use(adminAuth);
 // Dashboard stats
 router.get('/stats', async (req, res, next) => {
   try {
-    const [users, activeRooms, totalGames, totalRake, recentTxs] = await Promise.all([
+    const [users, activeRooms, totalGames, totalRake, recentTxs, activeCrashBets, expiredRooms, staleInvoices] = await Promise.all([
       query(`SELECT COUNT(*)::int AS total, SUM(balance)::bigint AS total_balance FROM users`),
       query(`SELECT COUNT(*)::int AS count FROM rooms WHERE status = 'IN_PROGRESS'`),
       query(`SELECT COUNT(*)::int AS count FROM rooms WHERE status = 'FINISHED'`),
       query(`SELECT COALESCE(SUM(amount)::bigint, 0) AS rake FROM transactions WHERE type = 'win' AND metadata->>'commission' IS NOT NULL`),
       query(`SELECT id, type, amount, user_id, game_type, created_at FROM transactions ORDER BY created_at DESC LIMIT 20`),
+      query(`SELECT COUNT(*)::int AS count FROM crash_bets WHERE status = 'active'`),
+      query(`SELECT COUNT(*)::int AS count FROM rooms WHERE (status = 'WAITING' AND NOW() - updated_at > INTERVAL '15 minutes') OR (status = 'IN_PROGRESS' AND NOW() - updated_at > INTERVAL '30 minutes')`),
+      query(`SELECT COUNT(*)::int AS count FROM star_invoices WHERE status = 'pending' AND expires_at < NOW() - INTERVAL '24 hours'`),
     ]);
 
     res.json({
@@ -24,6 +27,9 @@ router.get('/stats', async (req, res, next) => {
       totalGamesPlayed: totalGames.rows[0]?.count || 0,
       totalRake: totalRake.rows[0]?.rake || 0,
       recentTransactions: recentTxs.rows,
+      activeCrashBets: activeCrashBets.rows[0]?.count || 0,
+      expiredRooms: expiredRooms.rows[0]?.count || 0,
+      stalePendingInvoices: staleInvoices.rows[0]?.count || 0,
     });
   } catch (err) {
     next(err);
