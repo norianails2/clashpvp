@@ -2134,12 +2134,12 @@ function renderSoloBJ(area) {
     var hBtn = document.createElement('button');
     hBtn.id = 'bjHitBtn'; hBtn.className = 'pvp-bj-btn hit';
     hBtn.textContent = '➕ Ещё'; hBtn.style.display = 'none';
-    hBtn.onclick = bjHit;
+    hBtn.onclick = soloBjHit;
     ac.appendChild(hBtn);
     var stBtn = document.createElement('button');
     stBtn.id = 'bjStandBtn'; stBtn.className = 'pvp-bj-btn stand';
     stBtn.textContent = '✋ Хватит'; stBtn.style.display = 'none';
-    stBtn.onclick = bjStand;
+    stBtn.onclick = soloBjStand;
     ac.appendChild(stBtn);
     // Adjust buttons onclick
     document.getElementById('bjAdjMin').onclick = function(){bjAdjBet('min');};
@@ -2170,14 +2170,14 @@ function bjStart() {
         else if (res?.error) showToast('❌ ' + res.error, 'error');
     });
 }
-function bjHit() {
+function soloBjHit() {
     try {
         var st = document.getElementById('bjStatus'); if (st) st.textContent = '⚡ ХИТ...';
         if (typeof socket === 'undefined' || !socket) { if (st) st.textContent = '❌ Нет socket'; return; }
         socket.emit('bj:hit', {}, (res) => { if (typeof bjOnHitResult === 'function') bjOnHitResult(res); });
     } catch(e) { showToast('❌ bjHit: ' + e.message, 'error'); }
 }
-function bjStand() {
+function soloBjStand() {
     try {
         var st = document.getElementById('bjStatus'); if (st) st.textContent = '✋ СТОП...';
         if (typeof socket === 'undefined' || !socket) { if (st) st.textContent = '❌ Нет socket'; return; }
@@ -2193,8 +2193,8 @@ function bjOnStartResult(res) {
     document.getElementById('bjHitBtn').style.display = '';
     document.getElementById('bjStandBtn').style.display = '';
     // Set onclick AFTER buttons are visible
-    document.getElementById('bjHitBtn').onclick = bjHit;
-    document.getElementById('bjStandBtn').onclick = bjStand;
+    document.getElementById('bjHitBtn').onclick = soloBjHit;
+    document.getElementById('bjStandBtn').onclick = soloBjStand;
     document.getElementById('bjStatus').textContent = 'Твой ход';
     updateBJHands(res);
     if (res.gameOver) bjGameOver(res);
