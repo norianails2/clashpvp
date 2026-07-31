@@ -30,8 +30,11 @@ export function createApp() {
   }));
 
   // CORS — allow configured origin only in production
+  const corsOrigins = config.cors.origin
+    ? (config.cors.origin === '*' ? '*' : config.cors.origin.split(',').map(s => s.trim()))
+    : false;
   app.use(cors({
-    origin: config.cors.origin === '*' ? '*' : config.cors.origin.split(',').map(s => s.trim()),
+    origin: corsOrigins,
     credentials: true,
   }));
 

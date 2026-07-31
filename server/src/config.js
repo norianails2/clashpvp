@@ -22,6 +22,6 @@ export const config = {
   },
 
   cors: {
-    origin: process.env.CLIENT_ORIGIN || '*',
+    origin: process.env.CLIENT_ORIGIN || ((process.env.NODE_ENV || 'development') === 'development' ? '*' : ''),
   },
 };
