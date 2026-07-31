@@ -19,6 +19,7 @@ export async function getRoomById(roomId) {
  * Список ожидающих комнат для лобби.
  */
 export async function listWaitingRooms(gameType, limit = 50) {
+  const safeLimit = Number.isSafeInteger(limit) ? Math.min(Math.max(limit, 1), 50) : 50;
   const { rows } = await query(
     `SELECT id, game_type, bet_amount, creator_id,
             created_at
@@ -26,7 +27,7 @@ export async function listWaitingRooms(gameType, limit = 50) {
      WHERE game_type = $1 AND status = 'WAITING'
      ORDER BY created_at ASC
      LIMIT $2`,
-    [gameType, limit]
+    [gameType, safeLimit]
   );
   return rows;
 }
