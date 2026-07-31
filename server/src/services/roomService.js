@@ -72,17 +72,17 @@ export async function createRoom(userId, gameType, betAmount, gameData = null) {
   try {
     await client.query('BEGIN');
 
-    // Auto-cancel any existing waiting rooms for this user and refund bets
-    await client.query(
-      `UPDATE users u SET balance = balance + r.bet_amount
-       FROM rooms r
-       WHERE r.creator_id = $1 AND r.status = 'WAITING' AND u.id = r.creator_id`,
+    // Auto-cancel any existing waiting rooms and record each refund in the audit log.
+    const { rows: waitingRooms } = await client.query(
+      `SELECT id, bet_amount, game_type FROM rooms
+       WHERE creator_id = $1 AND status = 'WAITING'
+       FOR UPDATE`,
       [userId]
     );
-    await client.query(
-      `UPDATE rooms SET status = 'CANCELLED' WHERE creator_id = $1 AND status = 'WAITING'`,
-      [userId]
-    );
+    for (const waitingRoom of waitingRooms) {
+      await refund(userId, waitingRoom.bet_amount, waitingRoom.game_type, waitingRoom.id, client);
+      await client.query(`UPDATE rooms SET status = 'CANCELLED' WHERE id = $1`, [waitingRoom.id]);
+    }
 
     // 1. Списать ставку (внутри SELECT ... FOR UPDATE)
     await holdBet(userId, betAmount, gameType, null, client);
