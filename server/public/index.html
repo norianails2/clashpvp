@@ -72,6 +72,7 @@
         .game-card.c3 { background:#b8751a; }
         .game-card.c4 { background:#b81a5a; }
         .game-card.c5 { background:#1a5a8a; }
+        .game-card.c5 .game-icon { font-family:Georgia,'Times New Roman',serif;font-size:32px;font-weight:700; }
         .game-card.c6 { background:#b84a2a; }
         .game-card.c7 { background:#5a3ac8; }
         .game-card.c8 { background:#b81a2a; }
@@ -640,7 +641,7 @@
         <div class="game-card c2" data-game="dice"><div class="glow"></div><div class="game-icon">🎲</div><div class="game-info"><div class="name">Кости</div><div class="sub">Больше/меньше/ровно</div></div><span class="game-arrow">›</span></div>
         <div class="game-card c3" data-game="coin"><div class="glow"></div><div class="game-icon">🪙</div><div class="game-info"><div class="name">Монетка</div><div class="sub">Орёл или Решка</div></div><span class="game-arrow">›</span></div>
         <div class="game-card c4" data-game="mines"><div class="glow"></div><div class="game-icon">💣</div><div class="game-info"><div class="name">Мины</div><div class="sub">Найди алмазы, избегай бомб</div></div><div class="game-badge new">🔥 НОВОЕ</div><span class="game-arrow">›</span></div>
-        <div class="game-card c5" data-game="blackjack"><div class="glow"></div><div class="game-icon">🃏</div><div class="game-info"><div class="name">Блекджек</div><div class="sub">Собери 21</div></div><span class="game-arrow">›</span></div>
+        <div class="game-card c5" data-game="blackjack"><div class="glow"></div><div class="game-icon">♠</div><div class="game-info"><div class="name">Блекджек</div><div class="sub">Собери 21</div></div><span class="game-arrow">›</span></div>
         <div class="game-card c6" data-game="crash"><div class="glow"></div><div class="game-icon">🚀</div><div class="game-info"><div class="name">Crash</div><div class="sub">Забери до взрыва</div></div><div class="game-badge updated">⚡ ОБНОВЛЕНО</div><span class="game-arrow">›</span></div>
     </div>
 
@@ -850,7 +851,7 @@ const rulesData = {
     dice: {title:'🎲 Кости',body:'Брось кубик (1-6). Кто выбросил больше — тот победил. Совпадение — ничья. Комиссия платформы: 10%.'},
     coin: {title:'🪙 Монетка',body:'Выбери Орла 🦅 или Решку 🪙. Угадал — забираешь ставку x2 минус 10% комиссия. Не угадал — проигрыш.'},
     mines: {title:'💣 Мины',body:'Одиночная игра на поле 5×5. Выбери от 1 до 24 мин, открывай безопасные клетки и забери выигрыш в любой момент. Наткнёшься на мину — ставка сгорает. Комиссия: 10%.'},
-    blackjack: {title:'🃏 Блекджек',body:'Собери 21 или ближе к 21, чем соперник. Карты: 2-10 по номиналу, J/Q/K = 10, A = 11. Hit — ещё карта, Stand — хватит. Перебор >21 — проигрыш. Комиссия: 10%.'},
+    blackjack: {title:'♠ Блекджек',body:'Собери 21 или ближе к 21, чем соперник. Карты: 2-10 по номиналу, J/Q/K = 10, A = 11. Hit — ещё карта, Stand — хватит. Перебор >21 — проигрыш. Комиссия: 10%.'},
     crash: {title:'🚀 Crash',body:'Каждый раунд длится для всех одновременно. За 10 секунд сделай ставку. Множитель растёт с 1.00x — забери деньги ДО взрыва. Не успел — ставка сгорает. Комиссия платформы: 10%. Алгоритм Provably Fair (HMAC-SHA256).'},
 };
 function showRules() { const d = rulesData[currentGameId] || rulesData.rps; document.getElementById('rulesTitle').textContent = d.title; document.getElementById('rulesBody').innerHTML = d.body; document.getElementById('rulesPopup').classList.add('show'); }
@@ -1383,14 +1384,14 @@ function openGame(game) {
     if (game === 'mines') { renderSoloMines(area); return; }
     if (game === 'blackjack') { renderSoloBJ(area); return; }
 
-    const titles = { rps:'✊ Камень-Ножницы-Бумага', dice:'🎲 Кости', coin:'🪙 Монетка', mines:'💣 Мины', blackjack:'🃏 Блекджек' };
+    const titles = { rps:'✊ Камень-Ножницы-Бумага', dice:'🎲 Кости', coin:'🪙 Монетка', mines:'💣 Мины', blackjack:'♠ Блекджек' };
     document.getElementById('gameTitle').textContent = titles[game] || 'Игра';
     const previewHTML = {
         rps: '<div class="pv-icon-wrap"><div class="pv-icon-bg rps"><span class="pv-icon">✊✋✌️</span></div></div><div class="pv-title-text">Камень-Ножницы-Бумага</div><div class="pv-sub-text">Классическая дуэль на ставки. Победи забирает банк!</div>',
         dice: '<div class="pv-icon-wrap"><div class="pv-icon-bg dice"><span class="pv-icon">🎲</span></div></div><div class="pv-title-text">Кости</div><div class="pv-sub-text">Кто выбросит больше очков — тот забирает банк</div>',
         coin: '<div class="pv-icon-wrap"><div class="pv-icon-bg coin"><span class="pv-icon">🪙</span></div></div><div class="pv-title-text">Монетка</div><div class="pv-sub-text">Орёл или Решка? Угадай сторону и удвой ставку</div>',
         mines: '<div class="pv-icon-wrap"><div class="pv-icon-bg mines"><span class="pv-icon">💣</span></div></div><div class="pv-title-text">Мины</div><div class="pv-sub-text">Найди алмазы, избегая бомб. Кто больше — тот победил</div>',
-        blackjack: '<div class="pv-icon-wrap"><div class="pv-icon-bg blackjack"><span class="pv-icon">🃏</span></div></div><div class="pv-title-text">Блекджек</div><div class="pv-sub-text">Собери 21 очко и обыграй соперника</div>'
+        blackjack: '<div class="pv-icon-wrap"><div class="pv-icon-bg blackjack"><span class="pv-icon">♠</span></div></div><div class="pv-title-text">Блекджек</div><div class="pv-sub-text">Собери 21 очко и обыграй соперника</div>'
     };
     area.innerHTML = '<div class="game-preview">' + (previewHTML[game]||'') + '</div><div class="game-lobby" id="gameLobby"></div>';
 
@@ -2110,12 +2111,12 @@ function minesCashout() {
 var _bjState = null; // client-side game state
 
 function renderSoloBJ(area) {
-    document.getElementById('gameTitle').textContent = '🃏 Блекджек';
+    document.getElementById('gameTitle').textContent = '♠ Блекджек';
     area.innerHTML =
         '<div class="bj-solo" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;padding:0 16px;">' +
         '<div class="bj-solo-table" style="width:100%;">' +
-        '<div class="bj-row"><div class="bj-label">🎩 ДИЛЕР <span class="bj-score" id="bjDealerScore">?</span></div><div class="bj-hand" id="bjDealerHand"></div></div>' +
-        '<div class="bj-row"><div class="bj-label">👤 ТЫ <span class="bj-score" id="bjPlayerScore">0</span></div><div class="bj-hand" id="bjPlayerHand"></div></div>' +
+        '<div class="bj-row"><div class="bj-label">ДИЛЕР <span class="bj-score" id="bjDealerScore">?</span></div><div class="bj-hand" id="bjDealerHand"></div></div>' +
+        '<div class="bj-row"><div class="bj-label">ТЫ <span class="bj-score" id="bjPlayerScore">0</span></div><div class="bj-hand" id="bjPlayerHand"></div></div>' +
         '</div>' +
         '<div class="pvc-label" style="margin-top:4px;position:relative;z-index:1;">✦ СТАВКА</div>' +
         '<div class="pvc-row"><div class="pvc-input-wrap"><span class="pvc-star"><i class="tg-s"></i></span>' +
@@ -2129,7 +2130,7 @@ function renderSoloBJ(area) {
     ac.innerHTML = '';
     var sBtn = document.createElement('button');
     sBtn.id = 'bjStartBtn'; sBtn.className = 'c-main-btn';
-    sBtn.textContent = '🃏 СТАРТ';
+    sBtn.textContent = 'НАЧАТЬ';
     sBtn.onclick = bjStart;
     ac.appendChild(sBtn);
     var hBtn = document.createElement('button');
@@ -2235,7 +2236,7 @@ function bjGameOver(res) {
     if (res.draw) document.getElementById('bjStatus').textContent = '🤝 Ничья!';
     else if (res.winnerId === 'dealer' || res.winnerId === null || res.winnerId === undefined) document.getElementById('bjStatus').innerHTML = '−' + (document.getElementById('bjBetInput')?.value || '') + ' <i class="tg-s"></i>';
     else document.getElementById('bjStatus').innerHTML = '+' + (res.payout || 0) + ' <i class="tg-s"></i>';
-    setTimeout(function() { document.getElementById('bjStartBtn').style.display = ''; document.getElementById('bjStartBtn').textContent = '🃏 СТАРТ'; }, 2000);
+    setTimeout(function() { document.getElementById('bjStartBtn').style.display = ''; document.getElementById('bjStartBtn').textContent = 'НАЧАТЬ'; }, 2000);
 }
 function updateBJHands(res) {
     const playerHand = document.getElementById('bjPlayerHand');
