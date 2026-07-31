@@ -84,6 +84,11 @@ async function settleGame(state, userId, socket) {
   let balanceAfter = null;
   try {
     await client.query('BEGIN');
+    const { rows } = await client.query(
+      'SELECT 1 FROM solo_blackjack_games WHERE user_id = $1 FOR UPDATE',
+      [userId]
+    );
+    if (!rows.length) throw new Error('Game already settled');
     if (draw) {
       const result = await payout(userId, state.bet, 'blackjack', null, client, 0);
       payoutAmount = state.bet;

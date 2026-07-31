@@ -113,7 +113,7 @@ export function initSocket(httpServer) {
     registerCrashHandlers(io, socket);
 
     // Add balance (dev & test)
-    socket.on('balance:add', async (payload, ack) => {
+    if (config.isDev) socket.on('balance:add', async (payload, ack) => {
       const amount = payload?.amount || 1000;
       try {
         const { rows } = await query(
@@ -140,6 +140,7 @@ export function initSocket(httpServer) {
 
     // Stars purchase (from Telegram.WebApp.purchaseStars or dev simulation)
     socket.on('stars:purchase', async (payload, ack) => {
+      if (!config.isDev) return ack?.({ error: 'Direct balance credits are disabled' });
       const amount = payload?.amount || 0;
       if (amount <= 0 || !Number.isInteger(amount)) {
         return ack?.({ error: 'Invalid amount' });
@@ -204,6 +205,7 @@ export function initSocket(httpServer) {
 
     // Withdraw Stars (user pays invoice, bot refunds instantly)
     socket.on('stars:withdraw', async (payload, ack) => {
+      if (!config.isDev) return ack?.({ error: 'Withdrawals are not available' });
       const amount = payload?.amount || 0;
       if (amount <= 0 || !Number.isInteger(amount)) return ack?.({ error: 'Invalid amount' });
       try {

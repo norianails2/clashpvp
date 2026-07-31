@@ -112,7 +112,10 @@ export function initBot(server) {
   // Handle Telegram Stars payments via invoice
   bot.on('pre_checkout_query', async (query_) => {
     try {
-      // Verify payload — ensure the amount matches
+      const payload = JSON.parse(query_.invoice_payload || '{}');
+      if (query_.currency !== 'XTR' || !Number.isInteger(payload.amount) || payload.amount !== query_.total_amount || !payload.userId) {
+        throw new Error('Invalid invoice payload');
+      }
       await bot.answerPreCheckoutQuery(query_.id, true);
     } catch (err) {
       console.error('[telegramBot] pre_checkout_query error:', err);
@@ -128,31 +131,15 @@ export function initBot(server) {
       let payload = {};
       try {
         payload = JSON.parse(payment.invoice_payload);
-        starsAmount = payload.amount || starsAmount;
+        if (payload.amount && payload.amount !== starsAmount) throw new Error('Invoice amount mismatch');
       } catch {}
 
-      // Withdrawal flow: user paid invoice, refund instantly and deduct balance
+      // Old withdrawal invoices are refunded without changing the game balance.
       if (payload.action === 'withdraw' && payload.telegramId) {
-        // Refund the payment (send Stars back to user)
         try {
           await bot.refundStarPayment(Number(payload.telegramId), payment.telegram_payment_charge_id);
         } catch (refundErr) {
           console.error('[telegramBot] refund failed:', refundErr.message);
-        }
-        // Deduct from balance in DB
-        const { rows } = await query(
-          `UPDATE users SET balance = GREATEST(balance - $1, 0) WHERE id = $2 AND balance >= $1 RETURNING id, balance`,
-          [starsAmount, payload.userId]
-        );
-        if (rows.length > 0) {
-          const user = rows[0];
-          await query(
-            `INSERT INTO transactions (user_id, type, amount, balance_before, balance_after, metadata)
-             VALUES ($1, 'withdraw', $2, $3, $4, $5)`,
-            [user.id, starsAmount, Number(user.balance) + starsAmount, Number(user.balance),
-             JSON.stringify({ telegramPayment: true, refund: true, chargeId: payment.telegram_payment_charge_id })]
-          );
-          console.log(`[telegramBot] Withdrawal: user=${user.id} amount=${starsAmount} new_balance=${user.balance}`);
         }
         return;
       }

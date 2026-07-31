@@ -10,7 +10,7 @@ export async function verifyConnection(socket, next) {
   try {
     const raw = socket.handshake.query?.initData;
     // Dev bypass — allow test users when no initData
-    if (!raw) {
+    if (!raw && config.isDev) {
       const testUser = socket.handshake.query?.testUser;
       const telegramId = testUser || 'dev_user_1';
       try {
@@ -29,7 +29,7 @@ export async function verifyConnection(socket, next) {
       }
     }
 
-    if (!raw) return next(new Error('Missing initData'));
+    if (!raw) return next(new Error('Missing Telegram initData'));
 
     // Parse with URLSearchParams (matches Telegram's official algorithm)
     const sp = new URLSearchParams(raw);
