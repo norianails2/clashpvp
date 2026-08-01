@@ -2305,7 +2305,8 @@ function updateRoulette(state) {
     fair.textContent = state.serverSeed ? 'ПРОВЕРИТЬ РАУНД' : 'PROVABLY FAIR: ' + (state.serverSeedHash || '').slice(0, 24) + '...';
     fair.onclick = state.serverSeed ? verifyRouletteFair : null;
     timer.textContent = state.phase === 'betting' ? state.countdown : state.phase === 'spinning' ? '...' : state.result ? state.result.number : '--';
-    document.getElementById('rouletteTimerLabel').textContent = state.phase === 'betting' ? 'СЕК ДО СТАРТА' : state.phase === 'spinning' ? 'КРУТИМ' : 'ВЫПАЛО';
+    const resultLabel = { red: 'КРАСНОЕ', black: 'ЧЁРНОЕ', green: 'ZERO' };
+    document.getElementById('rouletteTimerLabel').textContent = state.phase === 'betting' ? 'СЕК ДО СТАРТА' : state.phase === 'spinning' ? 'КРУТИМ' : state.result ? 'ВЫПАЛО: ' + resultLabel[state.result.color] : 'ОЖИДАНИЕ';
     timer.className = state.phase === 'settled' && state.result ? state.result.color : state.phase === 'spinning' ? 'spinning' : (state.phase === 'betting' && state.countdown <= 5 ? 'urgent' : '');
     document.querySelector('.roulette-stage').className = 'roulette-stage' + (state.phase === 'spinning' ? ' spinning' : '') + (state.phase === 'settled' && state.result ? ' result-' + state.result.color : '');
     const status = document.getElementById('rouletteStatus');
