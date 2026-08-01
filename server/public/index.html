@@ -2599,6 +2599,10 @@ function connectSocket(initData) {
     });
 
     socket.on('roulette:state', (state) => updateRoulette(state));
+    socket.on('roulette:result', (result) => {
+        if (result?.won) showToast('Рулетка: выигрыш ' + result.payout + ' Stars', 'success');
+        else showToast('Рулетка: ставка ' + result.bet + ' не сыграла', 'error');
+    });
 
     // --- RPS ---
     socket.on('rps:game_started', (data) => {

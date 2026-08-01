@@ -150,6 +150,14 @@ class RouletteEngine {
       if (update.rowCount !== 1) throw new Error('Bet is already settled');
       await client.query('COMMIT');
       if (balanceAfter !== null) this.io?.to(`user:${bet.userId}`).emit('balance:update', { balance: balanceAfter });
+      this.io?.to(`user:${bet.userId}`).emit('roulette:result', {
+        round: this.round,
+        won,
+        payout: payoutAmount,
+        bet: bet.amount,
+        result: this.result,
+      });
+      return { userId: bet.userId, won, payout: payoutAmount };
     } catch (err) { await client.query('ROLLBACK'); throw err; } finally { client.release(); }
   }
 
