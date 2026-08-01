@@ -32,6 +32,7 @@ class RouletteEngine {
       phase: this.phase,
       countdown: this.countdown,
       result: this.phase === 'settled' ? this.result : null,
+      spinResult: this.phase === 'spinning' ? this.result : null,
       serverSeedHash: this.serverSeedHash,
       clientSeed: this.clientSeed,
       nonce: this.round,
@@ -101,6 +102,7 @@ class RouletteEngine {
     if (this.phase !== 'betting') return;
     clearInterval(this.timer);
     this.phase = 'spinning';
+    this.result = spinRoulette(this.serverSeed, this.clientSeed, this.round);
     this.countdown = SPINNING_SECONDS;
     this.broadcast();
     this.timer = setInterval(() => {
@@ -115,7 +117,6 @@ class RouletteEngine {
     this.pendingSettlements++;
     try {
       clearInterval(this.timer);
-      this.result = spinRoulette(this.serverSeed, this.clientSeed, this.round);
       const settled = await Promise.allSettled(this.bets.map(bet => this.settleBet(bet)));
       const failedBets = settled.flatMap((entry, index) => entry.status === 'rejected' ? [this.bets[index]] : []);
       if (failedBets.length) {
