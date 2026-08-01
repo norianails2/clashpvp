@@ -27,5 +27,5 @@ export function isValidColor(color) {
 }
 
 export function getMultiplier(color) {
-  return color === 'green' ? 36 : 2;
+  return color === 'green' ? 14 : 2;
 }

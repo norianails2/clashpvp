@@ -83,7 +83,7 @@ test('roulette accepts only board colors and keeps correct payouts', () => {
   assert.equal(isValidColor('blue'), false);
   assert.equal(getMultiplier('red'), 2);
   assert.equal(getMultiplier('black'), 2);
-  assert.equal(getMultiplier('green'), 36);
+  assert.equal(getMultiplier('green'), 14);
   const spin = spinRoulette();
   assert.ok(Number.isInteger(spin.number) && spin.number >= 0 && spin.number <= 36);
   assert.ok(isValidColor(spin.color));
