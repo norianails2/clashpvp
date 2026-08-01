@@ -17,6 +17,8 @@ class RouletteEngine {
     this.history = [];
     this.timer = null;
     this.pendingBets = new Set();
+    this.pendingSettlements = 0;
+    this.shuttingDown = false;
   }
 
   setIO(io) { this.io = io; }
@@ -57,7 +59,7 @@ class RouletteEngine {
   async start() { await this.restore(); await this.startBetting(); }
 
   async startBetting() {
-    if (this.phase === 'stopped') return;
+    if (this.phase === 'stopped' || this.shuttingDown) return;
     clearInterval(this.timer);
     this.round += 1;
     this.phase = 'betting';
@@ -88,20 +90,23 @@ class RouletteEngine {
 
   async settle() {
     if (this.phase !== 'spinning') return;
-    clearInterval(this.timer);
-    this.result = spinRoulette();
-    const settled = await Promise.allSettled(this.bets.map(bet => this.settleBet(bet)));
-    const failed = settled.filter(entry => entry.status === 'rejected');
-    if (failed.length) console.error(`[roulette] ${failed.length} bet settlement(s) failed`);
-    await query(
-      "UPDATE roulette_rounds SET status = 'settled', result_number = $2, result_color = $3, settled_at = NOW() WHERE round_number = $1",
-      [this.round, this.result.number, this.result.color]
-    );
-    this.phase = 'settled';
-    this.history.unshift(this.result);
-    this.history = this.history.slice(0, 12);
-    this.broadcast();
-    setTimeout(() => void this.startBetting().catch(err => console.error('[roulette] new round failed:', err.message)), RESULT_SECONDS * 1000);
+    this.pendingSettlements++;
+    try {
+      clearInterval(this.timer);
+      this.result = spinRoulette();
+      const settled = await Promise.allSettled(this.bets.map(bet => this.settleBet(bet)));
+      const failed = settled.filter(entry => entry.status === 'rejected');
+      if (failed.length) console.error(`[roulette] ${failed.length} bet settlement(s) failed`);
+      await query(
+        "UPDATE roulette_rounds SET status = 'settled', result_number = $2, result_color = $3, settled_at = NOW() WHERE round_number = $1",
+        [this.round, this.result.number, this.result.color]
+      );
+      this.phase = 'settled';
+      this.history.unshift(this.result);
+      this.history = this.history.slice(0, 12);
+      this.broadcast();
+      setTimeout(() => void this.startBetting().catch(err => console.error('[roulette] new round failed:', err.message)), RESULT_SECONDS * 1000);
+    } finally { this.pendingSettlements--; }
   }
 
   async settleBet(bet) {
@@ -126,6 +131,7 @@ class RouletteEngine {
   }
 
   async placeBet(userId, username, amount, color) {
+    if (this.shuttingDown) return { error: 'Game is restarting' };
     if (this.phase !== 'betting') return { error: 'Betting is closed' };
     if (!Number.isSafeInteger(amount) || amount < MIN_BET || amount > MAX_BET) return { error: `Bet must be between ${MIN_BET} and ${MAX_BET}` };
     if (!isValidColor(color)) return { error: 'Invalid roulette color' };
@@ -183,11 +189,12 @@ class RouletteEngine {
 
   async stopForShutdown() {
     clearInterval(this.timer);
-    this.phase = 'stopped';
+    this.shuttingDown = true;
     const deadline = Date.now() + 8000;
-    while (this.pendingBets.size > 0 && Date.now() < deadline) {
+    while ((this.pendingBets.size > 0 || this.pendingSettlements > 0) && Date.now() < deadline) {
       await new Promise(resolve => setTimeout(resolve, 50));
     }
+    this.phase = 'stopped';
     const active = [...this.bets];
     const refunds = await Promise.allSettled(active.map(bet => this.refundBet(bet)));
     const failed = refunds.filter(result => result.status === 'rejected').length;
