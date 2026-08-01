@@ -108,7 +108,7 @@
         .game-header .back:active { transform:scale(0.92); }
         .game-header h2 { font-family:'Fredoka',sans-serif;font-size:20px;font-weight:800;color:#fff;flex:1; }
         .game-header .balance { font-family:'Fredoka',sans-serif;font-size:15px;font-weight:700;color:#fbbf24;padding:6px 14px;border-radius:9999px;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.15);transition:all 0.2s; }
-        .game-header .balance .tg-s { margin-left:4px; }
+        .game-header .balance .tg-s { margin-right:4px; }
         .game-header .balance:hover { background:rgba(251,191,36,0.15);border-color:rgba(251,191,36,0.3); }
         .game-header .rules-btn { font-size:16px;color:rgba(255,255,255,0.3);cursor:pointer;padding:6px;border-radius:8px;transition:all 0.15s; }
         .game-header .rules-btn:hover { color:#fff;background:rgba(255,255,255,0.05); }
@@ -725,7 +725,7 @@
         <div class="game-header">
             <span class="back" onclick="closeGame()">←</span>
             <h2 id="gameTitle">Игра</h2>
-                    <span class="balance" id="balance">0<i class="tg-s"></i></span>
+                    <span class="balance" id="balance"><i class="tg-s"></i>0</span>
             <span class="rules-btn" onclick="showRules()">📖</span>
         </div>
         <div class="game-area" id="gameArea"></div>
@@ -815,7 +815,7 @@ function updateBalance() {
     const amt = balance;
     document.getElementById('balanceAmount').textContent = amt.toFixed(0);
     const bl = document.getElementById('balance');
-    if (bl) bl.innerHTML = amt.toFixed(0) + '<i class="tg-s"></i>';
+    if (bl) bl.innerHTML = '<i class="tg-s"></i>' + amt.toFixed(0);
     document.getElementById('balanceCurrency').textContent = 'Stars';
 }
 
