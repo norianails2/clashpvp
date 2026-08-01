@@ -2262,7 +2262,7 @@ function setRouletteUnavailable(message) {
     const timer = document.getElementById('rouletteTimer');
     if (timer) timer.textContent = '--';
     const label = document.getElementById('rouletteTimerLabel');
-    if (label) label.textContent = 'OFFLINE';
+    if (label) label.textContent = 'НЕТ СВЯЗИ';
     const button = document.getElementById('rouletteSpin');
     if (button) { button.disabled = true; button.textContent = 'НЕТ СОЕДИНЕНИЯ'; }
     document.getElementById('rouletteBet').disabled = true;
