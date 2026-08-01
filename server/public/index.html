@@ -2272,9 +2272,9 @@ function updateRoulette(state) {
     const status = document.getElementById('rouletteStatus');
     if (state.phase === 'settled' && state.result) {
         const won = mine && state.bets.find(bet => bet.userId === myUserId).color === state.result.color;
-        if (window._rouletteHapticResult !== state.round) {
+        if (mine && window._rouletteHapticResult !== state.round) {
             window._rouletteHapticResult = state.round;
-            rouletteHaptic(mine ? (won ? 'success' : 'error') : 'warning');
+            rouletteHaptic(won ? 'success' : 'error');
         }
         status.textContent = won ? 'Ваша ставка сыграла' : 'Выпало ' + state.result.number;
     } else if (state.phase === 'spinning') {
