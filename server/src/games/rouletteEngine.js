@@ -117,8 +117,13 @@ class RouletteEngine {
       clearInterval(this.timer);
       this.result = spinRoulette(this.serverSeed, this.clientSeed, this.round);
       const settled = await Promise.allSettled(this.bets.map(bet => this.settleBet(bet)));
-      const failed = settled.filter(entry => entry.status === 'rejected');
-      if (failed.length) console.error(`[roulette] ${failed.length} bet settlement(s) failed`);
+      const failedBets = settled.flatMap((entry, index) => entry.status === 'rejected' ? [this.bets[index]] : []);
+      if (failedBets.length) {
+        console.error(`[roulette] ${failedBets.length} bet settlement(s) failed; refunding affected bets`);
+        const refunds = await Promise.allSettled(failedBets.map(bet => this.refundBet(bet, true)));
+        const failedRefunds = refunds.filter(entry => entry.status === 'rejected').length;
+        if (failedRefunds) console.error(`[roulette] ${failedRefunds} settlement refund(s) failed`);
+      }
       await query(
         "UPDATE roulette_rounds SET status = 'settled', result_number = $2, result_color = $3, settled_at = NOW() WHERE round_number = $1",
         [this.round, this.result.number, this.result.color]
@@ -233,7 +238,7 @@ class RouletteEngine {
     return { refunded: active.length - failed };
   }
 
-  async refundBet(bet) {
+  async refundBet(bet, notifyPlayer = false) {
     const client = await getClient();
     try {
       await client.query('BEGIN');
@@ -241,8 +246,13 @@ class RouletteEngine {
         "UPDATE roulette_bets SET status = 'refunded', settled_at = NOW() WHERE round_number = $1 AND user_id = $2 AND status = 'active' RETURNING amount",
         [this.round, bet.userId]
       );
-      if (updated.rowCount) await refund(bet.userId, Number(updated.rows[0].amount), 'roulette', null, client);
+      let balanceAfter = null;
+      if (updated.rowCount) ({ balanceAfter } = await refund(bet.userId, Number(updated.rows[0].amount), 'roulette', null, client));
       await client.query('COMMIT');
+      if (balanceAfter !== null) this.io?.to(`user:${bet.userId}`).emit('balance:update', { balance: balanceAfter });
+      if (notifyPlayer && balanceAfter !== null) {
+        this.io?.to(`user:${bet.userId}`).emit('roulette:result', { round: this.round, refunded: true, bet: bet.amount });
+      }
     } catch (err) { await client.query('ROLLBACK'); throw err; } finally { client.release(); }
   }
 }
