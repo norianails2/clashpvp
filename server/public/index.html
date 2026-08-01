@@ -2261,7 +2261,7 @@ function updateRoulette(state) {
     const button = document.getElementById('rouletteSpin');
     button.disabled = state.phase !== 'betting';
     button.textContent = mine ? 'ОТМЕНИТЬ СТАВКУ' : state.phase === 'betting' ? 'ПОСТАВИТЬ' : 'СТАВКИ ЗАКРЫТЫ';
-    const history = state.phase === 'settled' && state.result ? [state.result, ...state.history] : state.history;
+    const history = state.history || [];
     const historyEl = document.getElementById('rouletteHistory');
     historyEl.classList.toggle('spinning', state.phase === 'spinning');
     historyEl.innerHTML = history.slice(0, 12).map((item, index) => '<span class="' + item.color + (state.phase === 'settled' && index === 0 ? ' latest' : '') + '">' + item.number + '</span>').join('');
