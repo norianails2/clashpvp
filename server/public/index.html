@@ -2582,7 +2582,10 @@ function connectSocket(initData) {
 
     socket.on('connect_error', (err) => {
         console.error('Socket error:', err.message);
-        showToast('⚠️ Ошибка: ' + err.message, 'error');
+        const message = err.message === 'Missing Telegram initData'
+            ? 'Откройте Clash PVP через Telegram'
+            : 'Ошибка подключения: ' + err.message;
+        showToast(message, 'error');
     });
 
     socket.on('balance:update', (data) => {
