@@ -16,6 +16,7 @@ class RouletteEngine {
     this.result = null;
     this.bets = [];
     this.history = [];
+    this.stats = { red: 0, green: 0, black: 0 };
     this.timer = null;
     this.pendingBets = new Set();
     this.pendingSettlements = 0;
@@ -36,6 +37,7 @@ class RouletteEngine {
       nonce: this.round,
       serverSeed: this.phase === 'settled' ? this.serverSeed : null,
       history: this.history,
+      stats: this.stats,
       bets: this.bets.map(({ userId, username, amount, color }) => ({ userId, username, amount, color })),
     };
   }
@@ -58,11 +60,20 @@ class RouletteEngine {
     }
     const { rows: rounds } = await query("SELECT round_number, result_number, result_color FROM roulette_rounds WHERE status = 'settled' ORDER BY round_number DESC LIMIT 12");
     this.history = rounds.map(row => ({ number: row.result_number, color: row.result_color }));
+    await this.refreshStats();
     const { rows: latest } = await query('SELECT COALESCE(MAX(round_number), 0) AS round FROM roulette_rounds');
     this.round = Number(latest[0].round);
   }
 
   async start() { await this.restore(); await this.startBetting(); }
+
+  async refreshStats() {
+    const { rows } = await query(
+      "SELECT result_color, COUNT(*)::int AS count FROM (SELECT result_color FROM roulette_rounds WHERE status = 'settled' ORDER BY round_number DESC LIMIT 100) recent GROUP BY result_color"
+    );
+    this.stats = { red: 0, green: 0, black: 0 };
+    for (const row of rows) this.stats[row.result_color] = Number(row.count);
+  }
 
   async startBetting() {
     if (this.phase === 'stopped' || this.shuttingDown) return;
@@ -112,6 +123,7 @@ class RouletteEngine {
         "UPDATE roulette_rounds SET status = 'settled', result_number = $2, result_color = $3, settled_at = NOW() WHERE round_number = $1",
         [this.round, this.result.number, this.result.color]
       );
+      await this.refreshStats();
       this.phase = 'settled';
       this.history.unshift(this.result);
       this.history = this.history.slice(0, 12);
