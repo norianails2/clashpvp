@@ -617,6 +617,7 @@
         .roulette-columns { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px; }.roulette-column { min-width:0;padding:5px;border:1px solid rgba(139,92,246,.1);border-radius:12px;background:rgba(255,255,255,.025);transition:border-color .2s,box-shadow .2s; }.roulette-color { width:100%;min-height:56px;border:0;border-radius:9px;color:#fff;font:800 12px 'Fredoka',sans-serif;cursor:pointer;box-shadow:inset 0 -4px rgba(0,0,0,.13);transition:transform .15s,filter .15s,box-shadow .15s; }.roulette-color:hover:not(:disabled) { filter:brightness(1.08);transform:translateY(-1px); }.roulette-color:active:not(:disabled) { transform:scale(.97); }.roulette-color:disabled { cursor:default;filter:saturate(.55);opacity:.55; }.roulette-color small { display:block;margin-top:2px;font-size:9px;opacity:.82; }.roulette-color.red { background:linear-gradient(135deg,#c24154,#e35d71); }.roulette-color.black { background:linear-gradient(135deg,#3d4450,#687384); }.roulette-color.green { background:linear-gradient(135deg,#238a5d,#43b881); }.roulette-color.active { outline:2px solid #a78bfa;outline-offset:2px;box-shadow:inset 0 -4px rgba(0,0,0,.13),0 0 14px rgba(167,139,250,.25); }
         .roulette-column-label { display:flex;justify-content:space-between;gap:3px;margin:8px 1px 5px;color:rgba(167,139,250,.5);font-size:8px;font-weight:800;letter-spacing:.35px; }.roulette-column-label span { display:inline-flex;align-items:center;gap:3px;min-width:0;white-space:nowrap; }.roulette-column-label b { color:#e5e7eb;font-weight:800; }.roulette-column-total { color:#fff!important;letter-spacing:0!important; }.roulette-column-total .tg-s { transform:scale(.72);transform-origin:center; }.roulette-column.winner { border-color:rgba(167,139,246,.6);box-shadow:0 0 16px rgba(139,92,246,.16); }
         .roulette-bets { display:flex;flex-direction:column;gap:4px;min-height:40px;max-height:108px;overflow-y:auto;padding-right:2px;scrollbar-width:thin;scrollbar-color:rgba(167,139,250,.35) transparent; }.roulette-bets::-webkit-scrollbar { width:3px; }.roulette-bets::-webkit-scrollbar-thumb { border-radius:999px;background:rgba(167,139,250,.35); }.roulette-bet { display:flex;align-items:center;gap:5px;min-width:0;padding:5px;border-radius:6px;background:rgba(255,255,255,.045);font-size:9px;color:rgba(255,255,255,.75); }.roulette-bet span { overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1; }.roulette-bet b { color:#fff; }.roulette-avatar { width:18px;height:18px;flex:0 0 18px;border-radius:5px;display:grid;place-items:center;color:#fff;font:800 9px 'Fredoka',sans-serif; }.roulette-avatar.red { background:#c24154; }.roulette-avatar.black { background:#5b6575; }.roulette-avatar.green { background:#319d6d; }.roulette-bet.me { box-shadow:inset 0 0 0 1px rgba(167,139,250,.85); }.roulette-empty { color:rgba(255,255,255,.2);font-size:9px;padding:7px 1px; }
+        .roulette-preview { min-height:15px;text-align:center;color:rgba(255,255,255,.42);font:800 9px 'Fredoka',sans-serif;letter-spacing:.7px;text-transform:uppercase; }.roulette-preview b { margin-left:4px;color:#c4b5fd;font-size:11px;letter-spacing:0; }.roulette-preview .tg-s { margin-left:3px;transform:scale(.72);transform-origin:center; }
         .roulette-spin { width:100%;min-height:43px;border:0;border-radius:999px;background:linear-gradient(135deg,#b84a2a,#d97706);color:#fff;font:800 12px 'Fredoka',sans-serif;letter-spacing:1px;cursor:pointer;box-shadow:0 6px 22px rgba(184,74,42,.32);transition:transform .2s,box-shadow .2s; }.roulette-spin:hover:not(:disabled) { transform:translateY(-1px);box-shadow:0 8px 26px rgba(184,74,42,.42); }.roulette-spin:active:not(:disabled) { transform:scale(.97); }.roulette-spin:disabled { opacity:.45;cursor:default; }
         .roulette-footer { display:flex;flex-direction:column;gap:6px;padding:0 3px; }.roulette-stats { display:flex;align-items:center;justify-content:center;gap:9px;color:rgba(167,139,250,.42);font-size:9px;font-weight:800;letter-spacing:.45px; }.roulette-stats span { display:inline-flex;align-items:center;gap:4px; }.roulette-stats i { width:8px;height:8px;border-radius:2px; }.roulette-stats .red { background:#e35d71; }.roulette-stats .green { background:#43b881; }.roulette-stats .black { background:#7b8594; }.roulette-fair { width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;border:0;background:transparent;padding:0;text-align:center;color:rgba(255,255,255,.22);font:700 8px monospace;letter-spacing:.2px; }.roulette-fair.ready { color:#c4b5fd;cursor:pointer; }
         @media (max-width:380px) { .roulette-game { padding-left:9px;padding-right:9px; }.roulette-color { font-size:12px; }.roulette-column-label { font-size:9px; }.roulette-bet { font-size:9px;padding:6px 4px; } }
@@ -2240,11 +2241,16 @@ function renderRoulette(area) {
     rouletteStage.insertAdjacentHTML('beforeend', '<small id="rouletteTimerLabel">ОЖИДАНИЕ</small>');
     rouletteCountdown.remove();
     rouletteTop.insertAdjacentElement('afterend', rouletteStage);
+    const rouletteSpin = document.getElementById('rouletteSpin');
+    rouletteSpin.insertAdjacentHTML('beforebegin', '<div class="roulette-preview" id="roulettePreview"></div>');
     area.querySelectorAll('.roulette-color').forEach(button => button.onclick = () => {
         rouletteColor = button.dataset.color;
         area.querySelectorAll('.roulette-color').forEach(item => item.classList.toggle('active', item === button));
+        updateRoulettePreview();
     });
-    document.getElementById('rouletteSpin').onclick = placeRouletteBet;
+    document.getElementById('rouletteBet').addEventListener('input', updateRoulettePreview);
+    rouletteSpin.onclick = placeRouletteBet;
+    updateRoulettePreview();
     socket?.emit('roulette:join');
     if (window._rouletteState) updateRoulette(window._rouletteState);
 }
@@ -2265,8 +2271,10 @@ function setRouletteUnavailable(message) {
 
 function rouletteEscape(value) { const node = document.createElement('span'); node.textContent = value || 'Player'; return node.innerHTML; }
 function rouletteInitial(value) { return rouletteEscape(String(value || 'P').trim().slice(0, 1).toUpperCase()); }
-function rouletteAdjust(multiplier, max) { const input = document.getElementById('rouletteBet'); if (!input) return; input.value = max ? Math.max(1, Math.floor(balance || 1)) : Math.max(1, Math.floor((Number(input.value) || 1) * multiplier)); }
-function rouletteSetMinimum() { const input = document.getElementById('rouletteBet'); if (input) input.value = 1; }
+function rouletteMultiplier(color) { return color === 'green' ? 14 : 2; }
+function updateRoulettePreview() { const preview = document.getElementById('roulettePreview'); const input = document.getElementById('rouletteBet'); if (!preview || !input) return; const amount = Math.max(0, Math.floor(Number(input.value) || 0)); preview.innerHTML = 'ПРИ ВЫИГРЫШЕ:<b>' + (amount * rouletteMultiplier(rouletteColor)) + '</b><i class="tg-s"></i>'; }
+function rouletteAdjust(multiplier, max) { const input = document.getElementById('rouletteBet'); if (!input) return; input.value = max ? Math.max(1, Math.floor(balance || 1)) : Math.max(1, Math.floor((Number(input.value) || 1) * multiplier)); updateRoulettePreview(); }
+function rouletteSetMinimum() { const input = document.getElementById('rouletteBet'); if (input) { input.value = 1; updateRoulettePreview(); } }
 function rouletteHaptic(kind) {
     try {
         const haptic = window.Telegram?.WebApp?.HapticFeedback;
