@@ -2317,7 +2317,7 @@ function updateRoulette(state) {
     } else { status.textContent = mine ? 'Ставка принята' : 'Приём ставок открыт'; }
     const button = document.getElementById('rouletteSpin');
     button.disabled = state.phase !== 'betting';
-    button.textContent = mine ? 'ОТМЕНИТЬ СТАВКУ' : state.phase === 'betting' ? 'ПОСТАВИТЬ' : 'СТАВКИ ЗАКРЫТЫ';
+    button.textContent = state.phase === 'betting' ? (mine ? 'ОТМЕНИТЬ СТАВКУ' : 'ПОСТАВИТЬ') : 'СТАВКИ ЗАКРЫТЫ';
     const canEditBet = state.phase === 'betting' && !mine;
     document.getElementById('rouletteBet').disabled = !canEditBet;
     document.querySelectorAll('.roulette-adjust button, .roulette-color').forEach(control => { control.disabled = !canEditBet; });
