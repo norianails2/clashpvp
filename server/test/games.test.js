@@ -80,3 +80,10 @@ test('roulette accepts only board colors and keeps correct payouts', () => {
   assert.ok(Number.isInteger(spin.number) && spin.number >= 0 && spin.number <= 36);
   assert.ok(isValidColor(spin.color));
 });
+
+test('roulette seed result is deterministic and stays on the board', () => {
+  const first = spinRoulette('server-seed', 'client-seed', 42);
+  assert.deepEqual(spinRoulette('server-seed', 'client-seed', 42), first);
+  assert.ok(first.number >= 0 && first.number <= 36);
+  assert.ok(isValidColor(first.color));
+});

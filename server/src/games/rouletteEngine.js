@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { getClient, query } from '../db/pool.js';
 import { holdBet, payout, refund } from '../services/balanceService.js';
 import { MAX_BET, MIN_BET, getMultiplier, isValidColor, spinRoulette } from './roulette.js';
@@ -19,6 +20,7 @@ class RouletteEngine {
     this.pendingBets = new Set();
     this.pendingSettlements = 0;
     this.shuttingDown = false;
+    this.clientSeed = crypto.randomBytes(16).toString('hex');
   }
 
   setIO(io) { this.io = io; }
@@ -29,6 +31,10 @@ class RouletteEngine {
       phase: this.phase,
       countdown: this.countdown,
       result: this.phase === 'settled' ? this.result : null,
+      serverSeedHash: this.serverSeedHash,
+      clientSeed: this.clientSeed,
+      nonce: this.round,
+      serverSeed: this.phase === 'settled' ? this.serverSeed : null,
       history: this.history,
       bets: this.bets.map(({ userId, username, amount, color }) => ({ userId, username, amount, color })),
     };
@@ -66,7 +72,12 @@ class RouletteEngine {
     this.countdown = BETTING_SECONDS;
     this.result = null;
     this.bets = [];
-    await query("INSERT INTO roulette_rounds (round_number, status) VALUES ($1, 'betting')", [this.round]);
+    this.serverSeed = crypto.randomBytes(32).toString('hex');
+    this.serverSeedHash = crypto.createHash('sha256').update(this.serverSeed).digest('hex');
+    await query(
+      "INSERT INTO roulette_rounds (round_number, status, server_seed_hash, server_seed, client_seed, nonce) VALUES ($1, 'betting', $2, $3, $4, $5)",
+      [this.round, this.serverSeedHash, this.serverSeed, this.clientSeed, this.round]
+    );
     this.broadcast();
     this.timer = setInterval(() => {
       this.countdown -= 1;
@@ -93,7 +104,7 @@ class RouletteEngine {
     this.pendingSettlements++;
     try {
       clearInterval(this.timer);
-      this.result = spinRoulette();
+      this.result = spinRoulette(this.serverSeed, this.clientSeed, this.round);
       const settled = await Promise.allSettled(this.bets.map(bet => this.settleBet(bet)));
       const failed = settled.filter(entry => entry.status === 'rejected');
       if (failed.length) console.error(`[roulette] ${failed.length} bet settlement(s) failed`);
