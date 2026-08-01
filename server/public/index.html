@@ -2248,14 +2248,19 @@ function updateRoulette(state) {
         status.textContent = 'Ставки закрыты, определяем результат';
     } else { status.textContent = mine ? 'Ставка принята' : 'Приём ставок открыт'; }
     const button = document.getElementById('rouletteSpin');
-    button.disabled = state.phase !== 'betting' || mine;
-    button.textContent = mine ? 'СТАВКА ПРИНЯТА' : state.phase === 'betting' ? 'ПОСТАВИТЬ' : 'СТАВКИ ЗАКРЫТЫ';
+    button.disabled = state.phase !== 'betting';
+    button.textContent = mine ? 'ОТМЕНИТЬ СТАВКУ' : state.phase === 'betting' ? 'ПОСТАВИТЬ' : 'СТАВКИ ЗАКРЫТЫ';
     const history = state.phase === 'settled' && state.result ? [state.result, ...state.history] : state.history;
     document.getElementById('rouletteHistory').innerHTML = history.slice(0, 12).map(item => '<span class="' + item.color + '">' + item.number + '</span>').join('');
     ['red', 'green', 'black'].forEach(color => { const bets = state.bets.filter(bet => bet.color === color); const prefix = 'roulette' + color[0].toUpperCase() + color.slice(1); document.getElementById(prefix + 'Total').textContent = bets.reduce((sum, bet) => sum + bet.amount, 0); document.getElementById(prefix + 'Bets').innerHTML = bets.length ? bets.map(bet => '<div class="roulette-bet' + (bet.userId === myUserId ? ' me' : '') + '"><i class="roulette-chip ' + color + '"></i><span>' + rouletteEscape(bet.userId === myUserId ? 'Вы' : bet.username) + '</span><b>' + bet.amount + '</b></div>').join('') : '<div class="roulette-empty">Нет ставок</div>'; document.getElementById(prefix + 'Bets').closest('.roulette-column').classList.toggle('winner', state.phase === 'settled' && state.result?.color === color); });
 }
 
 function placeRouletteBet() {
+    if (window._rouletteState?.bets?.some(bet => bet.userId === myUserId)) {
+        const button = document.getElementById('rouletteSpin'); button.disabled = true;
+        socket?.emit('roulette:cancel_bet', {}, result => { if (result?.error) { button.disabled = false; showToast(result.error, 'error'); } });
+        return;
+    }
     const betAmount = Number(document.getElementById('rouletteBet')?.value);
     if (!Number.isSafeInteger(betAmount) || betAmount < 1) return showToast('Введите целую ставку от 1');
     const button = document.getElementById('rouletteSpin'); button.disabled = true;

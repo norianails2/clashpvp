@@ -138,7 +138,11 @@ class RouletteEngine {
         ({ balanceAfter } = await holdBet(userId, amount, 'roulette', null, client));
         if (this.phase !== 'betting') throw new Error('Betting is closed');
         await client.query(
-          'INSERT INTO roulette_bets (round_number, user_id, username, color, amount) VALUES ($1, $2, $3, $4, $5)',
+          `INSERT INTO roulette_bets (round_number, user_id, username, color, amount)
+           VALUES ($1, $2, $3, $4, $5)
+           ON CONFLICT (round_number, user_id) DO UPDATE
+             SET username = EXCLUDED.username, color = EXCLUDED.color, amount = EXCLUDED.amount,
+                 status = 'active', payout = 0, created_at = NOW(), settled_at = NULL`,
           [this.round, userId, username, color, amount]
         );
         await client.query('COMMIT');
@@ -148,6 +152,32 @@ class RouletteEngine {
       this.broadcast();
       return { success: true, balance: balanceAfter };
     } catch (err) { return { error: err.message }; } finally { this.pendingBets.delete(userId); }
+  }
+
+  async cancelBet(userId) {
+    if (this.phase !== 'betting') return { error: 'Betting is closed' };
+    const bet = this.bets.find(entry => entry.userId === userId);
+    if (!bet) return { error: 'No active bet' };
+    const client = await getClient();
+    try {
+      await client.query('BEGIN');
+      const updated = await client.query(
+        "UPDATE roulette_bets SET status = 'refunded', settled_at = NOW() WHERE round_number = $1 AND user_id = $2 AND status = 'active' RETURNING amount",
+        [this.round, userId]
+      );
+      if (updated.rowCount !== 1) throw new Error('Bet is already settled');
+      if (this.phase !== 'betting') throw new Error('Betting is closed');
+      const { balanceAfter } = await refund(userId, Number(updated.rows[0].amount), 'roulette', null, client);
+      if (this.phase !== 'betting') throw new Error('Betting is closed');
+      await client.query('COMMIT');
+      this.bets = this.bets.filter(entry => entry.userId !== userId);
+      this.io?.to(`user:${userId}`).emit('balance:update', { balance: balanceAfter });
+      this.broadcast();
+      return { success: true, balance: balanceAfter };
+    } catch (err) {
+      await client.query('ROLLBACK');
+      return { error: err.message };
+    } finally { client.release(); }
   }
 
   async stopForShutdown() {
