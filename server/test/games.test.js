@@ -6,6 +6,7 @@ import { ProvablyFairService } from '../src/services/provablyFairService.js';
 import { resolveDice } from '../src/games/dice.js';
 import { resolveCoin } from '../src/games/coin.js';
 import { resolve as resolveRps } from '../src/games/rps.js';
+import { getMultiplier, isValidColor, spinRoulette } from '../src/games/roulette.js';
 
 test('blackjack scores aces correctly', () => {
   assert.equal(calculateScore(['Ah', '9d']), 20);
@@ -65,4 +66,17 @@ test('RPS resolves every winning pair and a draw', () => {
   assert.equal(resolveRps('scissors', 'paper').winnerIndex, 0);
   assert.equal(resolveRps('rock', 'paper').winnerIndex, 1);
   assert.equal(resolveRps('rock', 'rock').draw, true);
+});
+
+test('roulette accepts only board colors and keeps correct payouts', () => {
+  assert.equal(isValidColor('red'), true);
+  assert.equal(isValidColor('black'), true);
+  assert.equal(isValidColor('green'), true);
+  assert.equal(isValidColor('blue'), false);
+  assert.equal(getMultiplier('red'), 2);
+  assert.equal(getMultiplier('black'), 2);
+  assert.equal(getMultiplier('green'), 36);
+  const spin = spinRoulette();
+  assert.ok(Number.isInteger(spin.number) && spin.number >= 0 && spin.number <= 36);
+  assert.ok(isValidColor(spin.color));
 });
