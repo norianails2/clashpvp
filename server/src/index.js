@@ -6,6 +6,7 @@ import { initBot, startBotPolling, stopBotPolling } from './services/telegramBot
 import { runMigrations } from './db/migrate.js';
 import { query } from './db/pool.js';
 import crashEngine from './games/crash.js';
+import rouletteEngine from './games/rouletteEngine.js';
 
 const INVOICE_EXPIRY_CHECK_MS = 60 * 60 * 1000;
 
@@ -40,6 +41,7 @@ async function main() {
     Promise.allSettled([
       stopBotPolling(),
       crashEngine.stopForShutdown(),
+      rouletteEngine.stopForShutdown(),
     ])
       .then((results) => {
         for (const result of results) {

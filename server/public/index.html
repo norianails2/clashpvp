@@ -602,14 +602,19 @@
 
         /* Status text in games */
         .pvp-timer { font-family:'Fredoka',sans-serif;letter-spacing:1px; }
-        .roulette-game { padding:16px 14px 22px;display:flex;flex-direction:column;gap:14px; }
-        .roulette-wheel { min-height:176px;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:radial-gradient(circle at center,#282632 0 25%,#15141d 26% 50%,#0d0c12 51%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;box-shadow:inset 0 0 40px rgba(0,0,0,.5); }
-        .roulette-number { width:76px;height:76px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800;color:#fff;border:5px solid #f4c34e;background:#198754;box-shadow:0 0 0 5px #101016,0 8px 22px rgba(0,0,0,.45); }
-        .roulette-number.red { background:#d53d48; }.roulette-number.black { background:#25242a; }.roulette-number.green { background:#198754; }
-        .roulette-status { min-height:20px;font-size:12px;font-weight:700;color:rgba(255,255,255,.6); }
-        .roulette-bet-row { display:flex;gap:8px;align-items:center; }.roulette-bet-row input { flex:1;min-width:0;background:#1d1b25;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:12px;color:#fff;font:700 16px 'Fredoka',sans-serif;outline:none; }
-        .roulette-colors { display:grid;grid-template-columns:repeat(3,1fr);gap:8px; }.roulette-color { min-height:54px;border:1px solid rgba(255,255,255,.14);border-radius:8px;color:#fff;font:800 12px 'Fredoka',sans-serif;cursor:pointer; }.roulette-color.red { background:#bd3541; }.roulette-color.black { background:#29272e; }.roulette-color.green { background:#177447; }.roulette-color.active { outline:3px solid #fbbf24;outline-offset:1px; }
-        .roulette-spin { width:100%;min-height:48px;border:0;border-radius:8px;background:#fbbf24;color:#18151e;font:800 14px 'Fredoka',sans-serif;cursor:pointer; }.roulette-spin:disabled { opacity:.5;cursor:default; }
+        .roulette-game { min-height:100%;padding:14px 12px 20px;display:flex;flex-direction:column;gap:10px;background:#0d1714; }
+        .roulette-top { display:flex;align-items:center;justify-content:space-between;color:rgba(255,255,255,.55);font-size:10px;font-weight:800;letter-spacing:1px; }.roulette-top strong { color:#f5c84c;font-size:13px;letter-spacing:0; }
+        .roulette-wheel { position:relative;min-height:210px;overflow:hidden;border:1px solid rgba(211,178,91,.28);border-radius:8px;background:radial-gradient(circle at 50% 46%,#1e5438 0 23%,#0d261b 24% 39%,#c89d40 40% 41%,#171315 42% 62%,#090b0a 63%);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 0 48px rgba(0,0,0,.7),0 10px 20px rgba(0,0,0,.22); }
+        .roulette-wheel::before { content:'0   32   15   19   4   21   2   25   17   34   6   27   13   36   11   30';position:absolute;top:16px;left:12px;right:12px;overflow:hidden;white-space:nowrap;color:#ece3c7;font:700 10px Georgia,serif;letter-spacing:4px;text-align:center;opacity:.84; }
+        .roulette-wheel::after { content:'';position:absolute;width:158px;height:158px;border:1px dashed rgba(244,207,111,.42);border-radius:50%; }
+        .roulette-number { position:relative;z-index:1;width:70px;height:70px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:800 32px Georgia,serif;color:#fff;border:4px solid #e2b94f;background:#198754;box-shadow:0 0 0 5px #102218,0 8px 22px rgba(0,0,0,.5);transition:transform .3s ease; }.roulette-number.spinning { transform:rotate(720deg); }
+        .roulette-number.red { background:#c63d43; }.roulette-number.black { background:#1d1d20; }.roulette-number.green { background:#198754; }
+        .roulette-status { position:relative;z-index:1;min-height:18px;margin-top:14px;font-size:11px;font-weight:700;color:rgba(255,255,255,.72); }
+        .roulette-history { display:flex;gap:5px;overflow:hidden;min-height:24px; }.roulette-history span { min-width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font:700 10px Georgia,serif;color:#fff; }.roulette-history .red { background:#bd3541; }.roulette-history .black { background:#29272e; }.roulette-history .green { background:#16804a; }
+        .roulette-board { border:1px solid rgba(255,255,255,.08);border-radius:8px;background:#111c17;padding:10px; }.roulette-bet-row { display:flex;gap:8px;align-items:center; }.roulette-bet-row input { flex:1;min-width:0;background:#0b1210;border:1px solid rgba(255,255,255,.13);border-radius:6px;padding:11px 12px;color:#fff;font:700 16px 'Fredoka',sans-serif;outline:none; }
+        .roulette-colors { display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px; }.roulette-color { min-height:50px;border:1px solid rgba(255,255,255,.16);border-radius:6px;color:#fff;font:800 10px 'Fredoka',sans-serif;cursor:pointer; }.roulette-color small { display:block;margin-top:2px;font-size:9px;opacity:.72; }.roulette-color.red { background:#a93138; }.roulette-color.black { background:#242429; }.roulette-color.green { background:#126b3d; }.roulette-color.active { border-color:#f5cb58;box-shadow:inset 0 0 0 1px #f5cb58; }
+        .roulette-spin { width:100%;min-height:46px;border:0;border-radius:6px;background:#f3c74c;color:#1d1910;font:800 13px 'Fredoka',sans-serif;cursor:pointer;margin-top:10px; }.roulette-spin:disabled { opacity:.5;cursor:default; }
+        .roulette-bets-title { display:flex;justify-content:space-between;font-size:10px;font-weight:800;letter-spacing:1px;color:rgba(255,255,255,.46); }.roulette-bets { display:flex;flex-wrap:wrap;gap:6px;min-height:28px; }.roulette-bet { display:flex;align-items:center;gap:5px;padding:5px 7px;border-radius:6px;background:rgba(255,255,255,.05);font-size:10px;color:rgba(255,255,255,.75); }.roulette-chip { width:10px;height:10px;border-radius:50%; }.roulette-chip.red { background:#df4b53; }.roulette-chip.black { background:#25252a;border:1px solid rgba(255,255,255,.3); }.roulette-chip.green { background:#22a663; }.roulette-bet.me { border:1px solid rgba(245,203,88,.5); }.roulette-empty { color:rgba(255,255,255,.28);font-size:11px;padding:7px 0; }
 
     </style>
 </head>
@@ -1418,6 +1423,7 @@ function closeGame() {
     document.getElementById('gameOverlay').classList.remove('show');
     window._crashOnState = null;
     if (socket?.connected) socket.emit('crash:leave');
+    if (socket?.connected) socket.emit('roulette:leave');
     pvpCleanup();
     try { window._tgHideBack?.(); window._tgHideMain?.(); } catch(e) {}
 }
@@ -2212,31 +2218,52 @@ function soloBjDouble() {
 }
 
 let rouletteColor = 'red';
+window._rouletteState = null;
 function renderRoulette(area) {
     document.getElementById('gameTitle').textContent = 'Рулетка';
-    area.innerHTML = '<div class="roulette-game"><div class="roulette-wheel"><div class="roulette-number green" id="rouletteNumber">0</div><div class="roulette-status" id="rouletteStatus">Выберите цвет и сделайте ставку</div></div><div class="roulette-bet-row"><input id="rouletteBet" type="number" inputmode="numeric" min="1" max="100000" value="10" aria-label="Ставка"><span class="tg-s"></span></div><div class="roulette-colors"><button class="roulette-color red active" data-color="red" type="button">КРАСНОЕ x2</button><button class="roulette-color black" data-color="black" type="button">ЧЁРНОЕ x2</button><button class="roulette-color green" data-color="green" type="button">ZERO x36</button></div><button class="roulette-spin" id="rouletteSpin" type="button">КРУТИТЬ</button></div>';
+    area.innerHTML = '<div class="roulette-game"><div class="roulette-top"><span>ОБЩИЙ СТОЛ</span><strong id="rouletteTimer">--</strong><span id="rouletteRound">РАУНД #--</span></div><div class="roulette-wheel"><div class="roulette-number green" id="rouletteNumber">0</div><div class="roulette-status" id="rouletteStatus">Загрузка раунда...</div></div><div class="roulette-history" id="rouletteHistory"></div><div class="roulette-board"><div class="roulette-bet-row"><input id="rouletteBet" type="number" inputmode="numeric" min="1" max="100000" value="10" aria-label="Ставка"><span class="tg-s"></span></div><div class="roulette-colors"><button class="roulette-color red active" data-color="red" type="button">КРАСНОЕ<small>x2</small></button><button class="roulette-color black" data-color="black" type="button">ЧЁРНОЕ<small>x2</small></button><button class="roulette-color green" data-color="green" type="button">ZERO<small>x36</small></button></div><button class="roulette-spin" id="rouletteSpin" type="button">ПОСТАВИТЬ</button></div><div class="roulette-bets-title"><span>СТАВКИ ИГРОКОВ</span><span id="rouletteBetCount">0</span></div><div class="roulette-bets" id="rouletteBets"></div></div>';
     area.querySelectorAll('.roulette-color').forEach(button => button.onclick = () => {
         rouletteColor = button.dataset.color;
         area.querySelectorAll('.roulette-color').forEach(item => item.classList.toggle('active', item === button));
     });
-    document.getElementById('rouletteSpin').onclick = spinRoulette;
+    document.getElementById('rouletteSpin').onclick = placeRouletteBet;
+    socket?.emit('roulette:join');
+    if (window._rouletteState) updateRoulette(window._rouletteState);
 }
 
-function spinRoulette() {
-    const betAmount = Number(document.getElementById('rouletteBet')?.value);
-    const button = document.getElementById('rouletteSpin');
+function rouletteEscape(value) { const node = document.createElement('span'); node.textContent = value || 'Player'; return node.innerHTML; }
+function updateRoulette(state) {
+    window._rouletteState = state;
+    const timer = document.getElementById('rouletteTimer');
+    if (!timer) return;
+    const mine = state.bets.some(bet => bet.userId === myUserId);
+    document.getElementById('rouletteRound').textContent = 'РАУНД #' + state.round;
+    timer.textContent = state.phase === 'betting' ? state.countdown + ' СЕК' : state.phase === 'spinning' ? 'КРУТИМ' : 'РЕЗУЛЬТАТ';
     const status = document.getElementById('rouletteStatus');
+    const number = document.getElementById('rouletteNumber');
+    if (state.phase === 'settled' && state.result) {
+        number.textContent = state.result.number;
+        number.className = 'roulette-number ' + state.result.color;
+        const won = mine && state.bets.find(bet => bet.userId === myUserId).color === state.result.color;
+        status.textContent = won ? 'Ваша ставка сыграла' : 'Выпало ' + state.result.number;
+    } else if (state.phase === 'spinning') {
+        number.className = 'roulette-number spinning'; number.textContent = '?'; status.textContent = 'Ставки закрыты, колесо крутится';
+    } else { number.className = 'roulette-number green'; number.textContent = '0'; status.textContent = mine ? 'Ставка принята' : 'Приём ставок открыт'; }
+    const button = document.getElementById('rouletteSpin');
+    button.disabled = state.phase !== 'betting' || mine;
+    button.textContent = mine ? 'СТАВКА ПРИНЯТА' : state.phase === 'betting' ? 'ПОСТАВИТЬ' : 'СТАВКИ ЗАКРЫТЫ';
+    document.getElementById('rouletteBetCount').textContent = state.bets.length;
+    document.getElementById('rouletteHistory').innerHTML = state.history.map(item => '<span class="' + item.color + '">' + item.number + '</span>').join('');
+    const bets = document.getElementById('rouletteBets');
+    bets.innerHTML = state.bets.length ? state.bets.map(bet => '<div class="roulette-bet' + (bet.userId === myUserId ? ' me' : '') + '"><i class="roulette-chip ' + bet.color + '"></i><span>' + rouletteEscape(bet.userId === myUserId ? 'Вы' : bet.username) + '</span><b>' + bet.amount + '</b></div>').join('') : '<div class="roulette-empty">Пока нет ставок</div>';
+}
+
+function placeRouletteBet() {
+    const betAmount = Number(document.getElementById('rouletteBet')?.value);
     if (!Number.isSafeInteger(betAmount) || betAmount < 1) return showToast('Введите целую ставку от 1');
-    button.disabled = true;
-    status.textContent = 'Колесо крутится...';
-    socket?.emit('roulette:spin', { betAmount, color: rouletteColor }, (result) => {
-        button.disabled = false;
-        if (result?.error) { status.textContent = result.error; return; }
-        const number = document.getElementById('rouletteNumber');
-        number.textContent = result.number;
-        number.className = 'roulette-number ' + result.color;
-        status.textContent = result.won ? `Выигрыш ${result.payout} Stars` : `Выпало ${result.number}. Попробуйте ещё раз`;
-        playSound(result.won ? 'win' : 'lose');
+    const button = document.getElementById('rouletteSpin'); button.disabled = true;
+    socket?.emit('roulette:bet', { betAmount, color: rouletteColor }, result => {
+        if (result?.error) { button.disabled = false; showToast(result.error, 'error'); }
     });
 }
 
@@ -2538,6 +2565,8 @@ function connectSocket(initData) {
         if (data?.history) window._crashServerHistory = data.history;
         crUpdateHistory(window._crashServerState);
     });
+
+    socket.on('roulette:state', (state) => updateRoulette(state));
 
     // --- RPS ---
     socket.on('rps:game_started', (data) => {

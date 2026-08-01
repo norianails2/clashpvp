@@ -34,6 +34,7 @@ import { registerBlackjackHandlers } from './blackjackHandler.js';
 import { registerSoloBlackjackHandlers } from './soloBlackjackHandler.js';
 import { registerRouletteHandlers } from './rouletteHandler.js';
 import { registerCrashHandlers, startCrashEngine } from './crashHandler.js';
+import rouletteEngine from '../games/rouletteEngine.js';
 import https from 'https';
 import { randomUUID } from 'crypto';
 import { query } from '../db/pool.js';
@@ -54,6 +55,7 @@ export function initSocket(httpServer) {
   });
 
   crashEngine.setIO(io);
+  rouletteEngine.setIO(io);
 
   io.use(verifyConnection);
 
@@ -221,6 +223,7 @@ export function initSocket(httpServer) {
 
   // Start crash engine
   startCrashEngine().catch(err => console.error('[crash] engine start error:', err.message));
+  rouletteEngine.start().catch(err => console.error('[roulette] engine start error:', err.message));
 
   const cleanupRooms = async () => {
     try {
