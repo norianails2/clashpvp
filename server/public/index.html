@@ -607,7 +607,7 @@
         .roulette-top { display:grid;grid-template-columns:1fr auto 1fr;align-items:center;color:rgba(255,255,255,.48);font-size:10px;font-weight:800;letter-spacing:1px; }.roulette-top b { display:block;margin-top:2px;color:#f3c74c;font-size:13px;letter-spacing:0; }.roulette-top strong { color:#60d977;font-size:18px;letter-spacing:0; }.roulette-top strong.red { color:#ed5a5f; }.roulette-top strong.black { color:#d0d5db; }.roulette-top strong.green { color:#60d977; }.roulette-top span:last-child { text-align:right; }
         .roulette-status { min-height:16px;text-align:center;font-size:11px;font-weight:700;color:rgba(255,255,255,.62); }
         .roulette-history { display:flex;gap:6px;overflow:hidden;padding:9px 0;border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);min-height:50px; }.roulette-history::before { content:'ПОСЛЕДНИЕ';align-self:center;margin-right:3px;color:rgba(255,255,255,.4);font-size:9px;font-weight:800;letter-spacing:.8px; }.roulette-history span { flex:0 0 29px;height:29px;border-radius:5px;display:grid;place-items:center;font:700 12px Georgia,serif;color:#fff; }.roulette-history .red { background:#d9474c; }.roulette-history .black { background:#4a535e; }.roulette-history .green { background:#52ac57; }
-        .roulette-fair { overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:rgba(255,255,255,.35);font:700 9px monospace;letter-spacing:.2px; }
+        .roulette-fair { width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;border:0;background:transparent;padding:0;text-align:left;color:rgba(255,255,255,.35);font:700 9px monospace;letter-spacing:.2px; }.roulette-fair.ready { color:#f3c74c;cursor:pointer; }
         .roulette-board { display:flex;gap:8px;align-items:center;border:1px solid rgba(255,255,255,.1);border-radius:6px;background:#202627;padding:8px 10px; }.roulette-bet-row { display:flex;gap:7px;align-items:center;flex:1; }.roulette-bet-row input { width:100%;min-width:0;border:0;background:transparent;color:#fff;font:700 16px 'Fredoka',sans-serif;outline:none; }
         .roulette-adjust { display:flex;gap:5px; }.roulette-adjust button { min-width:36px;height:30px;border:1px solid rgba(255,255,255,.1);border-radius:5px;background:#252b2c;color:rgba(255,255,255,.55);font:700 10px 'Fredoka',sans-serif;cursor:pointer; }
         .roulette-columns { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px; }.roulette-column { min-width:0; }.roulette-color { width:100%;min-height:64px;border:0;border-radius:5px;color:#fff;font:800 14px 'Fredoka',sans-serif;cursor:pointer;box-shadow:inset 0 -3px rgba(0,0,0,.14); }.roulette-color small { display:block;margin-top:2px;font-size:10px;opacity:.78; }.roulette-color.red { background:#df474b; }.roulette-color.black { background:#4b535e; }.roulette-color.green { background:#51ad57; }.roulette-color.active { outline:2px solid #f5c84c;outline-offset:2px; }
@@ -2221,7 +2221,7 @@ let rouletteColor = 'red';
 window._rouletteState = null;
 function renderRoulette(area) {
     document.getElementById('gameTitle').textContent = 'Рулетка';
-    area.innerHTML = '<div class="roulette-game"><div class="roulette-top"><span>БАНК<b id="roulettePot">0</b></span><strong id="rouletteTimer">--</strong><span><span id="rouletteRound">РАУНД #--</span><b id="roulettePlayers">0 ИГРОКОВ</b></span></div><div class="roulette-status" id="rouletteStatus">Загрузка раунда...</div><div class="roulette-history" id="rouletteHistory"></div><div class="roulette-fair" id="rouletteFair"></div><div class="roulette-board"><div class="roulette-bet-row"><i class="tg-s"></i><input id="rouletteBet" type="number" inputmode="numeric" min="1" max="100000" value="10" aria-label="Ставка"></div><div class="roulette-adjust"><button type="button" onclick="rouletteAdjust(0.5)">1/2</button><button type="button" onclick="rouletteAdjust(2)">x2</button><button type="button" onclick="rouletteAdjust(1, true)">MAX</button></div></div><div class="roulette-columns"><div class="roulette-column"><button class="roulette-color red active" data-color="red" type="button">КРАСНОЕ<small>x2</small></button><div class="roulette-column-label"><span>КРАСНОЕ</span><b id="rouletteRedTotal">0</b></div><div class="roulette-bets" id="rouletteRedBets"></div></div><div class="roulette-column"><button class="roulette-color green" data-color="green" type="button">ZERO<small>x36</small></button><div class="roulette-column-label"><span>ЗЕЛЁНОЕ</span><b id="rouletteGreenTotal">0</b></div><div class="roulette-bets" id="rouletteGreenBets"></div></div><div class="roulette-column"><button class="roulette-color black" data-color="black" type="button">ЧЁРНОЕ<small>x2</small></button><div class="roulette-column-label"><span>ЧЁРНОЕ</span><b id="rouletteBlackTotal">0</b></div><div class="roulette-bets" id="rouletteBlackBets"></div></div></div><button class="roulette-spin" id="rouletteSpin" type="button">ПОСТАВИТЬ</button></div>';
+    area.innerHTML = '<div class="roulette-game"><div class="roulette-top"><span>БАНК<b id="roulettePot">0</b></span><strong id="rouletteTimer">--</strong><span><span id="rouletteRound">РАУНД #--</span><b id="roulettePlayers">0 ИГРОКОВ</b></span></div><div class="roulette-status" id="rouletteStatus">Загрузка раунда...</div><div class="roulette-history" id="rouletteHistory"></div><button class="roulette-fair" id="rouletteFair" type="button" disabled></button><div class="roulette-board"><div class="roulette-bet-row"><i class="tg-s"></i><input id="rouletteBet" type="number" inputmode="numeric" min="1" max="100000" value="10" aria-label="Ставка"></div><div class="roulette-adjust"><button type="button" onclick="rouletteAdjust(0.5)">1/2</button><button type="button" onclick="rouletteAdjust(2)">x2</button><button type="button" onclick="rouletteAdjust(1, true)">MAX</button></div></div><div class="roulette-columns"><div class="roulette-column"><button class="roulette-color red active" data-color="red" type="button">КРАСНОЕ<small>x2</small></button><div class="roulette-column-label"><span>КРАСНОЕ</span><b id="rouletteRedTotal">0</b></div><div class="roulette-bets" id="rouletteRedBets"></div></div><div class="roulette-column"><button class="roulette-color green" data-color="green" type="button">ZERO<small>x36</small></button><div class="roulette-column-label"><span>ЗЕЛЁНОЕ</span><b id="rouletteGreenTotal">0</b></div><div class="roulette-bets" id="rouletteGreenBets"></div></div><div class="roulette-column"><button class="roulette-color black" data-color="black" type="button">ЧЁРНОЕ<small>x2</small></button><div class="roulette-column-label"><span>ЧЁРНОЕ</span><b id="rouletteBlackTotal">0</b></div><div class="roulette-bets" id="rouletteBlackBets"></div></div></div><button class="roulette-spin" id="rouletteSpin" type="button">ПОСТАВИТЬ</button></div>';
     area.querySelectorAll('.roulette-color').forEach(button => button.onclick = () => {
         rouletteColor = button.dataset.color;
         area.querySelectorAll('.roulette-color').forEach(item => item.classList.toggle('active', item === button));
@@ -2241,7 +2241,11 @@ function updateRoulette(state) {
     document.getElementById('rouletteRound').textContent = 'РАУНД #' + state.round;
     document.getElementById('roulettePot').textContent = state.bets.reduce((sum, bet) => sum + bet.amount, 0);
     document.getElementById('roulettePlayers').textContent = state.bets.length + ' ИГРОКОВ';
-    document.getElementById('rouletteFair').textContent = state.serverSeed ? 'РАСКРЫТЫЙ SEED: ' + state.serverSeed : 'PROVABLY FAIR: ' + (state.serverSeedHash || '').slice(0, 24) + '...';
+    const fair = document.getElementById('rouletteFair');
+    fair.disabled = !state.serverSeed;
+    fair.classList.toggle('ready', !!state.serverSeed);
+    fair.textContent = state.serverSeed ? 'ПРОВЕРИТЬ РАУНД' : 'PROVABLY FAIR: ' + (state.serverSeedHash || '').slice(0, 24) + '...';
+    fair.onclick = state.serverSeed ? verifyRouletteFair : null;
     timer.textContent = state.phase === 'betting' ? state.countdown + ' СЕК' : state.phase === 'spinning' ? 'КРУТИМ' : state.result ? state.result.number : 'РЕЗУЛЬТАТ';
     timer.className = state.phase === 'settled' && state.result ? state.result.color : '';
     const status = document.getElementById('rouletteStatus');
@@ -2257,6 +2261,25 @@ function updateRoulette(state) {
     const history = state.phase === 'settled' && state.result ? [state.result, ...state.history] : state.history;
     document.getElementById('rouletteHistory').innerHTML = history.slice(0, 12).map(item => '<span class="' + item.color + '">' + item.number + '</span>').join('');
     ['red', 'green', 'black'].forEach(color => { const bets = state.bets.filter(bet => bet.color === color); const prefix = 'roulette' + color[0].toUpperCase() + color.slice(1); document.getElementById(prefix + 'Total').textContent = bets.reduce((sum, bet) => sum + bet.amount, 0); document.getElementById(prefix + 'Bets').innerHTML = bets.length ? bets.map(bet => '<div class="roulette-bet' + (bet.userId === myUserId ? ' me' : '') + '"><i class="roulette-chip ' + color + '"></i><span>' + rouletteEscape(bet.userId === myUserId ? 'Вы' : bet.username) + '</span><b>' + bet.amount + '</b></div>').join('') : '<div class="roulette-empty">Нет ставок</div>'; document.getElementById(prefix + 'Bets').closest('.roulette-column').classList.toggle('winner', state.phase === 'settled' && state.result?.color === color); });
+}
+
+async function verifyRouletteFair() {
+    const state = window._rouletteState;
+    const fair = document.getElementById('rouletteFair');
+    if (!state?.serverSeed || !state.result) return;
+    try {
+        const encoder = new TextEncoder();
+        const seedHash = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', encoder.encode(state.serverSeed)))).map(byte => byte.toString(16).padStart(2, '0')).join('');
+        const key = await crypto.subtle.importKey('raw', encoder.encode(state.serverSeed), { name:'HMAC', hash:'SHA-256' }, false, ['sign']);
+        let number;
+        for (let counter = 0; ; counter++) {
+            const hmac = new Uint8Array(await crypto.subtle.sign('HMAC', key, encoder.encode(state.clientSeed + '-' + state.nonce + '-' + counter)));
+            const value = new DataView(hmac.buffer).getBigUint64(0, false);
+            const max = 1n << 64n, limit = max - max % 37n;
+            if (value < limit) { number = Number(value % 37n); break; }
+        }
+        fair.textContent = seedHash === state.serverSeedHash && number === state.result.number ? 'ПРОВЕРКА ПРОЙДЕНА' : 'ПРОВЕРКА НЕ ПРОЙДЕНА';
+    } catch { fair.textContent = 'НЕ УДАЛОСЬ ПРОВЕРИТЬ'; }
 }
 
 function placeRouletteBet() {
