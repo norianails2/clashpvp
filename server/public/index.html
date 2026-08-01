@@ -868,6 +868,7 @@ const rulesData = {
     mines: {title:'💣 Мины',body:'Одиночная игра на поле 5×5. Выбери от 1 до 24 мин, открывай безопасные клетки и забери выигрыш в любой момент. Наткнёшься на мину — ставка сгорает. Комиссия: 10%.'},
     blackjack: {title:'♠ Блекджек',body:'Собери 21 или ближе к 21, чем соперник. Карты: 2-10 по номиналу, J/Q/K = 10, A = 11. Hit — ещё карта, Stand — хватит. Перебор >21 — проигрыш. Комиссия: 10%.'},
     crash: {title:'🚀 Crash',body:'Каждый раунд длится для всех одновременно. За 10 секунд сделай ставку. Множитель растёт с 1.00x — забери деньги ДО взрыва. Не успел — ставка сгорает. Комиссия платформы: 10%. Алгоритм Provably Fair (HMAC-SHA256).'},
+    roulette: {title:'Рулетка',body:'Общий раунд для всех игроков. Выбери один цвет: красное или чёрное дают x2, zero даёт x36. Пока идёт приём ставок, свою ставку можно отменить и поставить заново. После результата seed раскрывается, а раунд можно проверить.'},
 };
 function showRules() { const d = rulesData[currentGameId] || rulesData.rps; document.getElementById('rulesTitle').textContent = d.title; document.getElementById('rulesBody').innerHTML = d.body; document.getElementById('rulesPopup').classList.add('show'); }
 function closeRules() { document.getElementById('rulesPopup').classList.remove('show'); }
