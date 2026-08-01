@@ -2241,11 +2241,23 @@ function rouletteEscape(value) { const node = document.createElement('span'); no
 function rouletteInitial(value) { return rouletteEscape(String(value || 'P').trim().slice(0, 1).toUpperCase()); }
 function rouletteAdjust(multiplier, max) { const input = document.getElementById('rouletteBet'); if (!input) return; input.value = max ? Math.max(1, Math.floor(balance || 1)) : Math.max(1, Math.floor((Number(input.value) || 1) * multiplier)); }
 function rouletteSetMinimum() { const input = document.getElementById('rouletteBet'); if (input) input.value = 1; }
+function rouletteHaptic(kind) {
+    try {
+        const haptic = window.Telegram?.WebApp?.HapticFeedback;
+        if (!haptic) return;
+        if (kind === 'tick') haptic.impactOccurred('light');
+        else haptic.notificationOccurred(kind);
+    } catch (_) {}
+}
 function updateRoulette(state) {
     window._rouletteState = state;
     const timer = document.getElementById('rouletteTimer');
     if (!timer) return;
     const mine = state.bets.some(bet => bet.userId === myUserId);
+    if (state.phase === 'betting' && state.countdown <= 5) {
+        const tickId = state.round + ':' + state.countdown;
+        if (window._rouletteHapticTick !== tickId) { window._rouletteHapticTick = tickId; rouletteHaptic('tick'); }
+    }
     document.getElementById('rouletteRound').textContent = 'РАУНД #' + state.round;
     document.getElementById('roulettePot').textContent = state.bets.reduce((sum, bet) => sum + bet.amount, 0);
     document.getElementById('roulettePlayers').textContent = state.bets.length + ' ИГРОКОВ';
@@ -2260,6 +2272,10 @@ function updateRoulette(state) {
     const status = document.getElementById('rouletteStatus');
     if (state.phase === 'settled' && state.result) {
         const won = mine && state.bets.find(bet => bet.userId === myUserId).color === state.result.color;
+        if (window._rouletteHapticResult !== state.round) {
+            window._rouletteHapticResult = state.round;
+            rouletteHaptic(mine ? (won ? 'success' : 'error') : 'warning');
+        }
         status.textContent = won ? 'Ваша ставка сыграла' : 'Выпало ' + state.result.number;
     } else if (state.phase === 'spinning') {
         status.textContent = 'Ставки закрыты, определяем результат';
