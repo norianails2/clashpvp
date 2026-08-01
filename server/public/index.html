@@ -2294,7 +2294,8 @@ function prepareRouletteStrip(color) {
     const track = document.querySelector('.roulette-strip-track');
     const strip = document.querySelector('.roulette-strip');
     if (!track || !strip || !color) return;
-    const sequence = ['black', 'red', 'black', 'red', 'green', 'black', 'red', 'black', 'red', 'black', 'red', 'green', color, 'black', 'red', 'black'];
+    const sequence = ['black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', color, 'black', 'red', 'black'];
+    if (color !== 'green') sequence[4] = 'green';
     track.innerHTML = sequence.map(item => '<i class="' + item + '"></i>').join('');
     const targetIndex = 12;
     const cellWidth = 52;
@@ -2361,8 +2362,8 @@ async function verifyRouletteFair() {
         for (let counter = 0; ; counter++) {
             const hmac = new Uint8Array(await crypto.subtle.sign('HMAC', key, encoder.encode(state.clientSeed + '-' + state.nonce + '-' + counter)));
             const value = new DataView(hmac.buffer).getBigUint64(0, false);
-            const max = 1n << 64n, limit = max - max % 37n;
-            if (value < limit) { number = Number(value % 37n); break; }
+            const max = 1n << 64n, limit = max - max % 15n;
+            if (value < limit) { number = Number(value % 15n); break; }
         }
         fair.textContent = seedHash === state.serverSeedHash && number === state.result.number ? 'ПРОВЕРКА ПРОЙДЕНА' : 'ПРОВЕРКА НЕ ПРОЙДЕНА';
     } catch { fair.textContent = 'НЕ УДАЛОСЬ ПРОВЕРИТЬ'; }
