@@ -2321,8 +2321,8 @@ function updateRoulette(state) {
     fair.textContent = state.serverSeed ? 'ПРОВЕРИТЬ РАУНД' : 'PROVABLY FAIR: ' + (state.serverSeedHash || '').slice(0, 24) + '...';
     fair.onclick = state.serverSeed ? verifyRouletteFair : null;
     const resultLabel = { red: 'КРАСНОЕ', black: 'ЧЁРНОЕ', green: 'ZERO' };
-    timer.textContent = state.phase === 'betting' ? 'СТАВКИ' : state.phase === 'spinning' ? '' : state.result ? resultLabel[state.result.color] : 'ОЖИДАНИЕ';
-    document.getElementById('rouletteTimerLabel').textContent = state.phase === 'betting' ? 'ПРИЁМ ОТКРЫТ' : state.phase === 'spinning' ? 'КРУТИМ' : state.result ? 'РЕЗУЛЬТАТ' : '';
+    timer.textContent = state.phase === 'betting' ? state.countdown : state.phase === 'spinning' ? '' : state.result ? resultLabel[state.result.color] : 'ОЖИДАНИЕ';
+    document.getElementById('rouletteTimerLabel').textContent = state.phase === 'betting' ? 'СЕКУНД ДО ЗАКРЫТИЯ' : state.phase === 'spinning' ? 'КРУТИМ' : state.result ? 'РЕЗУЛЬТАТ' : '';
     timer.className = 'word ' + (state.phase === 'settled' && state.result ? state.result.color : state.phase === 'spinning' ? 'spinning' : (state.phase === 'betting' && state.countdown <= 5 ? 'urgent' : ''));
     const spinColor = state.spinResult?.color || state.result?.color;
     if (spinColor && window._rouletteStripRound !== state.round) { window._rouletteStripRound = state.round; prepareRouletteStrip(spinColor); }
