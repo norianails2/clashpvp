@@ -57,6 +57,7 @@ class RouletteEngine {
   async start() { await this.restore(); await this.startBetting(); }
 
   async startBetting() {
+    if (this.phase === 'stopped') return;
     clearInterval(this.timer);
     this.round += 1;
     this.phase = 'betting';
@@ -182,8 +183,16 @@ class RouletteEngine {
 
   async stopForShutdown() {
     clearInterval(this.timer);
+    this.phase = 'stopped';
+    const deadline = Date.now() + 8000;
+    while (this.pendingBets.size > 0 && Date.now() < deadline) {
+      await new Promise(resolve => setTimeout(resolve, 50));
+    }
     const active = [...this.bets];
-    await Promise.allSettled(active.map(bet => this.refundBet(bet)));
+    const refunds = await Promise.allSettled(active.map(bet => this.refundBet(bet)));
+    const failed = refunds.filter(result => result.status === 'rejected').length;
+    if (failed) console.error(`[roulette] ${failed} shutdown refund(s) failed`);
+    return { refunded: active.length - failed };
   }
 
   async refundBet(bet) {
