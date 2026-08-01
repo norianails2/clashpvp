@@ -4,6 +4,10 @@ import { broadcastLobbyUpdate } from './lobbyHandler.js';
 import { getClient, query } from '../db/pool.js';
 import { refund } from '../services/balanceService.js';
 
+export function isValidAutoCashoutAt(value) {
+  return value == null || (Number.isFinite(value) && value >= 1);
+}
+
 async function refundInterruptedCrashBets() {
   const { rows } = await query('SELECT round_number, user_id FROM crash_bets WHERE status = \'active\'');
   for (const bet of rows) {
@@ -44,7 +48,7 @@ export function registerCrashHandlers(io, socket) {
     try {
       const { amount, autoCashoutAt } = payload || {};
       if (!Number.isInteger(amount) || amount < 1) return ack?.({ error: 'Minimum bet is 1' });
-      if (autoCashoutAt !== undefined && (!Number.isFinite(autoCashoutAt) || autoCashoutAt < 1)) {
+      if (!isValidAutoCashoutAt(autoCashoutAt)) {
         return ack?.({ error: 'Invalid auto cashout multiplier' });
       }
 
@@ -52,7 +56,7 @@ export function registerCrashHandlers(io, socket) {
         user.id,
         user.username || 'Player',
         amount,
-        autoCashoutAt || null
+        autoCashoutAt ?? null
       );
 
       ack?.(result);

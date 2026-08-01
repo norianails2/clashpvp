@@ -111,6 +111,13 @@ class CrashEngine {
     if (this.timers.main) { clearInterval(this.timers.main); this.timers.main = null; }
     if (this.timers.countdown) { clearInterval(this.timers.countdown); this.timers.countdown = null; }
 
+    // An auto cashout may have started on the same tick as the crash. Let that
+    // transaction settle before marking the remaining active bets as busted.
+    const cashoutDeadline = Date.now() + 1500;
+    while (this.pendingCashoutCount > 0 && Date.now() < cashoutDeadline) {
+      await new Promise(resolve => setTimeout(resolve, 20));
+    }
+
     try {
       const client = await getClient();
       let revealed;

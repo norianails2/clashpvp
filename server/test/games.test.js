@@ -7,6 +7,7 @@ import { resolveDice } from '../src/games/dice.js';
 import { resolveCoin } from '../src/games/coin.js';
 import { resolve as resolveRps } from '../src/games/rps.js';
 import { getMultiplier, isValidColor, spinRoulette } from '../src/games/roulette.js';
+import { isValidAutoCashoutAt } from '../src/socket/crashHandler.js';
 
 test('blackjack scores aces correctly', () => {
   assert.equal(calculateScore(['Ah', '9d']), 20);
@@ -46,6 +47,13 @@ test('Crash proof does not expose an unrevealed seed or crash point', () => {
   service.rounds.get(7).revealed = true;
   assert.equal(service.getRoundInfo(7).serverSeed, 'secret');
   assert.equal(service.getRoundInfo(7).crashPoint, 12.34);
+});
+
+test('Crash accepts a manual bet without an auto cashout target', () => {
+  assert.equal(isValidAutoCashoutAt(null), true);
+  assert.equal(isValidAutoCashoutAt(undefined), true);
+  assert.equal(isValidAutoCashoutAt(2), true);
+  assert.equal(isValidAutoCashoutAt(0), false);
 });
 
 test('dice resolves higher roll and ties correctly', () => {
