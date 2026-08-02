@@ -657,7 +657,7 @@
             <div class="balance-actions">
                 <div class="balance-actions-top">
                     <select class="language-select" id="languageSelect" aria-label="Language"><option value="ru">RU Русский</option><option value="en">EN English</option><option value="de">DE Deutsch</option><option value="es">ES Español</option></select>
-                    <button class="bal-btn deposit" onclick="playSound('click');openModal('depositModal')">💰 Пополнить</button>
+                    <button class="bal-btn deposit" onclick="playSound('click');openModal('depositModal')">💰 Депозит</button>
                 </div>
             </div>
         </div>
@@ -886,12 +886,12 @@ document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('cli
 
 const LANGUAGES = {
     ru: {
-        balance:'Баланс', topUp:'Пополнить', allGames:'Все игры', games:'7 ИГР', invite:'Пригласить друзей', inviteSub:'Получи 50 Stars за каждого друга', invited:'{count} приглашено',
+        balance:'Баланс', topUp:'Депозит', allGames:'Все игры', games:'7 ИГР', invite:'Пригласить друзей', inviteSub:'Получи 50 Stars за каждого друга', invited:'{count} приглашено',
         rps:'Камень-Ножницы-Бумага', rpsSub:'Дуэль на ставки', dice:'Кости', diceSub:'Больше/меньше/ровно', coin:'Монетка', coinSub:'Орёл или Решка', mines:'Мины', minesSub:'Найди алмазы, избегай бомб', blackjack:'Блекджек', blackjackSub:'Собери 21', crashSub:'Забери до взрыва', roulette:'Рулетка', rouletteSub:'Красное, чёрное или zero', new:'НОВОЕ', updated:'ОБНОВЛЕНО',
         game:'ИГРА', round:'РАУНД', players:'ИГРОКОВ', seconds:'СЕК', bet:'СТАВКА', nextRound:'НА СЛЕД. РАУНД', autoCashout:'АВТОВЫВОД', placeBet:'СТАВКА', verify:'ПРОВЕРИТЬ', participants:'УЧАСТНИКИ', dealer:'ДИЛЕР', you:'ТЫ', start:'НАЧАТЬ', more:'Ещё', enough:'Хватит', red:'КРАСНОЕ', black:'ЧЁРНОЕ', chooseColor:'ВЫБЕРИ ЦВЕТ', bank:'БАНК', loadingRound:'Загрузка раунда...', waiting:'ОЖИДАНИЕ', last100:'ПОСЛЕДНИЕ 100', place:'ПОСТАВИТЬ'
     },
     en: {
-        balance:'Balance', topUp:'Top up', allGames:'All games', games:'7 GAMES', invite:'Invite friends', inviteSub:'Earn 50 Stars for every friend', invited:'{count} friends invited',
+        balance:'Balance', topUp:'Deposit', allGames:'All games', games:'7 GAMES', invite:'Invite friends', inviteSub:'Earn 50 Stars for every friend', invited:'{count} friends invited',
         rps:'Rock-Paper-Scissors', rpsSub:'Head-to-head bets', dice:'Dice', diceSub:'Higher/lower/equal', coin:'Coin', coinSub:'Heads or tails', mines:'Mines', minesSub:'Find diamonds, avoid bombs', blackjack:'Blackjack', blackjackSub:'Reach 21', crashSub:'Cash out before the crash', roulette:'Roulette', rouletteSub:'Red, black or zero', new:'NEW', updated:'UPDATED',
         game:'GAME', round:'ROUND', players:'PLAYERS', seconds:'SEC', bet:'BET', nextRound:'NEXT ROUND', autoCashout:'AUTO CASHOUT', placeBet:'BET', verify:'VERIFY', participants:'PLAYERS', dealer:'DEALER', you:'YOU', start:'START', more:'Hit', enough:'Stand', red:'RED', black:'BLACK', chooseColor:'CHOOSE A COLOR', bank:'BANK', loadingRound:'Loading round...', waiting:'WAITING', last100:'LAST 100', place:'PLACE BET'
     },
