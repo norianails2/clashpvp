@@ -671,7 +671,7 @@
 
         <div class="section-title">🎮 Все игры <span style="margin-left:auto;font-size:11px;color:rgba(255,255,255,0.25);font-family:'Fredoka',sans-serif;font-weight:700;letter-spacing:1px;">7 ИГР</span></div>
 
-        <div class="game-card c1" data-game="rps"><div class="glow"></div><div class="game-icon">✊</div><div class="game-info"><div class="name">Камень-Ножницы-Бумага</div><div class="sub">Дуэль на ставки</div></div><span class="game-arrow">›</span></div>
+        <div class="game-card c1" data-game="rps"><div class="glow"></div><div class="game-icon">🪨</div><div class="game-info"><div class="name">Камень-Ножницы-Бумага</div><div class="sub">Дуэль на ставки</div></div><span class="game-arrow">›</span></div>
         <div class="game-card c2" data-game="dice"><div class="glow"></div><div class="game-icon">🎲</div><div class="game-info"><div class="name">Кости</div><div class="sub">Больше/меньше/ровно</div></div><span class="game-arrow">›</span></div>
         <div class="game-card c3" data-game="coin"><div class="glow"></div><div class="game-icon">🪙</div><div class="game-info"><div class="name">Монетка</div><div class="sub">Орёл или Решка</div></div><span class="game-arrow">›</span></div>
         <div class="game-card c4" data-game="mines"><div class="glow"></div><div class="game-icon">💣</div><div class="game-info"><div class="name">Мины</div><div class="sub">Найди алмазы, избегай бомб</div></div><div class="game-badge new">🔥 НОВОЕ</div><span class="game-arrow">›</span></div>
@@ -882,7 +882,7 @@ function showToast(msg, type) {
 document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); }));
 
 const rulesData = {
-    rps: {title:'✊ Камень-Ножницы-Бумага',body:'PvP-дуэль: оба игрока выбирают ход (✊✋✌️). Камень бьёт ножницы, ножницы бьют бумагу, бумага бьёт камень. Победитель забирает ставку x2 минус 10% комиссия. Ничья — возврат.'},
+    rps: {title:'🪨 Камень-Ножницы-Бумага',body:'PvP-дуэль: оба игрока выбирают ход (🪨📄✂️). Камень бьёт ножницы, ножницы бьют бумагу, бумага бьёт камень. Победитель забирает ставку x2 минус 10% комиссия. Ничья — возврат.'},
     dice: {title:'🎲 Кости',body:'Брось кубик (1-6). Кто выбросил больше — тот победил. Совпадение — ничья. Комиссия платформы: 10%.'},
     coin: {title:'🪙 Монетка',body:'Выбери Орла 🦅 или Решку 🪙. Угадал — забираешь ставку x2 минус 10% комиссия. Не угадал — проигрыш.'},
     mines: {title:'💣 Мины',body:'Одиночная игра на поле 5×5. Выбери от 1 до 24 мин, открывай безопасные клетки и забери выигрыш в любой момент. Наткнёшься на мину — ставка сгорает. Комиссия: 10%.'},
@@ -1116,7 +1116,7 @@ function pvpStartGame(r) {
 
 // Game UI rendering — kept from original, uses socket emits for moves
 const RPS_MOVES = ['rock', 'paper', 'scissors'];
-const RPS_ICONS = ['✊', '✋', '✌️'];
+const RPS_ICONS = ['🪨', '📄', '✂️'];
 
 function pvpShowRPS(area, r) {
     const totalBank = (r && r.bet) ? r.bet * 2 : 100;
@@ -1137,17 +1137,17 @@ function pvpShowRPS(area, r) {
             <div>
                 <div class="rps-cards-grid" id="rpsChoices">
                     <div class="rps-choice-card rock" onclick="pvpRPSPick(0)">
-                        <div class="card-icon">✊</div>
+                        <div class="card-icon">🪨</div>
                         <div class="card-title">Камень</div>
                         <div class="card-sub">Бьёт ножницы</div>
                     </div>
                     <div class="rps-choice-card paper" onclick="pvpRPSPick(1)">
-                        <div class="card-icon">✋</div>
+                        <div class="card-icon">📄</div>
                         <div class="card-title">Бумага</div>
                         <div class="card-sub">Бьёт камень</div>
                     </div>
                     <div class="rps-choice-card scissors" onclick="pvpRPSPick(2)">
-                        <div class="card-icon">✌️</div>
+                        <div class="card-icon">✂️</div>
                         <div class="card-title">Ножницы</div>
                         <div class="card-sub">Бьют бумагу</div>
                     </div>
@@ -1375,7 +1375,7 @@ function bjRender(area) {
         g.oppCards.map(v => '<div class="bjc' + (v >= 10 ? ' red' : '') + '">' + v + '</div>').join('');
     const actions = g.over ? '' :
         g.myTurn
-            ? '<div class="pvp-bj-actions"><button class="pvp-bj-btn hit" onclick="bjHit()">➕ Ещё</button><button class="pvp-bj-btn stand" onclick="bjStand()">✋ Хватит</button></div>'
+            ? '<div class="pvp-bj-actions"><button class="pvp-bj-btn hit" onclick="bjHit()">➕ Ещё</button><button class="pvp-bj-btn stand" onclick="bjStand()">🛑 Хватит</button></div>'
             : '<div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:6px;">⏳ Ждём хода соперника...</div>';
     const status = g.over && g.bust ? '💥 Перебор!' : g.myTurn ? 'Твой ход' : g.waiting ? '⏳ Загрузка...' : '';
     area.innerHTML = '<div class="pvp-timer" id="pvpTimer" style="display:none;font-size:11px;color:rgba(255,255,255,0.4);font-weight:700;text-align:center;padding:4px 0;">⏱ 30с</div><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;"><div class="pvp-bj-table"><div class="pvp-bj-row"><div class="pvp-bj-col"><div class="bj-label">Соперник</div><div class="bj-score">' + (g.waiting ? '?' : g.oppScore) + '</div><div class="pvp-bj-hand">' + oppHtml + '</div></div><div class="pvp-bj-row-sep"></div><div class="pvp-bj-col"><div class="bj-label">Ты</div><div class="bj-score">' + g.score + '</div><div class="pvp-bj-hand">' + handHtml + '</div></div></div></div>' + actions + '<div style="font-size:12px;color:rgba(255,255,255,0.4);font-weight:600;min-height:20px;" id="bjStatus">' + status + '</div></div>';
@@ -1421,10 +1421,10 @@ function openGame(game) {
     if (game === 'blackjack') { renderSoloBJ(area); return; }
     if (game === 'roulette') { renderRoulette(area); return; }
 
-    const titles = { rps:'✊ Камень-Ножницы-Бумага', dice:'🎲 Кости', coin:'🪙 Монетка', mines:'💣 Мины', blackjack:'♠ Блекджек' };
+    const titles = { rps:'🪨 Камень-Ножницы-Бумага', dice:'🎲 Кости', coin:'🪙 Монетка', mines:'💣 Мины', blackjack:'♠ Блекджек' };
     document.getElementById('gameTitle').textContent = titles[game] || 'Игра';
     const previewHTML = {
-        rps: '<div class="pv-icon-wrap"><div class="pv-icon-bg rps"><span class="pv-icon">✊✋✌️</span></div></div><div class="pv-title-text">Камень-Ножницы-Бумага</div><div class="pv-sub-text">Классическая дуэль на ставки. Победи забирает банк!</div>',
+        rps: '<div class="pv-icon-wrap"><div class="pv-icon-bg rps"><span class="pv-icon">🪨📄✂️</span></div></div><div class="pv-title-text">Камень-Ножницы-Бумага</div><div class="pv-sub-text">Классическая дуэль на ставки. Победи забирает банк!</div>',
         dice: '<div class="pv-icon-wrap"><div class="pv-icon-bg dice"><span class="pv-icon">🎲</span></div></div><div class="pv-title-text">Кости</div><div class="pv-sub-text">Кто выбросит больше очков — тот забирает банк</div>',
         coin: '<div class="pv-icon-wrap"><div class="pv-icon-bg coin"><span class="pv-icon">🪙</span></div></div><div class="pv-title-text">Монетка</div><div class="pv-sub-text">Орёл или Решка? Угадай сторону и удвой ставку</div>',
         mines: '<div class="pv-icon-wrap"><div class="pv-icon-bg mines"><span class="pv-icon">💣</span></div></div><div class="pv-title-text">Мины</div><div class="pv-sub-text">Найди алмазы, избегая бомб. Кто больше — тот победил</div>',
@@ -2183,7 +2183,7 @@ function renderSoloBJ(area) {
     ac.appendChild(dBtn);
     var stBtn = document.createElement('button');
     stBtn.id = 'bjStandBtn'; stBtn.className = 'pvp-bj-btn stand';
-    stBtn.textContent = '✋ Хватит'; stBtn.style.display = 'none';
+    stBtn.textContent = '🛑 Хватит'; stBtn.style.display = 'none';
     stBtn.onclick = soloBjStand;
     ac.appendChild(stBtn);
     // Adjust buttons onclick
@@ -2224,7 +2224,7 @@ function soloBjHit() {
 }
 function soloBjStand() {
     try {
-        var st = document.getElementById('bjStatus'); if (st) st.textContent = '✋ СТОП...';
+        var st = document.getElementById('bjStatus'); if (st) st.textContent = '🛑 СТОП...';
         if (typeof socket === 'undefined' || !socket) { if (st) st.textContent = '❌ Нет socket'; return; }
         socket.emit('bj:stand', {}, (res) => { if (typeof bjOnStandResult === 'function') bjOnStandResult(res); });
     } catch(e) { showToast('❌ bjStand: ' + e.message, 'error'); }
