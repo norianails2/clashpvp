@@ -2451,7 +2451,8 @@ function updateBJHands(res) {
         }
     }
     if (playerScore) playerScore.textContent = res.playerScore ?? res.score ?? 0;
-    if (dealerScore) dealerScore.textContent = res.dealerScore ?? '?';
+    // During an active hand, show the value of the dealer's visible card.
+    if (dealerScore) dealerScore.textContent = res.dealerScore ?? (res.dealerCard ? cardValue(res.dealerCard) : 0);
 }
 
 window.addDevStars = function(amount) {
