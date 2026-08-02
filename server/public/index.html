@@ -1538,7 +1538,7 @@ function openGame(game) {
     const titles = { rps:'🪨 Камень-Ножницы-Бумага', dice:'🎲 Кости', coin:'🪙 Монетка', mines:'💣 Мины', blackjack:'♠ Блекджек' };
     document.getElementById('gameTitle').textContent = titles[game] || 'Игра';
     const previewHTML = {
-        rps: '<div class="pv-icon-wrap"><div class="pv-icon-bg rps"><span class="pv-icon">🪨✋✂️</span></div></div><div class="pv-title-text">Камень-Ножницы-Бумага</div><div class="pv-sub-text">Классическая дуэль на ставки. Победи забирает банк!</div>',
+        rps: '<div class="pv-icon-wrap"><div class="pv-icon-bg rps"><span class="pv-icon">✊</span></div></div><div class="pv-title-text">Камень-Ножницы-Бумага</div><div class="pv-sub-text">Классическая дуэль на ставки. Победи забирает банк!</div>',
         dice: '<div class="pv-icon-wrap"><div class="pv-icon-bg dice"><span class="pv-icon">🎲</span></div></div><div class="pv-title-text">Кости</div><div class="pv-sub-text">Кто выбросит больше очков — тот забирает банк</div>',
         coin: '<div class="pv-icon-wrap"><div class="pv-icon-bg coin"><span class="pv-icon">🪙</span></div></div><div class="pv-title-text">Монетка</div><div class="pv-sub-text">Орёл или Решка? Угадай сторону и удвой ставку</div>',
         mines: '<div class="pv-icon-wrap"><div class="pv-icon-bg mines"><span class="pv-icon">💣</span></div></div><div class="pv-title-text">Мины</div><div class="pv-sub-text">Найди алмазы, избегая бомб. Кто больше — тот победил</div>',
