@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Clash PVP Admin</title>
+  <style>
+    :root { color-scheme:dark; --bg:#0a0a14; --panel:#151523; --line:#2c2940; --muted:#9793aa; --text:#f7f5ff; --purple:#a78bfa; --gold:#f7c948; --green:#43b881; --red:#e35d71; }
+    * { box-sizing:border-box; } body { margin:0;min-width:320px;background:radial-gradient(ellipse 80% 48% at 50% -10%,rgba(139,92,246,.16),transparent 68%),var(--bg);color:var(--text);font:14px/1.4 Inter,Arial,sans-serif; }
+    button,input { font:inherit; } button { cursor:pointer; } .shell { max-width:1180px;margin:0 auto;padding:28px 20px 56px; }
+    .brand { font-weight:900;letter-spacing:1.2px;color:var(--purple);font-size:12px; } h1 { margin:5px 0 0;font-size:26px;letter-spacing:0;font-weight:800; } .sub { color:var(--muted);margin:5px 0 0; }
+    .topbar { display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:26px; } .actions { display:flex;gap:8px;align-items:center; } .icon-btn { width:38px;height:38px;border:1px solid var(--line);border-radius:7px;background:transparent;color:var(--text);font-size:20px; } .logout { height:38px;border:1px solid var(--line);border-radius:7px;background:transparent;color:var(--muted);padding:0 12px;font-weight:700; }
+    .metrics { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px; } .metric { min-height:106px;border:1px solid var(--line);border-radius:8px;background:rgba(21,21,35,.88);padding:15px; } .metric dt { color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.7px;text-transform:uppercase; } .metric dd { margin:8px 0 0;font-size:27px;font-weight:800;letter-spacing:0; } .metric dd.gold { color:var(--gold); } .metric dd.green { color:var(--green); } .metric dd.purple { color:var(--purple); } .metric small { display:block;color:var(--muted);margin-top:3px; }
+    .layout { display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px; } .panel { border:1px solid var(--line);border-radius:8px;background:rgba(21,21,35,.88);overflow:hidden; } .panel.wide { grid-column:1 / -1; } .panel-head { min-height:48px;padding:0 15px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line); } .panel-title { font-size:12px;font-weight:900;letter-spacing:.8px;text-transform:uppercase; } .panel-meta { color:var(--muted);font-size:11px; }
+    table { width:100%;border-collapse:collapse; } th,td { padding:10px 14px;text-align:left;border-bottom:1px solid rgba(255,255,255,.05);white-space:nowrap; } th { color:var(--muted);font-size:10px;letter-spacing:.7px;text-transform:uppercase; } td { font-size:12px; } tr:last-child td { border-bottom:0; } .scroll { overflow:auto; } .amount { color:var(--gold);font-weight:800; } .type { display:inline-block;padding:3px 7px;border:1px solid var(--line);border-radius:4px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase; } .type.win { color:var(--green);border-color:rgba(67,184,129,.35); } .type.bet { color:var(--gold);border-color:rgba(247,201,72,.32); } .type.refund { color:var(--purple);border-color:rgba(167,139,250,.32); }
+    .alerts { display:flex;gap:8px;flex-wrap:wrap;padding:14px; } .alert { border:1px solid var(--line);border-radius:5px;padding:8px 10px;color:var(--muted);font-size:12px; } .alert b { color:var(--text);margin-left:5px; } .alert.bad b { color:var(--red); }
+    .login { min-height:100vh;display:grid;place-items:center;padding:20px; } .login-box { width:min(390px,100%);border:1px solid var(--line);border-radius:9px;background:rgba(21,21,35,.94);padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.35); } .login-box h1 { font-size:24px; } label { display:block;margin:24px 0 7px;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.7px;text-transform:uppercase; } input { width:100%;height:43px;border:1px solid var(--line);border-radius:6px;background:#0e0e18;color:var(--text);outline:0;padding:0 12px; } input:focus { border-color:var(--purple); } .primary { width:100%;height:43px;margin-top:12px;border:0;border-radius:6px;background:var(--gold);color:#17120a;font-weight:900; } .error { min-height:20px;color:var(--red);font-size:12px;margin-top:10px; }
+    .hidden { display:none!important; } .loading { color:var(--muted);padding:24px;text-align:center; }
+    @media (max-width:720px) { .shell { padding:20px 12px 38px; }.topbar { align-items:flex-start; }.metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }.metric { min-height:94px;padding:12px; }.metric dd { font-size:22px; }.layout { grid-template-columns:1fr; }.panel.wide { grid-column:auto; } }
+  </style>
+</head>
+<body>
+  <main id="loginView" class="login">
+    <form id="loginForm" class="login-box">
+      <div class="brand">CLASH PVP</div><h1>Админ-панель</h1><p class="sub">Операционная статистика платформы.</p>
+      <label for="adminKey">Ключ администратора</label><input id="adminKey" type="password" autocomplete="current-password" required>
+      <button class="primary" type="submit">ВОЙТИ</button><div id="loginError" class="error"></div>
+    </form>
+  </main>
+  <main id="dashboardView" class="shell hidden">
+    <header class="topbar"><div><div class="brand">CLASH PVP</div><h1>Бизнес-статистика</h1><p class="sub" id="updatedAt">Загрузка данных...</p></div><div class="actions"><button class="icon-btn" id="refresh" title="Обновить" aria-label="Обновить">↻</button><button class="logout" id="logout">Выйти</button></div></header>
+    <section class="metrics" aria-label="Ключевые показатели">
+      <dl class="metric"><dt>Пользователи</dt><dd id="totalUsers">-</dd><small><span id="newUsers">-</span> новых сегодня</small></dl>
+      <dl class="metric"><dt>Баланс игроков</dt><dd class="gold" id="totalBalance">-</dd><small>Stars внутри платформы</small></dl>
+      <dl class="metric"><dt>Оборот ставок</dt><dd class="gold" id="turnover">-</dd><small>Все подтверждённые ставки</small></dl>
+      <dl class="metric"><dt>Выплаты</dt><dd class="green" id="payouts">-</dd><small>Все выигрыши</small></dl>
+      <dl class="metric"><dt>Учтённая комиссия</dt><dd class="purple" id="rake">-</dd><small>Комиссии в транзакциях</small></dl>
+      <dl class="metric"><dt>Сыграно PvP</dt><dd id="totalGames">-</dd><small><span id="activeRooms">-</span> активных комнат</small></dl>
+    </section>
+    <section class="layout">
+      <article class="panel"><header class="panel-head"><span class="panel-title">Состояние платформы</span></header><div class="alerts"><span class="alert">Активные Crash-ставки<b id="activeCrash">-</b></span><span class="alert bad">Зависшие комнаты<b id="expiredRooms">-</b></span><span class="alert bad">Просроченные счета<b id="staleInvoices">-</b></span></div></article>
+      <article class="panel"><header class="panel-head"><span class="panel-title">Игры PvP</span><span class="panel-meta">Комнаты</span></header><div class="scroll"><table><thead><tr><th>Игра</th><th>Всего</th><th>Завершено</th><th>В игре</th></tr></thead><tbody id="gamesTable"><tr><td colspan="4" class="loading">Загрузка...</td></tr></tbody></table></div></article>
+      <article class="panel wide"><header class="panel-head"><span class="panel-title">Последние операции</span><span class="panel-meta">20 записей</span></header><div class="scroll"><table><thead><tr><th>Время</th><th>Пользователь</th><th>Тип</th><th>Игра</th><th>Stars</th></tr></thead><tbody id="transactionsTable"><tr><td colspan="5" class="loading">Загрузка...</td></tr></tbody></table></div></article>
+      <article class="panel wide"><header class="panel-head"><span class="panel-title">Пользователи</span><span class="panel-meta">Топ-50 по балансу</span></header><div class="scroll"><table><thead><tr><th>Пользователь</th><th>Telegram ID</th><th>Баланс</th><th>Регистрация</th></tr></thead><tbody id="usersTable"><tr><td colspan="4" class="loading">Загрузка...</td></tr></tbody></table></div></article>
+    </section>
+  </main>
+  <script>
+    const keyName = 'clashpvp-admin-key';
+    const $ = id => document.getElementById(id);
+    const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+    const stars = value => new Intl.NumberFormat('ru-RU').format(Number(value || 0)) + ' Stars';
+    const date = value => value ? new Intl.DateTimeFormat('ru-RU',{dateStyle:'short',timeStyle:'short'}).format(new Date(value)) : '—';
+    function authHeaders() { return {'x-admin-key': sessionStorage.getItem(keyName) || ''}; }
+    async function api(path) { const response = await fetch(path,{headers:authHeaders(),cache:'no-store'}); if (!response.ok) throw Object.assign(new Error('Не удалось загрузить данные'),{status:response.status}); return response.json(); }
+    function setText(id, value) { $(id).textContent = value; }
+    function renderDashboard(stats, games, users) {
+      setText('totalUsers', stats.totalUsers); setText('newUsers', stats.newUsersToday); setText('totalBalance', stars(stats.totalBalance)); setText('turnover', stars(stats.totalTurnover)); setText('payouts', stars(stats.totalPayouts)); setText('rake', stars(stats.totalRake)); setText('totalGames', stats.totalGamesPlayed); setText('activeRooms', stats.activeRooms); setText('activeCrash', stats.activeCrashBets); setText('expiredRooms', stats.expiredRooms); setText('staleInvoices', stats.stalePendingInvoices); setText('updatedAt', 'Обновлено ' + new Intl.DateTimeFormat('ru-RU',{timeStyle:'medium'}).format(new Date()));
+      $('gamesTable').innerHTML = games.games.length ? games.games.map(game => `<tr><td>${escapeHtml(game.game_type)}</td><td>${game.total}</td><td>${game.finished}</td><td>${game.in_progress}</td></tr>`).join('') : '<tr><td colspan="4" class="loading">Пока нет PvP-комнат</td></tr>';
+      $('transactionsTable').innerHTML = stats.recentTransactions.length ? stats.recentTransactions.map(tx => `<tr><td>${date(tx.created_at)}</td><td>${escapeHtml(tx.username || tx.user_id)}</td><td><span class="type ${escapeHtml(tx.type)}">${escapeHtml(tx.type)}</span></td><td>${escapeHtml(tx.game_type || '—')}</td><td class="amount">${stars(tx.amount)}</td></tr>`).join('') : '<tr><td colspan="5" class="loading">Операций ещё нет</td></tr>';
+      $('usersTable').innerHTML = users.users.length ? users.users.map(user => `<tr><td>${escapeHtml(user.username || 'Без имени')}</td><td>${escapeHtml(user.telegram_id)}</td><td class="amount">${stars(user.balance)}</td><td>${date(user.created_at)}</td></tr>`).join('') : '<tr><td colspan="4" class="loading">Пользователей пока нет</td></tr>';
+    }
+    async function loadDashboard() { try { const [stats,games,users] = await Promise.all([api('/api/admin/stats'),api('/api/admin/games'),api('/api/admin/users?limit=50')]); renderDashboard(stats,games,users); } catch (error) { if (error.status === 401) { sessionStorage.removeItem(keyName); showLogin('Неверный ключ администратора'); return; } setText('updatedAt','Ошибка загрузки. Нажми обновить ещё раз.'); } }
+    function showLogin(message='') { $('dashboardView').classList.add('hidden'); $('loginView').classList.remove('hidden'); $('loginError').textContent = message; }
+    function showDashboard() { $('loginView').classList.add('hidden'); $('dashboardView').classList.remove('hidden'); loadDashboard(); }
+    $('loginForm').addEventListener('submit', event => { event.preventDefault(); sessionStorage.setItem(keyName,$('adminKey').value); showDashboard(); });
+    $('refresh').addEventListener('click',loadDashboard); $('logout').addEventListener('click',() => { sessionStorage.removeItem(keyName); $('adminKey').value=''; showLogin(); });
+    if (sessionStorage.getItem(keyName)) showDashboard();
+  </script>
+</body>
+</html>
