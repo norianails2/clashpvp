@@ -998,7 +998,7 @@ function setupLanguage() {
 }
 
 const rulesData = {
-    rps: {title:'🪨 Камень-Ножницы-Бумага',body:'PvP-дуэль: оба игрока выбирают ход (🪨📄✂️). Камень бьёт ножницы, ножницы бьют бумагу, бумага бьёт камень. Победитель забирает ставку x2 минус 10% комиссия. Ничья — возврат.'},
+    rps: {title:'🪨 Камень-Ножницы-Бумага',body:'PvP-дуэль: оба игрока выбирают ход (🪨✋✂️). Камень бьёт ножницы, ножницы бьют бумагу, бумага бьёт камень. Победитель забирает ставку x2 минус 10% комиссия. Ничья — возврат.'},
     dice: {title:'🎲 Кости',body:'Брось кубик (1-6). Кто выбросил больше — тот победил. Совпадение — ничья. Комиссия платформы: 10%.'},
     coin: {title:'🪙 Монетка',body:'Выбери Орла 🦅 или Решку 🪙. Угадал — забираешь ставку x2 минус 10% комиссия. Не угадал — проигрыш.'},
     mines: {title:'💣 Мины',body:'Одиночная игра на поле 5×5. Выбери от 1 до 24 мин, открывай безопасные клетки и забери выигрыш в любой момент. Наткнёшься на мину — ставка сгорает. Комиссия: 10%.'},
@@ -1232,7 +1232,7 @@ function pvpStartGame(r) {
 
 // Game UI rendering — kept from original, uses socket emits for moves
 const RPS_MOVES = ['rock', 'paper', 'scissors'];
-const RPS_ICONS = ['🪨', '📄', '✂️'];
+const RPS_ICONS = ['🪨', '✋', '✂️'];
 
 function pvpShowRPS(area, r) {
     const totalBank = (r && r.bet) ? r.bet * 2 : 100;
@@ -1258,7 +1258,7 @@ function pvpShowRPS(area, r) {
                         <div class="card-sub">Бьёт ножницы</div>
                     </div>
                     <div class="rps-choice-card paper" onclick="pvpRPSPick(1)">
-                        <div class="card-icon">📄</div>
+                        <div class="card-icon">✋</div>
                         <div class="card-title">Бумага</div>
                         <div class="card-sub">Бьёт камень</div>
                     </div>
@@ -1538,7 +1538,7 @@ function openGame(game) {
     const titles = { rps:'🪨 Камень-Ножницы-Бумага', dice:'🎲 Кости', coin:'🪙 Монетка', mines:'💣 Мины', blackjack:'♠ Блекджек' };
     document.getElementById('gameTitle').textContent = titles[game] || 'Игра';
     const previewHTML = {
-        rps: '<div class="pv-icon-wrap"><div class="pv-icon-bg rps"><span class="pv-icon">🪨📄✂️</span></div></div><div class="pv-title-text">Камень-Ножницы-Бумага</div><div class="pv-sub-text">Классическая дуэль на ставки. Победи забирает банк!</div>',
+        rps: '<div class="pv-icon-wrap"><div class="pv-icon-bg rps"><span class="pv-icon">🪨✋✂️</span></div></div><div class="pv-title-text">Камень-Ножницы-Бумага</div><div class="pv-sub-text">Классическая дуэль на ставки. Победи забирает банк!</div>',
         dice: '<div class="pv-icon-wrap"><div class="pv-icon-bg dice"><span class="pv-icon">🎲</span></div></div><div class="pv-title-text">Кости</div><div class="pv-sub-text">Кто выбросит больше очков — тот забирает банк</div>',
         coin: '<div class="pv-icon-wrap"><div class="pv-icon-bg coin"><span class="pv-icon">🪙</span></div></div><div class="pv-title-text">Монетка</div><div class="pv-sub-text">Орёл или Решка? Угадай сторону и удвой ставку</div>',
         mines: '<div class="pv-icon-wrap"><div class="pv-icon-bg mines"><span class="pv-icon">💣</span></div></div><div class="pv-title-text">Мины</div><div class="pv-sub-text">Найди алмазы, избегая бомб. Кто больше — тот победил</div>',
