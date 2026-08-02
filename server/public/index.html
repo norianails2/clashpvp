@@ -1368,16 +1368,23 @@ function pvpShowBlackjack(area, r) {
     bjGame = { cards: [], score: 0, oppCards: [], oppScore: 0, over: false, myTurn: false, oppTurn: false, waiting: true };
     bjRender(area);
 }
+function bjPvpCardHtml(card) {
+    const value = String(card || '');
+    const rank = value.slice(0, -1);
+    const suit = value.slice(-1);
+    const symbol = suit === 'h' ? '♥' : suit === 'd' ? '♦' : suit === 'c' ? '♣' : '♠';
+    return '<div class="bjc' + (suit === 'h' || suit === 'd' ? ' red' : '') + '">' + rank + symbol + '</div>';
+}
 function bjRender(area) {
     const g = bjGame;
-    const handHtml = g.cards.map(v => '<div class="bjc' + (v >= 10 ? ' red' : '') + '">' + v + '</div>').join('');
+    const handHtml = g.cards.map(bjPvpCardHtml).join('');
     const oppHtml = g.waiting ? '<div style="font-size:10px;color:rgba(255,255,255,0.3);">ожидание...</div>' :
-        g.oppCards.map(v => '<div class="bjc' + (v >= 10 ? ' red' : '') + '">' + v + '</div>').join('');
+        g.oppCards.map(bjPvpCardHtml).join('');
     const actions = g.over ? '' :
         g.myTurn
             ? '<div class="pvp-bj-actions"><button class="pvp-bj-btn hit" onclick="bjHit()">Ещё</button><button class="pvp-bj-btn stand" onclick="bjStand()">Хватит</button></div>'
             : '<div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:6px;">⏳ Ждём хода соперника...</div>';
-    const status = g.over && g.bust ? '💥 Перебор!' : g.myTurn ? 'Твой ход' : g.waiting ? '⏳ Загрузка...' : '';
+    const status = g.over && g.bust ? '💥 Перебор!' : g.myTurn ? 'Твой ход' : g.waiting ? '⏳ Загрузка...' : '⏳ Ждём хода соперника...';
     area.innerHTML = '<div class="pvp-timer" id="pvpTimer" style="display:none;font-size:11px;color:rgba(255,255,255,0.4);font-weight:700;text-align:center;padding:4px 0;">⏱ 30с</div><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;"><div class="pvp-bj-table"><div class="pvp-bj-row"><div class="pvp-bj-col"><div class="bj-label">Соперник</div><div class="bj-score">' + (g.waiting ? '?' : g.oppScore) + '</div><div class="pvp-bj-hand">' + oppHtml + '</div></div><div class="pvp-bj-row-sep"></div><div class="pvp-bj-col"><div class="bj-label">Ты</div><div class="bj-score">' + g.score + '</div><div class="pvp-bj-hand">' + handHtml + '</div></div></div></div>' + actions + '<div style="font-size:12px;color:rgba(255,255,255,0.4);font-weight:600;min-height:20px;" id="bjStatus">' + status + '</div></div>';
 }
 window.bjHit = function () {
