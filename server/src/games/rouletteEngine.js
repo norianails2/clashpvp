@@ -59,7 +59,7 @@ class RouletteEngine {
         await client.query('COMMIT');
       } catch (err) { await client.query('ROLLBACK'); throw err; } finally { client.release(); }
     }
-    const { rows: rounds } = await query("SELECT round_number, result_number, result_color FROM roulette_rounds WHERE status = 'settled' ORDER BY round_number DESC LIMIT 12");
+    const { rows: rounds } = await query("SELECT round_number, result_number, result_color FROM roulette_rounds WHERE status = 'settled' ORDER BY round_number DESC LIMIT 13");
     this.history = rounds.map(row => ({ number: row.result_number, color: row.result_color }));
     await this.refreshStats();
     const { rows: latest } = await query('SELECT COALESCE(MAX(round_number), 0) AS round FROM roulette_rounds');
@@ -132,7 +132,7 @@ class RouletteEngine {
       await this.refreshStats();
       this.phase = 'settled';
       this.history.unshift(this.result);
-      this.history = this.history.slice(0, 12);
+      this.history = this.history.slice(0, 13);
       this.broadcast();
       setTimeout(() => void this.startBetting().catch(err => console.error('[roulette] new round failed:', err.message)), RESULT_SECONDS * 1000);
     } finally { this.pendingSettlements--; }
