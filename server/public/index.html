@@ -635,7 +635,7 @@
         .roulette-column { background-color:transparent!important;background-image:none!important;border:0!important;border-radius:0!important; }.roulette-bets { margin-top:8px;background-color:transparent!important;background-image:none!important; }.roulette-bet { border:1px solid rgba(255,255,255,.14);border-radius:5px;background:transparent!important;box-shadow:none!important; }.roulette-bet.me { border-color:rgba(167,139,250,.75); }.roulette-column-label,.roulette-empty,.roulette-preview { display:none!important; }.roulette-color.red,.roulette-strip-track i.red { background:#e35d71!important; }.roulette-color.green,.roulette-strip-track i.green { background:#43b881!important; }.roulette-color.black,.roulette-strip-track i.black { background:#7b8594!important; }.roulette-history .red { background:#e35d71!important; }.roulette-history .green { background:#43b881!important; }.roulette-history .black { background:#7b8594!important; }.roulette-avatar.red { background:#e35d71!important; }.roulette-avatar.green { background:#43b881!important; }.roulette-avatar.black { background:#7b8594!important; }.roulette-strip,.roulette-strip-track i,.roulette-history span { border-radius:0!important;box-shadow:none!important; }
         .pvc-row,.c-bet-row { width:100%;gap:7px;margin:0; }.pvc-input-wrap,.c-bet-input-wrap { max-width:none;flex:1;min-width:0;height:46px;gap:8px;padding:0 12px;border:1px solid rgba(167,139,250,.28);border-radius:10px;background:rgba(139,92,246,.07); }.pvc-input-wrap .pvc-star,.c-bet-input-wrap .c-cr-sm { display:inline-flex;width:18px;height:18px;flex:0 0 18px;align-items:center;justify-content:center;opacity:1; }.pvc-input-wrap input,.c-bet-input-wrap input { flex:1;min-width:24px;font-size:16px; }.pvc-input-wrap .pvc-currency,.c-bet-input-wrap .c-usd { font:800 8px 'Fredoka',sans-serif;letter-spacing:.8px;color:rgba(196,181,253,.82); }.pvc-input-wrap .pvc-currency,.c-bet-input-wrap .c-usd { font-size:0; }.pvc-input-wrap .pvc-currency::after,.c-bet-input-wrap .c-usd::after { content:'STARS';font-size:8px; }.pvc-adj,.c-bet-adj { display:flex;gap:4px;flex:0 0 auto; }.pvc-adj button,.c-bet-adj button { min-width:32px;height:30px;padding:0 7px;border:1px solid rgba(255,255,255,.1);border-radius:999px;background:rgba(255,255,255,.045);color:rgba(255,255,255,.55);font:800 8px 'Fredoka',sans-serif;letter-spacing:0; }.pvc-adj button:hover,.c-bet-adj button:hover { border-color:rgba(167,139,250,.45);color:#d8ccff;background:rgba(139,92,246,.12); }
         .pvc-row,.c-bet-row { align-items:center;padding:7px 10px;border:1px solid rgba(139,92,246,.32);border-radius:14px;background:rgba(139,92,246,.055); }.pvc-input-wrap,.c-bet-input-wrap { height:30px;padding:0;gap:7px;border:0;border-radius:0;background:transparent; }.pvc-input-wrap input,.c-bet-input-wrap input { font-size:16px; }.pvc-adj,.c-bet-adj { gap:5px; }.pvc-adj button,.c-bet-adj button { min-width:31px;height:28px;padding:0 6px;border-color:rgba(167,139,250,.24);background:rgba(255,255,255,.035);color:rgba(196,181,253,.78); }.pvc-adj button:nth-child(1),.c-bet-adj button:nth-child(1) { order:3; }.pvc-adj button:nth-child(2),.c-bet-adj button:nth-child(2) { order:1; }.pvc-adj button:nth-child(3),.c-bet-adj button:nth-child(3) { order:2; }.pvc-adj button:nth-child(4),.c-bet-adj button:nth-child(4) { order:4; }
-        .pvp-create-btn { margin-top:10px; }.pvc-adj button,.c-bet-adj button,.roulette-adjust button { width:30px;min-width:30px;height:30px;padding:0;border-radius:5px; }
+        .pvp-create-btn { margin-top:10px; }.pvc-adj button,.c-bet-adj button,.roulette-adjust button { width:30px;min-width:30px;height:30px;padding:0;border-radius:5px; }.game-header .balance { display:inline-flex;align-items:center;gap:5px;padding:0;border:0;border-radius:0;background:transparent;color:#f7c948;font-family:'Fredoka',sans-serif;line-height:1; }.game-header .balance .tg-s { width:20px;height:20px;margin:0; }.game-header .balance b { font-size:27px;font-weight:800;color:#f7c948; }.game-header .balance small { color:rgba(255,255,255,.4);font-size:9px;font-weight:700;align-self:flex-end;margin-bottom:3px; }
 
     </style>
 </head>
@@ -745,7 +745,7 @@
         <div class="game-header">
             <span class="back" onclick="closeGame()">←</span>
             <h2 id="gameTitle">Игра</h2>
-                    <span class="balance" id="balance"><i class="tg-s"></i>0</span>
+                    <span class="balance" id="balance"><i class="tg-s"></i><b>0</b><small>Stars</small></span>
             <span class="rules-btn" onclick="showRules()">📖</span>
         </div>
         <div class="game-area" id="gameArea"></div>
@@ -835,7 +835,7 @@ function updateBalance() {
     const amt = balance;
     document.getElementById('balanceAmount').textContent = amt.toFixed(0);
     const bl = document.getElementById('balance');
-    if (bl) bl.innerHTML = '<i class="tg-s"></i>' + amt.toFixed(0);
+    if (bl) bl.innerHTML = '<i class="tg-s"></i><b>' + amt.toFixed(0) + '</b><small>Stars</small>';
     document.getElementById('balanceCurrency').textContent = 'Stars';
 }
 
