@@ -1573,10 +1573,9 @@ function crUpdateGraph(state) {
     var crashed = state.phase === 'crashed';
     var isFinished = flying || crashed;
 
-    // ---- Background Grid (parallax) ----
+    // ---- Background Grid ----
     if (isFinished) {
-        var gridSpeed = flying ? mult : cp;
-        var gridOffset = (Date.now() / 20 * (flying ? mult * 0.3 : 0.3)) % 40;
+        var gridOffset = 0;
         ctx.strokeStyle = 'rgba(139,92,246,0.06)';
         ctx.lineWidth = 1;
         for (var gx = pad - gridOffset; gx < W - pad; gx += 20) {
