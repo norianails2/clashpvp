@@ -2308,7 +2308,7 @@ function prepareRouletteStrip(color) {
     if (color !== 'green') sequence[4] = 'green';
     sequence[targetIndex] = color;
     track.innerHTML = sequence.map((item, index) => '<i class="' + item + (index === targetIndex ? ' landing' : '') + '"></i>').join('');
-    const markerRatio = 0.32 + Math.random() * 0.36;
+    const markerRatio = 0.5;
     const markerPosition = (strip.clientWidth || 320) * markerRatio;
     const landingTile = track.querySelector('.landing');
     const landingCenter = landingTile.offsetLeft + landingTile.offsetWidth / 2;
