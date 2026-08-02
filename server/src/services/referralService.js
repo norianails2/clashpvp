@@ -58,5 +58,5 @@ export async function getReferralStats(userId) {
 }
 
 export function generateReferralLink(userId, botUsername) {
-  return `https://t.me/${botUsername}/app?startapp=ref_${userId}`;
+  return `https://t.me/${botUsername}?startapp=ref_${userId}`;
 }

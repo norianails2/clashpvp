@@ -8,6 +8,7 @@ import { resolveCoin } from '../src/games/coin.js';
 import { resolve as resolveRps } from '../src/games/rps.js';
 import { getMultiplier, isValidColor, spinRoulette } from '../src/games/roulette.js';
 import { isValidAutoCashoutAt } from '../src/socket/crashHandler.js';
+import { generateReferralLink } from '../src/services/referralService.js';
 
 test('blackjack scores aces correctly', () => {
   assert.equal(calculateScore(['Ah', '9d']), 20);
@@ -17,6 +18,13 @@ test('blackjack scores aces correctly', () => {
 test('blackjack resolves bust and draw', () => {
   assert.equal(resolveGame(22, 'bust', 18, 'stood', 'a', 'b').winnerId, 'b');
   assert.equal(resolveGame(18, 'stood', 18, 'stood', 'a', 'b').draw, true);
+});
+
+test('referral links open the bot main mini app with startapp payload', () => {
+  assert.equal(
+    generateReferralLink('11111111-1111-4111-8111-111111111111', 'ClashPVPbot'),
+    'https://t.me/ClashPVPbot?startapp=ref_11111111-1111-4111-8111-111111111111'
+  );
 });
 
 test('mines multiplier increases with safe cells', () => {
