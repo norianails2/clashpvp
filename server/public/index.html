@@ -1527,12 +1527,12 @@ function crAdjBet(type) {
     if (!inp) return;
     let val = parseInt(inp.value) || 10;
     const ls = window._crashState;
-    const max = Math.max(ls.bet, val);
+    const max = Math.max(1, Math.floor(Number(balance) || 0));
     switch (type) {
         case 'min': val = 1; break;
         case 'half': val = Math.max(1, Math.floor(val / 2)); break;
         case 'double': val = Math.min(max, val * 2); break;
-        case 'max': val = Math.max(1, max); break;
+        case 'max': val = max; break;
     }
     inp.value = val;
     ls.bet = val;
