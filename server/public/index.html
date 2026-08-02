@@ -1596,7 +1596,9 @@ function crUpdateGraph(state) {
 
     // ---- Calculate curve points ----
     var displayMult = crashed ? cp : mult;
-    var maxMult = Math.max(displayMult, 2);
+    // Keep headroom while flying so the rocket never pins itself to the graph edge.
+    // As the multiplier grows, the visible scale expands and the graph keeps moving.
+    var maxMult = flying ? Math.max(displayMult * 1.25, 2) : Math.max(displayMult, 2);
     var points = [];
     var steps = 80;
     for (var i = 0; i <= steps; i++) {
