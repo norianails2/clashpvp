@@ -2303,9 +2303,10 @@ function prepareRouletteStrip(color) {
     const track = document.querySelector('.roulette-strip-track');
     const strip = document.querySelector('.roulette-strip');
     if (!track || !strip || !color) return;
-    const targetIndex = 12;
-    const sequence = ['black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', color, 'black', 'red', 'black'];
+    const targetIndex = 20;
+    const sequence = Array.from({ length: 32 }, (_, index) => index % 2 ? 'red' : 'black');
     if (color !== 'green') sequence[4] = 'green';
+    sequence[targetIndex] = color;
     track.innerHTML = sequence.map((item, index) => '<i class="' + item + (index === targetIndex ? ' landing' : '') + '"></i>').join('');
     const cellWidth = 50;
     const markerRatio = 0.32 + Math.random() * 0.36;
