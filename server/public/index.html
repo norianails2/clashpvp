@@ -42,6 +42,8 @@
         .bal-btn.dev-add:hover { background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.5); }
         .tg-s { display:inline-block;width:1em;height:1em;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%2332B6E8;stop-opacity:1' /%3E%3Cstop offset='50%25' style='stop-color:%23D332D3;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23FF6AB0;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M12 2c.22 0 .43.1.58.28l2.94 4.54a1 1 0 0 0 .84.45h5.4c.3 0 .58.17.7.46s.08.62-.12.82l-4.1 4a1 1 0 0 0 -.3.96l1.37 5.25c.08.31-.03.65-.29.84a.78.78 0 0 1-.9 0L12 17a1 1 0 0 0 -1.18 0l-4.66 3a.78.78 0 0 1-.9 0c-.26-.2-.37-.53-.29-.84l1.37-5.25a1 1 0 0 0 -.3-.96l-4.1-4c-.2-.2-.24-.53-.12-.82.12-.3.4-.46.7-.46h5.4a1 1 0 0 0 .84-.45l2.94-4.54c.15-.18.36-.28.58-.28z' fill='url(%23grad)' stroke='%23ffffff' stroke-width='0.7' stroke-linejoin='round' /%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center;background-size:contain;vertical-align:text-bottom;filter:drop-shadow(0 0 2px rgba(211,50,211,0.5)) drop-shadow(0 0 5px rgba(50,182,232,0.3)); }
         .balance-actions-top { display:flex;flex-direction:column;align-items:flex-end;gap:6px; }
+        .language-select { height:24px;max-width:94px;border:1px solid rgba(255,255,255,.1);border-radius:5px;background:transparent;color:rgba(255,255,255,.58);font:800 9px 'Fredoka',sans-serif;letter-spacing:.4px;outline:0;padding:0 5px; }
+        .language-select option { background:#151523;color:#fff; }
         .referral-block { background:rgba(255,255,255,0.03);border:1px solid rgba(251,191,36,0.14);border-radius:18px;padding:14px 16px;margin-bottom:18px;display:flex;align-items:center;gap:12px; }
         .referral-block[hidden] { display:none; }
         .referral-icon { width:42px;height:42px;border-radius:12px;background:rgba(251,191,36,0.12);display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0; }
@@ -654,6 +656,7 @@
             </div>
             <div class="balance-actions">
                 <div class="balance-actions-top">
+                    <select class="language-select" id="languageSelect" aria-label="Language"><option value="ru">RU Русский</option><option value="en">EN English</option><option value="de">DE Deutsch</option><option value="es">ES Español</option></select>
                     <button class="bal-btn deposit" onclick="playSound('click');openModal('depositModal')">💰 Пополнить</button>
                 </div>
             </div>
@@ -880,6 +883,119 @@ function showToast(msg, type) {
     setTimeout(() => t.classList.remove('show'), 2200);
 }
 document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); }));
+
+const LANGUAGES = {
+    ru: {
+        balance:'Баланс', topUp:'Пополнить', allGames:'Все игры', games:'7 ИГР', invite:'Пригласить друзей', inviteSub:'Получи 50 Stars за каждого друга', invited:'{count} приглашено',
+        rps:'Камень-Ножницы-Бумага', rpsSub:'Дуэль на ставки', dice:'Кости', diceSub:'Больше/меньше/ровно', coin:'Монетка', coinSub:'Орёл или Решка', mines:'Мины', minesSub:'Найди алмазы, избегай бомб', blackjack:'Блекджек', blackjackSub:'Собери 21', crashSub:'Забери до взрыва', roulette:'Рулетка', rouletteSub:'Красное, чёрное или zero', new:'НОВОЕ', updated:'ОБНОВЛЕНО',
+        game:'ИГРА', round:'РАУНД', players:'ИГРОКОВ', seconds:'СЕК', bet:'СТАВКА', nextRound:'НА СЛЕД. РАУНД', autoCashout:'АВТОВЫВОД', placeBet:'СТАВКА', verify:'ПРОВЕРИТЬ', participants:'УЧАСТНИКИ', dealer:'ДИЛЕР', you:'ТЫ', start:'НАЧАТЬ', more:'Ещё', enough:'Хватит', red:'КРАСНОЕ', black:'ЧЁРНОЕ', chooseColor:'ВЫБЕРИ ЦВЕТ', bank:'БАНК', loadingRound:'Загрузка раунда...', waiting:'ОЖИДАНИЕ', last100:'ПОСЛЕДНИЕ 100', place:'ПОСТАВИТЬ'
+    },
+    en: {
+        balance:'Balance', topUp:'Top up', allGames:'All games', games:'7 GAMES', invite:'Invite friends', inviteSub:'Earn 50 Stars for every friend', invited:'{count} friends invited',
+        rps:'Rock-Paper-Scissors', rpsSub:'Head-to-head bets', dice:'Dice', diceSub:'Higher/lower/equal', coin:'Coin', coinSub:'Heads or tails', mines:'Mines', minesSub:'Find diamonds, avoid bombs', blackjack:'Blackjack', blackjackSub:'Reach 21', crashSub:'Cash out before the crash', roulette:'Roulette', rouletteSub:'Red, black or zero', new:'NEW', updated:'UPDATED',
+        game:'GAME', round:'ROUND', players:'PLAYERS', seconds:'SEC', bet:'BET', nextRound:'NEXT ROUND', autoCashout:'AUTO CASHOUT', placeBet:'BET', verify:'VERIFY', participants:'PLAYERS', dealer:'DEALER', you:'YOU', start:'START', more:'Hit', enough:'Stand', red:'RED', black:'BLACK', chooseColor:'CHOOSE A COLOR', bank:'BANK', loadingRound:'Loading round...', waiting:'WAITING', last100:'LAST 100', place:'PLACE BET'
+    },
+    de: {
+        balance:'Guthaben', topUp:'Aufladen', allGames:'Alle Spiele', games:'7 SPIELE', invite:'Freunde einladen', inviteSub:'50 Stars pro Freund erhalten', invited:'{count} Freunde eingeladen',
+        rps:'Stein-Papier-Schere', rpsSub:'Duell mit Einsätzen', dice:'Würfel', diceSub:'Höher/niedriger/gleich', coin:'Münze', coinSub:'Kopf oder Zahl', mines:'Minen', minesSub:'Finde Diamanten, meide Bomben', blackjack:'Blackjack', blackjackSub:'Erreiche 21', crashSub:'Vor dem Crash auszahlen', roulette:'Roulette', rouletteSub:'Rot, schwarz oder zero', new:'NEU', updated:'AKTUALISIERT',
+        game:'SPIEL', round:'RUNDE', players:'SPIELER', seconds:'SEK', bet:'EINSATZ', nextRound:'NÄCHSTE RUNDE', autoCashout:'AUTO-AUSZAHLUNG', placeBet:'EINSATZ', verify:'PRÜFEN', participants:'SPIELER', dealer:'DEALER', you:'DU', start:'START', more:'Karte', enough:'Halten', red:'ROT', black:'SCHWARZ', chooseColor:'FARBE WÄHLEN', bank:'POT', loadingRound:'Runde wird geladen...', waiting:'WARTEN', last100:'LETZTE 100', place:'SETZEN'
+    },
+    es: {
+        balance:'Saldo', topUp:'Recargar', allGames:'Todos los juegos', games:'7 JUEGOS', invite:'Invitar amigos', inviteSub:'Gana 50 Stars por cada amigo', invited:'{count} amigos invitados',
+        rps:'Piedra-Papel-Tijeras', rpsSub:'Duelo con apuestas', dice:'Dados', diceSub:'Mayor/menor/igual', coin:'Moneda', coinSub:'Cara o cruz', mines:'Minas', minesSub:'Encuentra diamantes, evita bombas', blackjack:'Blackjack', blackjackSub:'Llega a 21', crashSub:'Retira antes del crash', roulette:'Ruleta', rouletteSub:'Rojo, negro o zero', new:'NUEVO', updated:'ACTUALIZADO',
+        game:'JUEGO', round:'RONDA', players:'JUGADORES', seconds:'SEG', bet:'APUESTA', nextRound:'PRÓXIMA RONDA', autoCashout:'RETIRO AUTOMÁTICO', placeBet:'APUESTA', verify:'VERIFICAR', participants:'JUGADORES', dealer:'CRUPIER', you:'TÚ', start:'INICIAR', more:'Pedir', enough:'Plantarse', red:'ROJO', black:'NEGRO', chooseColor:'ELIGE UN COLOR', bank:'BOTE', loadingRound:'Cargando ronda...', waiting:'ESPERANDO', last100:'ÚLTIMAS 100', place:'APOSTAR'
+    }
+};
+let uiLanguage = 'ru';
+function t(key, values = {}) {
+    const text = (LANGUAGES[uiLanguage] || LANGUAGES.en)[key] || LANGUAGES.ru[key] || key;
+    return text.replace(/\{(\w+)\}/g, (_, name) => values[name] ?? '');
+}
+const UI_PHRASES = {
+    ru: { betsOpen:'ПРИЁМ СТАВОК ОТКРЫТ', betsClosed:'СТАВКИ ЗАКРЫТЫ', betting:'ПРИЁМ СТАВОК...', flying:'ПОЛЁТ...', crashed:'КРАШ!', launching:'ЗАПУСК...', watching:'НАБЛЮДАЮ', cashout:'ЗАБРАТЬ', betMade:'СТАВКА СДЕЛАНА', waitingPlayers:'ОЖИДАНИЕ ИГРОКОВ...', secondsToClose:'СЕКУНД ДО ЗАКРЫТИЯ', spinning:'КРУТИМ', result:'РЕЗУЛЬТАТ', betAccepted:'Ставка принята', betWon:'Ваша ставка сыграла', landed:'Выпало {number}', deciding:'Ставки закрыты, определяем результат', cancelBet:'ОТМЕНИТЬ СТАВКУ', noConnection:'НЕТ СОЕДИНЕНИЯ', noLink:'НЕТ СВЯЗИ', payout:'ПРИ ВЫИГРЫШЕ:' },
+    en: { betsOpen:'BETTING OPEN', betsClosed:'BETS CLOSED', betting:'BETTING...', flying:'FLYING...', crashed:'CRASH!', launching:'STARTING...', watching:'WATCHING', cashout:'CASH OUT', betMade:'BET PLACED', waitingPlayers:'WAITING FOR PLAYERS...', secondsToClose:'SECONDS TO CLOSE', spinning:'SPINNING', result:'RESULT', betAccepted:'Bet accepted', betWon:'Your bet won', landed:'Landed on {number}', deciding:'Bets closed, determining result', cancelBet:'CANCEL BET', noConnection:'NO CONNECTION', noLink:'OFFLINE', payout:'POTENTIAL WIN:' },
+    de: { betsOpen:'EINSÄTZE OFFEN', betsClosed:'EINSÄTZE GESCHLOSSEN', betting:'EINSÄTZE...', flying:'FLUG...', crashed:'CRASH!', launching:'START...', watching:'ZUSCHAUEN', cashout:'AUSZAHLEN', betMade:'EINSATZ GEMACHT', waitingPlayers:'WARTE AUF SPIELER...', secondsToClose:'SEKUNDEN BIS SCHLUSS', spinning:'DREHT SICH', result:'ERGEBNIS', betAccepted:'Einsatz angenommen', betWon:'Dein Einsatz gewinnt', landed:'Ergebnis: {number}', deciding:'Einsätze geschlossen, Ergebnis wird bestimmt', cancelBet:'EINSATZ STORNIEREN', noConnection:'KEINE VERBINDUNG', noLink:'OFFLINE', payout:'MÖGLICHER GEWINN:' },
+    es: { betsOpen:'APUESTAS ABIERTAS', betsClosed:'APUESTAS CERRADAS', betting:'APOSTANDO...', flying:'VOLANDO...', crashed:'¡CRASH!', launching:'INICIANDO...', watching:'MIRANDO', cashout:'RETIRAR', betMade:'APUESTA HECHA', waitingPlayers:'ESPERANDO JUGADORES...', secondsToClose:'SEGUNDOS PARA CERRAR', spinning:'GIRANDO', result:'RESULTADO', betAccepted:'Apuesta aceptada', betWon:'Tu apuesta ganó', landed:'Salió {number}', deciding:'Apuestas cerradas, determinando resultado', cancelBet:'CANCELAR APUESTA', noConnection:'SIN CONEXIÓN', noLink:'SIN CONEXIÓN', payout:'GANANCIA POSIBLE:' }
+};
+function phrase(key, values = {}) {
+    const text = (UI_PHRASES[uiLanguage] || UI_PHRASES.en)[key] || UI_PHRASES.ru[key] || key;
+    return text.replace(/\{(\w+)\}/g, (_, name) => values[name] ?? '');
+}
+function applyLanguage() {
+    const pack = LANGUAGES[uiLanguage] || LANGUAGES.en;
+    document.documentElement.lang = uiLanguage;
+    const label = document.getElementById('balanceLabel'); if (label) label.textContent = t('balance');
+    const topUp = document.querySelector('.bal-btn.deposit'); if (topUp) topUp.textContent = '💰 ' + t('topUp');
+    const section = document.querySelector('.section-title'); if (section) section.childNodes[0].nodeValue = '🎮 ' + t('allGames') + ' ';
+    const count = document.querySelector('.section-title span'); if (count) count.textContent = t('games');
+    const referralTitle = document.querySelector('.referral-title'); if (referralTitle) referralTitle.textContent = t('invite');
+    const referralSub = document.querySelector('.referral-subtitle'); if (referralSub) referralSub.textContent = t('inviteSub');
+    document.querySelectorAll('.game-card[data-game]').forEach(card => {
+        const game = card.dataset.game;
+        const name = card.querySelector('.name'); const sub = card.querySelector('.sub');
+        if (name && pack[game]) name.textContent = pack[game];
+        if (sub && pack[game + 'Sub']) sub.textContent = pack[game + 'Sub'];
+    });
+    document.querySelectorAll('.game-badge.new').forEach(node => { node.textContent = '🔥 ' + t('new'); });
+    document.querySelectorAll('.game-badge.updated').forEach(node => { node.textContent = '⚡ ' + t('updated'); });
+    const select = document.getElementById('languageSelect'); if (select) select.value = uiLanguage;
+    if (currentGameId && document.getElementById('gameTitle')) {
+        const title = currentGameId === 'crash' ? '🚀 Crash' : (pack[currentGameId] || currentGameId);
+        document.getElementById('gameTitle').textContent = title;
+    }
+    applyGameLanguage();
+}
+function setNodeText(selector, text, root = document) { const node = root.querySelector(selector); if (node) node.textContent = text; }
+function applyGameLanguage() {
+    const area = document.getElementById('gameArea');
+    if (!area) return;
+    if (currentGameId === 'crash') {
+        const roundLabel = area.querySelector('.c-round'); const round = document.getElementById('crRound');
+        if (roundLabel && round) { roundLabel.textContent = '✦ ' + t('round') + ' '; roundLabel.appendChild(round); }
+        setNodeText('.c-bet-label', '✦ ' + t('nextRound'), area);
+        setNodeText('.c-auto-label', '🚀 ' + t('autoCashout'), area);
+        setNodeText('.crash-social-title span:first-child', '✦ ' + t('participants'), area);
+        setNodeText('.cf-verify', t('verify'), area);
+    }
+    if (currentGameId === 'mines') {
+        setNodeText('.c-auto-label', '💣 ' + t('mines'), area);
+        setNodeText('.pvc-label', '✦ ' + t('bet'), area);
+        const start = document.getElementById('minesStartBtn'); if (start && start.style.display !== 'none') start.textContent = '💣 ' + t('start');
+    }
+    if (currentGameId === 'blackjack') {
+        const labels = area.querySelectorAll('.bj-label');
+        if (labels[0]) labels[0].childNodes[0].nodeValue = t('dealer') + ' ';
+        if (labels[1]) labels[1].childNodes[0].nodeValue = t('you') + ' ';
+        setNodeText('.pvc-label', '✦ ' + t('bet'), area);
+        const start = document.getElementById('bjStartBtn'); if (start && start.style.display !== 'none') start.textContent = t('start');
+        const hit = document.getElementById('bjHitBtn'); if (hit) hit.textContent = t('more');
+        const stand = document.getElementById('bjStandBtn'); if (stand) stand.textContent = t('enough');
+    }
+    if (currentGameId === 'roulette') {
+        const round = area.querySelector('.roulette-round'); const roundValue = document.getElementById('rouletteRound');
+        if (round && roundValue) { round.textContent = t('game') + ' '; round.appendChild(roundValue); }
+        const bank = area.querySelector('.roulette-bankline span:first-child'); const pot = document.getElementById('roulettePot');
+        if (bank && pot) { bank.textContent = t('bank'); bank.appendChild(pot); }
+        setNodeText('.roulette-bankline span:last-child', t('chooseColor'), area);
+        const red = area.querySelector('.roulette-color.red'); if (red) red.innerHTML = t('red') + '<small>x2</small>';
+        const black = area.querySelector('.roulette-color.black'); if (black) black.innerHTML = t('black') + '<small>x2</small>';
+        area.querySelectorAll('.roulette-column-label > span:first-child').forEach(label => {
+            const count = label.querySelector('b');
+            label.textContent = t('players') + ' ';
+            if (count) label.appendChild(count);
+        });
+        const stats = area.querySelector('.roulette-stats');
+        if (stats) stats.childNodes[0].nodeValue = t('last100') + ': ';
+        const button = document.getElementById('rouletteSpin'); if (button && !button.disabled) button.textContent = t('place');
+    }
+}
+function setupLanguage() {
+    const telegramLanguage = window.Telegram?.WebApp?.initDataUnsafe?.user?.language_code || navigator.language.slice(0, 2);
+    uiLanguage = localStorage.getItem('clashpvp-language') || (LANGUAGES[telegramLanguage] ? telegramLanguage : 'en');
+    const select = document.getElementById('languageSelect');
+    if (select) select.onchange = () => { uiLanguage = select.value; localStorage.setItem('clashpvp-language', uiLanguage); applyLanguage(); };
+    applyLanguage();
+}
 
 const rulesData = {
     rps: {title:'🪨 Камень-Ножницы-Бумага',body:'PvP-дуэль: оба игрока выбирают ход (🪨📄✂️). Камень бьёт ножницы, ножницы бьют бумагу, бумага бьёт камень. Победитель забирает ставку x2 минус 10% комиссия. Ничья — возврат.'},
@@ -1414,10 +1530,10 @@ function openGame(game) {
     document.getElementById('gameOverlay').classList.add('show');
     updateBalance();
     const area = document.getElementById('gameArea');
-    if (game === 'crash') { renderCrash(area); return; }
-    if (game === 'mines') { renderSoloMines(area); return; }
-    if (game === 'blackjack') { renderSoloBJ(area); return; }
-    if (game === 'roulette') { renderRoulette(area); return; }
+    if (game === 'crash') { renderCrash(area); applyLanguage(); return; }
+    if (game === 'mines') { renderSoloMines(area); applyLanguage(); return; }
+    if (game === 'blackjack') { renderSoloBJ(area); applyLanguage(); return; }
+    if (game === 'roulette') { renderRoulette(area); applyLanguage(); return; }
 
     const titles = { rps:'🪨 Камень-Ножницы-Бумага', dice:'🎲 Кости', coin:'🪙 Монетка', mines:'💣 Мины', blackjack:'♠ Блекджек' };
     document.getElementById('gameTitle').textContent = titles[game] || 'Игра';
@@ -1429,6 +1545,7 @@ function openGame(game) {
         blackjack: '<div class="pv-icon-wrap"><div class="pv-icon-bg blackjack"><span class="pv-icon">♠</span></div></div><div class="pv-title-text">Блекджек</div><div class="pv-sub-text">Собери 21 очко и обыграй соперника</div>'
     };
     area.innerHTML = '<div class="game-preview">' + (previewHTML[game]||'') + '</div><div class="game-lobby" id="gameLobby"></div>';
+    applyLanguage();
 
     // Request lobby data
     socket?.emit('lobby:list', { gameType: game }, (res) => {
@@ -1764,15 +1881,15 @@ function crUpdateRound(state) {
         }
     }
     const cl = document.getElementById('crCountLabel');
-    if (cl) cl.textContent = state.phase === 'betting' ? 'сек' : '';
+    if (cl) cl.textContent = state.phase === 'betting' ? t('seconds').toLowerCase() : '';
     const pc = document.getElementById('crPlayerCount');
-    if (pc) pc.textContent = '👥 ' + state.players.length + ' ИГРОКОВ';
+    if (pc) pc.textContent = '👥 ' + state.players.length + ' ' + t('players');
     const st = document.getElementById('crStatus');
     if (st) {
-        if (state.phase === 'betting') { st.textContent = 'ПРИЕМ СТАВОК...'; st.className = 'c-status'; }
-        else if (state.phase === 'flying') { st.textContent = '🚀 ПОЛЕТ...'; st.className = 'c-status'; }
-        else if (state.phase === 'crashed') { st.textContent = '💥 КРАШ!'; st.className = 'c-status crashed'; }
-        else { st.textContent = '⏳ ЗАПУСК...'; st.className = 'c-status'; }
+        if (state.phase === 'betting') { st.textContent = phrase('betting'); st.className = 'c-status'; }
+        else if (state.phase === 'flying') { st.textContent = '🚀 ' + phrase('flying'); st.className = 'c-status'; }
+        else if (state.phase === 'crashed') { st.textContent = '💥 ' + phrase('crashed'); st.className = 'c-status crashed'; }
+        else { st.textContent = '⏳ ' + phrase('launching'); st.className = 'c-status'; }
     }
 }
 
@@ -1789,7 +1906,7 @@ function crUpdateSocial(state) {
     displayPlayers.push(...otherPlayers.slice(0, myEntry ? 19 : 20));
 
     if (!displayPlayers.length) {
-        const emptyMsg = '<div style="padding:10px 6px;font-size:10px;color:rgba(255,255,255,0.1);font-family:\'Fredoka\',sans-serif;font-weight:700;letter-spacing:1px;">ОЖИДАНИЕ ИГРОКОВ...</div>';
+        const emptyMsg = '<div style="padding:10px 6px;font-size:10px;color:rgba(255,255,255,0.1);font-family:\'Fredoka\',sans-serif;font-weight:700;letter-spacing:1px;">' + phrase('waitingPlayers') + '</div>';
         if (list.innerHTML !== emptyMsg) list.innerHTML = emptyMsg;
         return;
     }
@@ -1807,7 +1924,7 @@ function crUpdateSocial(state) {
         } else {
             s = p.bet ? '<span class="crash-part-bet">' + p.bet + ' ★</span>' : '<span class="crash-part-bet">0</span>';
         }
-        html += '<div class="crash-participant' + (isMe ? ' me' : '') + '" style="animation-delay:' + (i*0.03) + 's"><div class="crash-part-avatar">' + (isMe ? '⚡' : '👤') + '</div><div class="crash-part-name">' + (isMe ? 'Ты' : (p.username||'Player')) + '</div>' + s + '</div>';
+        html += '<div class="crash-participant' + (isMe ? ' me' : '') + '" style="animation-delay:' + (i*0.03) + 's"><div class="crash-part-avatar">' + (isMe ? '⚡' : '👤') + '</div><div class="crash-part-name">' + (isMe ? t('you') : (p.username||'Player')) + '</div>' + s + '</div>';
     });
     if (list.innerHTML !== html) list.innerHTML = html;
 }
@@ -1834,26 +1951,26 @@ function crUpdateBtn(state) {
     const cashed = myBet?.status === 'cashed';
 
     if (!socket?.connected || !socket.id) {
-        btn.textContent = '★ СТАВКА'; btn.className = 'c-main-btn disabled'; return;
+        btn.textContent = '★ ' + t('placeBet'); btn.className = 'c-main-btn disabled'; return;
     }
     if (state.phase === 'betting') {
-        if (hasBet) { btn.textContent = '★ СТАВКА СДЕЛАНА'; btn.className = 'c-main-btn disabled'; }
-        else { btn.textContent = '★ СТАВКА'; btn.className = 'c-main-btn'; }
+        if (hasBet) { btn.textContent = '★ ' + phrase('betMade'); btn.className = 'c-main-btn disabled'; }
+        else { btn.textContent = '★ ' + t('placeBet'); btn.className = 'c-main-btn'; }
     } else if (state.phase === 'flying') {
         if (hasBet && !cashed) {
-            btn.textContent = '◆ ЗАБРАТЬ ' + (state.mult||1).toFixed(2) + 'x';
+            btn.textContent = '◆ ' + phrase('cashout') + ' ' + (state.mult||1).toFixed(2) + 'x';
             btn.className = 'c-main-btn cashout';
         } else if (cashed) {
             btn.textContent = '✓ +' + (myBet?.payout || Math.ceil((myBet?.bet||0) * (myBet?.cashedAt||1)));
             btn.className = 'c-main-btn cashed';
         } else {
-            btn.textContent = '— НАБЛЮДАЮ'; btn.className = 'c-main-btn disabled';
+            btn.textContent = '— ' + phrase('watching'); btn.className = 'c-main-btn disabled';
         }
     } else if (state.phase === 'crashed') {
         if (cashed) btn.textContent = '✓ ВЫИГРЫШ +' + (myBet?.payout || Math.ceil((myBet?.bet||0) * (myBet?.cashedAt||1))); else btn.textContent = '💥 КРАШ';
         btn.className = 'c-main-btn ' + (cashed ? 'cashed' : 'disabled');
     } else {
-        btn.textContent = '★ СТАВКА'; btn.className = 'c-main-btn disabled';
+        btn.textContent = '★ ' + t('placeBet'); btn.className = 'c-main-btn disabled';
     }
 }
 
@@ -2286,9 +2403,9 @@ function setRouletteUnavailable(message) {
     const timer = document.getElementById('rouletteTimer');
     if (timer) timer.textContent = '--';
     const label = document.getElementById('rouletteTimerLabel');
-    if (label) label.textContent = 'НЕТ СВЯЗИ';
+    if (label) label.textContent = phrase('noLink');
     const button = document.getElementById('rouletteSpin');
-    if (button) { button.disabled = true; button.textContent = 'НЕТ СОЕДИНЕНИЯ'; }
+    if (button) { button.disabled = true; button.textContent = phrase('noConnection'); }
     document.getElementById('rouletteBet').disabled = true;
     document.querySelectorAll('.roulette-adjust button, .roulette-color').forEach(control => { control.disabled = true; });
 }
@@ -2296,7 +2413,7 @@ function setRouletteUnavailable(message) {
 function rouletteEscape(value) { const node = document.createElement('span'); node.textContent = value || 'Player'; return node.innerHTML; }
 function rouletteInitial(value) { return rouletteEscape(String(value || 'P').trim().slice(0, 1).toUpperCase()); }
 function rouletteMultiplier(color) { return color === 'green' ? 14 : 2; }
-function updateRoulettePreview() { const preview = document.getElementById('roulettePreview'); const input = document.getElementById('rouletteBet'); if (!preview || !input) return; const amount = Math.max(0, Math.floor(Number(input.value) || 0)); preview.innerHTML = 'ПРИ ВЫИГРЫШЕ:<b>' + (amount * rouletteMultiplier(rouletteColor)) + '</b><i class="tg-s"></i>'; const button = document.getElementById('rouletteSpin'); if (button && !button.disabled && !window._rouletteState?.bets?.some(bet => bet.userId === myUserId)) button.textContent = 'ПОСТАВИТЬ ' + amount + ' STARS'; }
+function updateRoulettePreview() { const preview = document.getElementById('roulettePreview'); const input = document.getElementById('rouletteBet'); if (!preview || !input) return; const amount = Math.max(0, Math.floor(Number(input.value) || 0)); preview.innerHTML = phrase('payout') + '<b>' + (amount * rouletteMultiplier(rouletteColor)) + '</b><i class="tg-s"></i>'; const button = document.getElementById('rouletteSpin'); if (button && !button.disabled && !window._rouletteState?.bets?.some(bet => bet.userId === myUserId)) button.textContent = t('place') + ' ' + amount + ' STARS'; }
 function rouletteAdjust(multiplier, max) { const input = document.getElementById('rouletteBet'); if (!input) return; input.value = max ? Math.max(1, Math.floor(balance || 1)) : Math.max(1, Math.floor((Number(input.value) || 1) * multiplier)); updateRoulettePreview(); }
 function rouletteSetMinimum() { const input = document.getElementById('rouletteBet'); if (input) { input.value = 1; updateRoulettePreview(); } }
 function rouletteHaptic(kind) {
@@ -2335,16 +2452,16 @@ function updateRoulette(state) {
     }
     document.getElementById('rouletteRound').textContent = 'LIVE';
     document.getElementById('roulettePot').textContent = state.bets.reduce((sum, bet) => sum + bet.amount, 0);
-    document.getElementById('roulettePlayers').textContent = state.bets.length + ' ИГРОКОВ';
+    document.getElementById('roulettePlayers').textContent = state.bets.length + ' ' + t('players');
     ['red', 'green', 'black'].forEach(color => { document.getElementById('rouletteStat' + color[0].toUpperCase() + color.slice(1)).textContent = state.stats?.[color] || 0; });
     const fair = document.getElementById('rouletteFair');
     fair.disabled = !state.serverSeed;
     fair.classList.toggle('ready', !!state.serverSeed);
     fair.textContent = state.serverSeed ? 'ПРОВЕРИТЬ РАУНД' : 'PROVABLY FAIR: ' + (state.serverSeedHash || '').slice(0, 24) + '...';
     fair.onclick = state.serverSeed ? verifyRouletteFair : null;
-    const resultLabel = { red: 'КРАСНОЕ', black: 'ЧЁРНОЕ', green: 'ZERO' };
-    timer.textContent = state.phase === 'betting' ? state.countdown : state.phase === 'spinning' ? '' : state.result ? resultLabel[state.result.color] : 'ОЖИДАНИЕ';
-    document.getElementById('rouletteTimerLabel').textContent = state.phase === 'betting' ? 'СЕКУНД ДО ЗАКРЫТИЯ' : state.phase === 'spinning' ? 'КРУТИМ' : state.result ? 'РЕЗУЛЬТАТ' : '';
+    const resultLabel = { red: t('red'), black: t('black'), green: 'ZERO' };
+    timer.textContent = state.phase === 'betting' ? state.countdown : state.phase === 'spinning' ? '' : state.result ? resultLabel[state.result.color] : t('waiting');
+    document.getElementById('rouletteTimerLabel').textContent = state.phase === 'betting' ? phrase('secondsToClose') : state.phase === 'spinning' ? phrase('spinning') : state.result ? phrase('result') : '';
     timer.className = 'word ' + (state.phase === 'betting' ? 'countdown ' : '') + (state.phase === 'settled' && state.result ? state.result.color : state.phase === 'spinning' ? 'spinning' : (state.phase === 'betting' && state.countdown <= 5 ? 'urgent' : ''));
     const spinColor = state.spinResult?.color || state.result?.color;
     if (spinColor && window._rouletteStripRound !== state.round) { window._rouletteStripRound = state.round; prepareRouletteStrip(spinColor); }
@@ -2356,13 +2473,13 @@ function updateRoulette(state) {
             window._rouletteHapticResult = state.round;
             rouletteHaptic(won ? 'success' : 'error');
         }
-        status.textContent = won ? 'Ваша ставка сыграла' : 'Выпало ' + state.result.number;
+        status.textContent = won ? phrase('betWon') : phrase('landed', { number: state.result.number });
     } else if (state.phase === 'spinning') {
-        status.textContent = 'Ставки закрыты, определяем результат';
-    } else { status.textContent = mine ? 'Ставка принята' : 'Приём ставок открыт'; }
+        status.textContent = phrase('deciding');
+    } else { status.textContent = mine ? phrase('betAccepted') : phrase('betsOpen'); }
     const button = document.getElementById('rouletteSpin');
     button.disabled = state.phase !== 'betting';
-    button.textContent = state.phase === 'betting' ? (mine ? 'ОТМЕНИТЬ СТАВКУ' : 'ПОСТАВИТЬ ' + Math.max(0, Math.floor(Number(document.getElementById('rouletteBet')?.value) || 0)) + ' STARS') : 'СТАВКИ ЗАКРЫТЫ';
+    button.textContent = state.phase === 'betting' ? (mine ? phrase('cancelBet') : t('place') + ' ' + Math.max(0, Math.floor(Number(document.getElementById('rouletteBet')?.value) || 0)) + ' STARS') : phrase('betsClosed');
     const canEditBet = state.phase === 'betting' && !mine;
     document.getElementById('rouletteBet').disabled = !canEditBet;
     document.querySelectorAll('.roulette-adjust button, .roulette-color').forEach(control => { control.disabled = !canEditBet; });
@@ -2593,7 +2710,7 @@ async function loadReferral() {
         const linkData = await linkResponse.json();
         const stats = await statsResponse.json();
         referralLink = linkData.link;
-        document.getElementById('referralStats').textContent = `${stats.totalReferrals || 0} friends invited`;
+        document.getElementById('referralStats').textContent = t('invited', { count: stats.totalReferrals || 0 });
         document.getElementById('referralBlock').hidden = false;
     } catch (err) {
         console.warn('Referral data unavailable:', err.message);
@@ -2944,6 +3061,7 @@ window.loadLeaderboard = async function() {
     });
 };
 
+setupLanguage();
 startConnection();
 </script>
 <script>window._supa = null; // Supabase removed</script>
