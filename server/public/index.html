@@ -1602,7 +1602,9 @@ function crUpdateGraph(state) {
     for (var i = 0; i <= steps; i++) {
         var m = 1 + (maxMult - 1) * (i / steps);
         var x = pad + (W - pad * 2) * (i / steps);
-        var y = H - pad - ((m - 1) / maxMult) * (H - pad * 2 - 20);
+        // Keep the launch low, then make the flight climb progressively faster.
+        var progress = i / steps;
+        var y = H - pad - Math.pow(progress, 2.2) * (H - pad * 2 - 20);
         y = Math.max(pad + 20, Math.min(H - pad, y));
         points.push({ x: x, y: y, m: m });
     }
