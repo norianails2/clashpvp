@@ -11,15 +11,15 @@
     <style>
         * { margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent; }
         :root {
-            --tg-bg: #0d0d14; --tg-text: #fff; --tg-hint: rgba(255,255,255,0.4);
+            --tg-bg: #0a0a14; --tg-text: #fff; --tg-hint: rgba(255,255,255,0.4);
             --tg-link: #fbbf24; --tg-btn: #fbbf24; --tg-btn-text: #1a0a2e; --tg-sec: rgba(255,255,255,0.05);
             --tg-safe-top: 0px; --tg-safe-bottom: 0px;
         }
         body { font-family:'Fredoka',sans-serif;background:#111118 !important;display:flex;justify-content:center;align-items:center;min-height:100vh;touch-action:manipulation; }
-        .phone { width:100%;max-width:430px;height:100vh;max-height:932px;background:var(--tg-bg);overflow:hidden;position:relative;box-shadow:0 0 60px rgba(100,50,255,0.3);border-radius:0;padding-top:var(--tg-safe-top);padding-bottom:var(--tg-safe-bottom); }
+        .phone { width:100%;max-width:430px;height:100vh;max-height:932px;background:radial-gradient(ellipse 70% 45% at 50% -5%,rgba(139,92,246,0.14),rgba(236,72,153,0.05),transparent 70%),var(--tg-bg);overflow:hidden;position:relative;box-shadow:0 0 60px rgba(100,50,255,0.3);border-radius:0;padding-top:var(--tg-safe-top);padding-bottom:var(--tg-safe-bottom); }
         @media (min-width:500px) { .phone { border-radius:36px;height:min(844px,100vh); } }
         .content { height:100%;overflow-y:auto;padding:20px 16px 100px;scrollbar-width:none;-webkit-overflow-scrolling:touch;position:relative; }
-        .content::before { content:'';position:absolute;top:0;left:0;right:0;height:280px;background:radial-gradient(ellipse 80% 60% at 50% -20%,rgba(100,50,255,0.12),transparent);pointer-events:none; }
+        .content::before { content:'';position:absolute;top:0;left:0;right:0;height:280px;background:radial-gradient(ellipse 80% 60% at 50% -20%,rgba(139,92,246,0.08),transparent);pointer-events:none; }
         .content::-webkit-scrollbar { display:none; }
         ::-webkit-scrollbar { width:4px; }
         ::-webkit-scrollbar-track { background:transparent; }
@@ -2956,7 +2956,7 @@ startConnection();
 
     const tp = tg.themeParams || {};
     const vars = {
-        '--tg-bg': tp.bg_color || '#0d0d14',
+        '--tg-bg': '#0a0a14',
         '--tg-text': tp.text_color || '#fff',
         '--tg-hint': tp.hint_color || 'rgba(255,255,255,0.4)',
         '--tg-link': tp.link_color || '#fbbf24',
@@ -2971,8 +2971,8 @@ startConnection();
     document.documentElement.style.setProperty('--tg-safe-top', tg.contentSafeAreaInset?.top + 'px' || '0');
     document.documentElement.style.setProperty('--tg-safe-bottom', tg.contentSafeAreaInset?.bottom + 'px' || '0');
 
-    try { tg.setBackgroundColor('#111118'); } catch(e) {}
-    try { tg.setHeaderColor ? tg.setHeaderColor('#111118') : null; } catch(e) {}
+    try { tg.setBackgroundColor('#0a0a14'); } catch(e) {}
+    try { tg.setHeaderColor ? tg.setHeaderColor('#0a0a14') : null; } catch(e) {}
 
     let _tgBackShown = false;
     window._tgShowBack = function() {
