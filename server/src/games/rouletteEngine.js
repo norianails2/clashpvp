@@ -3,7 +3,7 @@ import { getClient, query } from '../db/pool.js';
 import { holdBet, payout, refund } from '../services/balanceService.js';
 import { MAX_BET, MIN_BET, getMultiplier, isValidColor, spinRoulette } from './roulette.js';
 
-const BETTING_SECONDS = 15;
+const BETTING_SECONDS = 10;
 const SPINNING_SECONDS = 4;
 const RESULT_SECONDS = 5;
 
