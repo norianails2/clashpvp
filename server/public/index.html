@@ -637,6 +637,7 @@
         .pvc-row,.c-bet-row { align-items:center;padding:7px 10px;border:1px solid rgba(139,92,246,.32);border-radius:14px;background:rgba(139,92,246,.055); }.pvc-input-wrap,.c-bet-input-wrap { height:30px;padding:0;gap:7px;border:0;border-radius:0;background:transparent; }.pvc-input-wrap input,.c-bet-input-wrap input { font-size:16px; }.pvc-adj,.c-bet-adj { gap:5px; }.pvc-adj button,.c-bet-adj button { min-width:31px;height:28px;padding:0 6px;border-color:rgba(167,139,250,.24);background:rgba(255,255,255,.035);color:rgba(196,181,253,.78); }.pvc-adj button:nth-child(1),.c-bet-adj button:nth-child(1) { order:3; }.pvc-adj button:nth-child(2),.c-bet-adj button:nth-child(2) { order:1; }.pvc-adj button:nth-child(3),.c-bet-adj button:nth-child(3) { order:2; }.pvc-adj button:nth-child(4),.c-bet-adj button:nth-child(4) { order:4; }
         .pvp-create-btn { margin-top:10px; }.pvc-adj button,.c-bet-adj button,.roulette-adjust button { width:30px;min-width:30px;height:30px;padding:0;border-radius:5px; }.game-header .balance { display:inline-flex;align-items:center;gap:7px;padding:0;border:0;border-radius:0;background:transparent;color:#f7c948;font-family:'Fredoka',sans-serif;line-height:1; }.game-header .balance .tg-s { width:13px;height:13px;margin:0;align-self:flex-end;margin-bottom:5px; }.game-header .balance b { font-size:27px;font-weight:800;color:#f7c948; }.game-header .balance small { color:rgba(255,255,255,.4);font-size:9px;font-weight:700;align-self:flex-end;margin-bottom:3px; }
 
+        .balance-row { gap:7px; }.balance-row .balance-star { display:inline-flex;width:13px;height:13px;align-self:flex-end;margin-bottom:5px; }.balance-row .balance-star .tg-s { width:13px;height:13px; }.balance-row .amount { font-size:27px!important; }.balance-row .currency { align-self:flex-end;margin-bottom:3px;font-size:9px; }
     </style>
 </head>
 <body>
@@ -647,7 +648,7 @@
             <div class="balance-left">
                 <div class="label" id="balanceLabel">Баланс</div>
                 <div class="balance-row">
-                    <span style="font-size:22px;line-height:1;margin-right:2px;"><i class="tg-s"></i></span>
+                    <span class="balance-star"><i class="tg-s"></i></span>
                     <span class="amount" id="balanceAmount">0</span>
                     <span class="currency" id="balanceCurrency">Stars</span>
                 </div>
