@@ -257,7 +257,16 @@ export function registerSoloBlackjackHandlers(_io, socket) {
         } finally {
           client.release();
         }
-        const result = { card, score, bust: true, gameOver: true, playerCards: state.playerCards, dealerCards: state.dealerCards, bet: state.bet };
+        const result = {
+          card,
+          score,
+          bust: true,
+          gameOver: true,
+          playerCards: state.playerCards,
+          dealerCards: state.dealerCards,
+          dealerScore: calculateScore(state.dealerCards),
+          bet: state.bet,
+        };
         socket.emit('bj:hit_result', result);
         return ack?.(result);
       }
@@ -279,7 +288,14 @@ export function registerSoloBlackjackHandlers(_io, socket) {
       } finally {
         client.release();
       }
-      const result = { card, score, bust: false, gameOver: false, playerCards: state.playerCards };
+      const result = {
+        card,
+        score,
+        bust: false,
+        gameOver: false,
+        playerCards: state.playerCards,
+        dealerCard: state.dealerCards[0],
+      };
       socket.emit('bj:hit_result', result);
       ack?.(result);
     } catch (err) {
@@ -328,7 +344,16 @@ export function registerSoloBlackjackHandlers(_io, socket) {
           await deleteGame(userId, client);
           await client.query('COMMIT');
           socket.emit('balance:update', { balance: held.balanceAfter });
-          return ack?.({ card, score, bust: true, gameOver: true, playerCards: state.playerCards, dealerCards: state.dealerCards, bet: state.bet });
+          return ack?.({
+            card,
+            score,
+            bust: true,
+            gameOver: true,
+            playerCards: state.playerCards,
+            dealerCards: state.dealerCards,
+            dealerScore: calculateScore(state.dealerCards),
+            bet: state.bet,
+          });
         }
 
         await saveGame(userId, state, client);

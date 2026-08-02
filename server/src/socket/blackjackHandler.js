@@ -113,16 +113,40 @@ export function registerBlackjackHandlers(io, socket) {
           opponentCards,
           opponentScore,
           opponentStatus,
-          currentTurn: room.creator_id,
         };
 
+        const openingIsOver = creatorStatus === 'stood' && opponentStatus === 'stood';
+        let openingResult = null;
+
+        if (openingIsOver) {
+          openingResult = resolveGame(
+            creatorScore, creatorStatus,
+            opponentScore, opponentStatus,
+            room.creator_id, user.id
+          );
+
+          if (openingResult.draw) {
+            await refund(room.creator_id, room.bet_amount, 'blackjack', room.id, client);
+            await refund(user.id, room.bet_amount, 'blackjack', room.id, client);
+          } else {
+            await payout(openingResult.winnerId, room.bet_amount * 2, 'blackjack', room.id, client, HOUSE_EDGE);
+          }
+
+          updatedData.winnerId = openingResult.winnerId;
+          updatedData.draw = openingResult.draw;
+          delete updatedData.deck;
+        } else {
+          // A creator blackjack is already stood, so the opponent must take the first turn.
+          updatedData.currentTurn = creatorStatus === 'active' ? room.creator_id : user.id;
+        }
+
         await client.query(
-          `UPDATE rooms
-           SET status = 'IN_PROGRESS',
-               opponent_id = $1,
-               game_data = $2::jsonb
-           WHERE id = $3`,
-          [user.id, JSON.stringify(updatedData), room.id]
+           `UPDATE rooms
+           SET status = $1,
+               opponent_id = $2,
+               game_data = $3::jsonb
+           WHERE id = $4`,
+          [openingIsOver ? 'FINISHED' : 'IN_PROGRESS', user.id, JSON.stringify(updatedData), room.id]
         );
 
         await client.query('COMMIT');
@@ -138,13 +162,28 @@ export function registerBlackjackHandlers(io, socket) {
           opponentCards,
           opponentScore,
           opponentStatus,
-          currentTurn: room.creator_id,
+          currentTurn: updatedData.currentTurn || null,
         });
+
+        if (openingResult) {
+          io.to(`room:${room.id}`).emit('blackjack:game_over', {
+            roomId: room.id,
+            winnerId: openingResult.winnerId,
+            draw: openingResult.draw,
+            creatorCards,
+            creatorScore,
+            opponentCards,
+            opponentScore,
+            payout: openingResult.draw ? room.bet_amount : Math.ceil(room.bet_amount * 2 * (1 - HOUSE_EDGE)),
+          });
+        }
 
         ack?.({
           cards: opponentCards,
           score: opponentScore,
         });
+
+        broadcastLobbyUpdate(io, 'blackjack');
       } catch (err) {
         await client.query('ROLLBACK');
         throw err;
