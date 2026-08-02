@@ -2311,10 +2311,10 @@ function prepareRouletteStrip(color) {
     const markerRatio = 0.5;
     const markerPosition = (strip.clientWidth || 320) * markerRatio;
     const landingTile = track.querySelector('.landing');
-    const landingCenter = landingTile.offsetLeft + landingTile.offsetWidth / 2;
+    const landingPoint = landingTile.offsetLeft + landingTile.offsetWidth * (0.25 + Math.random() * 0.5);
     strip.style.setProperty('--roulette-marker', (markerRatio * 100).toFixed(1) + '%');
     document.querySelector('.roulette-stage')?.style.setProperty('--roulette-marker', (markerRatio * 100).toFixed(1) + '%');
-    track.style.setProperty('--roulette-stop', Math.round(markerPosition - landingCenter) + 'px');
+    track.style.setProperty('--roulette-stop', Math.round(markerPosition - landingPoint) + 'px');
 }
 function updateRoulette(state) {
     window._rouletteState = state;
