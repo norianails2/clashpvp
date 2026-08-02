@@ -2311,7 +2311,7 @@ function prepareRouletteStrip(color) {
     const markerRatio = 0.32 + Math.random() * 0.36;
     const markerPosition = (strip.clientWidth || 320) * markerRatio;
     strip.style.setProperty('--roulette-marker', (markerRatio * 100).toFixed(1) + '%');
-    track.style.setProperty('--roulette-stop', Math.round(markerPosition - (targetIndex * cellWidth + 27)) + 'px');
+    track.style.setProperty('--roulette-stop', Math.round(markerPosition - (targetIndex * cellWidth + 77)) + 'px');
 }
 function updateRoulette(state) {
     window._rouletteState = state;
