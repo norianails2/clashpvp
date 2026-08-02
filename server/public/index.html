@@ -1619,8 +1619,9 @@ function crUpdateGraph(state) {
         rocketT = Math.min(1, cp / maxMult);
     }
     var rocketIdx = Math.floor(rocketT * steps);
-    var rocketX = points[rocketIdx] ? points[rocketIdx].x : pad;
-    var rocketY = points[rocketIdx] ? points[rocketIdx].y : H - pad;
+    var rocketX = pad + (W - pad * 2) * rocketT;
+    var rocketY = H - pad - Math.pow(rocketT, 2.2) * (H - pad * 2 - 20);
+    rocketY = Math.max(pad + 20, Math.min(H - pad, rocketY));
 
     // ---- Neon glow under curve ----
     ctx.beginPath();
@@ -1628,6 +1629,7 @@ function crUpdateGraph(state) {
     for (var i = 0; i <= rocketIdx; i++) {
         ctx.lineTo(points[i].x, points[i].y);
     }
+    ctx.lineTo(rocketX, rocketY);
     ctx.lineTo(rocketX, H - pad);
     ctx.closePath();
     var fillGrad = ctx.createLinearGradient(0, pad, 0, H - pad);
@@ -1643,6 +1645,7 @@ function crUpdateGraph(state) {
     for (var i = 0; i <= rocketIdx; i++) {
         ctx.lineTo(points[i].x, points[i].y);
     }
+    ctx.lineTo(rocketX, rocketY);
     ctx.strokeStyle = 'rgba(168,85,247,0.6)';
     ctx.lineWidth = 2;
     ctx.shadowColor = 'rgba(139,92,246,0.4)';
@@ -1656,6 +1659,7 @@ function crUpdateGraph(state) {
     for (var i = 0; i <= rocketIdx; i++) {
         ctx.lineTo(points[i].x, points[i].y);
     }
+    ctx.lineTo(rocketX, rocketY);
     ctx.strokeStyle = 'rgba(255,255,255,0.5)';
     ctx.lineWidth = 1;
     ctx.stroke();
@@ -1664,9 +1668,12 @@ function crUpdateGraph(state) {
     ctx.save();
     ctx.translate(rocketX, rocketY);
     var angle = -Math.PI / 4;
-    if (rocketIdx > 1) {
-        var dx = points[rocketIdx].x - points[rocketIdx - 1].x;
-        var dy = points[rocketIdx].y - points[rocketIdx - 1].y;
+    if (rocketT > 0.01) {
+        var previousT = Math.max(0, rocketT - 0.01);
+        var previousX = pad + (W - pad * 2) * previousT;
+        var previousY = H - pad - Math.pow(previousT, 2.2) * (H - pad * 2 - 20);
+        var dx = rocketX - previousX;
+        var dy = rocketY - previousY;
         angle = Math.atan2(dy, dx);
     }
     ctx.rotate(angle);

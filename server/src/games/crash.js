@@ -90,7 +90,7 @@ class CrashEngine {
 
     this.timers.main = setInterval(() => {
       const elapsed = (Date.now() - this.startTime) / 1000;
-      this.mult = Math.round(Math.exp(elapsed * 0.06) * 100) / 100;
+      this.mult = Math.round(Math.exp(elapsed * 0.09) * 100) / 100;
       this.broadcast();
 
       this.players.forEach(p => {
