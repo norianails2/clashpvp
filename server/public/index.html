@@ -2386,6 +2386,8 @@ function renderRoulette(area) {
     rouletteStage.insertAdjacentHTML('beforeend', '<small id="rouletteTimerLabel">ОЖИДАНИЕ</small>');
     rouletteCountdown.remove();
     rouletteTop.insertAdjacentElement('afterend', rouletteStage);
+    const greenColumn = area.querySelector('.roulette-color.green')?.closest('.roulette-column');
+    if (greenColumn) greenColumn.parentElement.appendChild(greenColumn);
     const rouletteSpin = document.getElementById('rouletteSpin');
     rouletteSpin.insertAdjacentHTML('beforebegin', '<div class="roulette-preview" id="roulettePreview"></div>');
     area.querySelectorAll('.roulette-color').forEach(button => button.onclick = () => {
