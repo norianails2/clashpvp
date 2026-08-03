@@ -77,9 +77,8 @@
         .game-card.c5 .game-icon { font-family:Georgia,'Times New Roman',serif;font-size:32px;font-weight:700; }
         .game-card[data-game="roulette"] { background:linear-gradient(135deg,#29263b,#171724);border-color:rgba(196,181,253,.2);box-shadow:0 6px 22px rgba(0,0,0,.28); }
         .game-card[data-game="roulette"] .glow { width:180px;height:180px;top:-62px;right:-46px;background:radial-gradient(circle,rgba(67,184,129,.36),rgba(67,184,129,.08) 42%,transparent 70%);opacity:1;animation:none; }
-        .game-icon.roulette-lobby-icon { border-radius:50%;background:conic-gradient(from -9deg,#43b881 0 13deg,#d94b61 13deg 33deg,#242a38 33deg 53deg,#d94b61 53deg 73deg,#242a38 73deg 93deg,#d94b61 93deg 113deg,#242a38 113deg 133deg,#d94b61 133deg 153deg,#242a38 153deg 173deg,#d94b61 173deg 193deg,#242a38 193deg 213deg,#d94b61 213deg 233deg,#242a38 233deg 253deg,#d94b61 253deg 273deg,#242a38 273deg 293deg,#d94b61 293deg 313deg,#242a38 313deg 333deg,#d94b61 333deg 360deg);border:2px solid #8c96a8;box-shadow:inset 0 0 0 3px #151925,inset 0 0 0 5px rgba(255,255,255,.13),0 5px 16px rgba(0,0,0,.35),0 0 0 3px rgba(167,139,250,.08);overflow:hidden; }
-        .game-icon.roulette-lobby-icon::before { content:'';position:absolute;inset:13px;border-radius:50%;background:radial-gradient(circle at 38% 34%,#566174 0 11%,#252b38 12% 63%,#151925 64%);border:2px solid rgba(255,255,255,.2);box-shadow:0 1px 5px rgba(0,0,0,.55); }
-        .game-icon.roulette-lobby-icon::after { content:'';position:absolute;width:5px;height:5px;top:7px;left:50%;border-radius:50%;background:#f3f4f6;box-shadow:0 0 5px rgba(255,255,255,.65);transform:translateX(-50%); }
+        .game-icon.roulette-lobby-icon { border-radius:50%;background:#1b1d2b url('/assets/roulette-wheel.png') center/52px 52px no-repeat;border:1px solid rgba(230,232,238,.28);box-shadow:0 5px 16px rgba(0,0,0,.4),0 0 0 3px rgba(167,139,250,.08); }
+        .game-icon.roulette-lobby-icon::before,.game-icon.roulette-lobby-icon::after { content:none; }
         .game-card.c6 { background:#b84a2a; }
         .game-card.c7 { background:#5a3ac8; }
         .game-card.c8 { background:#b81a2a; }
