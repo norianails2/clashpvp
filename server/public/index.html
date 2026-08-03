@@ -81,6 +81,25 @@
         .game-card:hover .game-icon.roulette-lobby-icon { background:radial-gradient(circle at 50% 50%,transparent 0 28%,rgba(0,0,0,.18) 29% 31%,transparent 32%),conic-gradient(from -10deg,#43b881 0 18deg,transparent 18deg 360deg),repeating-conic-gradient(from -10deg,#d94b61 0 17deg,#10141e 17deg 19deg,#303949 19deg 36deg,#10141e 36deg 38deg);border-color:#c8d0dc; }
         .game-icon.roulette-lobby-icon::before { content:'';position:absolute;inset:15px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#7d899a 0 12%,#414b5a 13% 27%,#202735 28% 71%,#111620 72%);border:1px solid rgba(255,255,255,.24);box-shadow:0 1px 4px rgba(0,0,0,.62); }
         .game-icon.roulette-lobby-icon::after { content:'';position:absolute;width:5px;height:5px;top:6px;right:10px;border-radius:50%;background:#f4f5f7;box-shadow:0 1px 3px rgba(0,0,0,.7),0 0 4px rgba(255,255,255,.55); }
+        .game-icon.css-game-icon { border-radius:50%;background:#1b1e2a;border:2px solid #8c96a8;box-shadow:inset 0 0 0 3px #121621,inset 0 0 0 5px rgba(255,255,255,.1),0 5px 16px rgba(0,0,0,.4),0 0 0 3px rgba(167,139,250,.08);overflow:hidden; }
+        .game-icon.css-game-icon::before,.game-icon.css-game-icon::after { content:'';position:absolute;display:block; }
+        .game-icon.rps-lobby-icon { background:radial-gradient(circle at 33% 23%,rgba(221,214,254,.3),transparent 26%),conic-gradient(from 35deg,#5131a6,#2d1d62,#6b43c3,#5131a6); }
+        .game-icon.rps-lobby-icon::before { width:29px;height:22px;left:11px;top:17px;border-radius:9px 9px 11px 11px;background:linear-gradient(145deg,#ddd6fe,#8b5cf6);box-shadow:inset 0 2px rgba(255,255,255,.35),0 3px 7px rgba(17,9,48,.65); }
+        .game-icon.rps-lobby-icon::after { width:8px;height:16px;left:9px;top:12px;border-radius:6px 5px 3px 6px;background:#c4b5fd;box-shadow:9px -2px 0 -1px #c4b5fd,18px -1px 0 -1px #c4b5fd;transform:rotate(-18deg); }
+        .game-icon.dice-lobby-icon { background:radial-gradient(circle at 33% 23%,rgba(226,232,240,.26),transparent 26%),conic-gradient(from 35deg,#38465b,#151d2d,#56667c,#38465b); }
+        .game-icon.dice-lobby-icon::before { width:29px;height:29px;left:10px;top:10px;border-radius:7px;background:radial-gradient(circle at 26% 26%,#273246 0 3px,transparent 3.5px),radial-gradient(circle at 74% 26%,#273246 0 3px,transparent 3.5px),radial-gradient(circle at 50% 50%,#273246 0 3px,transparent 3.5px),radial-gradient(circle at 26% 74%,#273246 0 3px,transparent 3.5px),radial-gradient(circle at 74% 74%,#273246 0 3px,transparent 3.5px),linear-gradient(145deg,#f8fafc,#aeb9cb);border:1px solid #fff;box-shadow:inset 0 2px rgba(255,255,255,.7),0 3px 7px rgba(0,0,0,.45);transform:rotate(-8deg); }
+        .game-icon.coin-lobby-icon { background:radial-gradient(circle at 33% 23%,rgba(255,235,141,.32),transparent 26%),conic-gradient(from 35deg,#785108,#352306,#a47317,#785108); }
+        .game-icon.coin-lobby-icon::before { width:32px;height:32px;left:8px;top:8px;border-radius:50%;background:radial-gradient(circle at 35% 28%,#fff4b5 0 6%,transparent 7%),radial-gradient(circle at 50% 50%,#facd52 0 40%,#ca7e12 41% 57%,#6d3d07 58% 63%,#f7b92f 64%);border:2px solid #ffdd6a;box-shadow:inset 0 0 0 3px rgba(102,55,0,.35),0 3px 8px rgba(0,0,0,.43); }
+        .game-icon.coin-lobby-icon::after { width:10px;height:10px;left:20px;top:19px;border:2px solid rgba(104,57,3,.64);border-radius:50%; }
+        .game-icon.mines-lobby-icon { background:radial-gradient(circle at 33% 23%,rgba(189,203,221,.25),transparent 26%),conic-gradient(from 35deg,#364254,#121925,#526173,#364254); }
+        .game-icon.mines-lobby-icon::before { width:28px;height:28px;left:10px;top:14px;border-radius:50%;background:radial-gradient(circle at 34% 28%,#73829a 0 7%,transparent 8%),radial-gradient(circle at 52% 52%,#3d485a 0 42%,#111722 43%);border:2px solid #a7b4c6;box-shadow:inset 0 -5px 8px rgba(0,0,0,.7),0 3px 8px rgba(0,0,0,.5); }
+        .game-icon.mines-lobby-icon::after { width:17px;height:8px;left:28px;top:8px;border-top:3px solid #e3a43f;border-radius:50%;box-shadow:8px -3px 0 -3px #ffd25d;transform:rotate(-34deg); }
+        .game-icon.blackjack-lobby-icon { background:radial-gradient(circle at 33% 23%,rgba(255,218,224,.2),transparent 26%),conic-gradient(from 35deg,#62263e,#1f1727,#8a4057,#62263e); }
+        .game-icon.blackjack-lobby-icon::before { width:20px;height:29px;left:9px;top:11px;border-radius:4px;background:linear-gradient(145deg,#f8fafc,#b4bfce);border:1px solid #fff;box-shadow:0 3px 7px rgba(0,0,0,.46); }
+        .game-icon.blackjack-lobby-icon::after { width:20px;height:29px;left:21px;top:11px;border-radius:4px;background:linear-gradient(145deg,#ef6078,#9f2944);border:1px solid rgba(255,227,232,.7);box-shadow:0 3px 7px rgba(0,0,0,.46); }
+        .game-icon.crash-lobby-icon { background:radial-gradient(circle at 33% 23%,rgba(255,216,225,.23),transparent 26%),conic-gradient(from 35deg,#7a283c,#211521,#b84261,#7a283c); }
+        .game-icon.crash-lobby-icon::before { width:15px;height:29px;left:18px;top:8px;border-radius:12px 12px 5px 5px;background:linear-gradient(90deg,#e4ebf6 0 34%,#f26b84 35% 66%,#96334e 67%);border:1px solid rgba(255,255,255,.75);box-shadow:0 3px 8px rgba(0,0,0,.44);transform:rotate(42deg); }
+        .game-icon.crash-lobby-icon::after { width:0;height:0;left:10px;top:30px;border-top:12px solid #ffc34d;border-left:7px solid transparent;border-right:7px solid transparent;filter:drop-shadow(0 2px 3px rgba(255,86,67,.7));transform:rotate(-48deg); }
         .game-card.c6 { background:#b84a2a; }
         .game-card.c7 { background:#5a3ac8; }
         .game-card.c8 { background:#b81a2a; }
@@ -95,7 +114,8 @@
         .game-card.c7 .glow { background:#a29bfe; }
         .game-card.c8 .glow { background:#ff7675; }
         .game-icon { width:52px;height:52px;border-radius:16px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.12);position:relative;z-index:1;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 2px 12px rgba(0,0,0,0.15); }
-        .game-card:hover .game-icon { transform:scale(1.12) rotate(-6deg);background:rgba(255,255,255,0.18);border-color:rgba(255,255,255,0.2);box-shadow:0 6px 20px rgba(0,0,0,0.25); }
+        .game-card:hover .game-icon { transform:scale(1.12) rotate(-6deg);border-color:rgba(255,255,255,0.2);box-shadow:0 6px 20px rgba(0,0,0,0.25); }
+        .game-card:hover .game-icon:not(.css-game-icon):not(.roulette-lobby-icon) { background:rgba(255,255,255,0.18); }
         .game-card:active .game-icon { transform:scale(0.95) rotate(0); }
         .game-info { flex:1;min-width:0;position:relative;z-index:1; }
         .game-info .name { font-family:'Fredoka',sans-serif;font-size:17px;font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:-0.2px; }
@@ -678,13 +698,13 @@
 
         <div class="section-title">🎮 Все игры <span style="margin-left:auto;font-size:11px;color:rgba(255,255,255,0.25);font-family:'Fredoka',sans-serif;font-weight:700;letter-spacing:1px;">7 ИГР</span></div>
 
-        <div class="game-card c4" data-game="mines"><div class="glow"></div><div class="game-icon">💣</div><div class="game-info"><div class="name">Мины</div><div class="sub">Найди алмазы, избегай бомб</div></div><div class="game-badge new">🔥 НОВОЕ</div><span class="game-arrow">›</span></div>
-        <div class="game-card c5" data-game="blackjack"><div class="glow"></div><div class="game-icon">♠</div><div class="game-info"><div class="name">Блекджек</div><div class="sub">Собери 21</div></div><span class="game-arrow">›</span></div>
-        <div class="game-card c6" data-game="crash"><div class="glow"></div><div class="game-icon">🚀</div><div class="game-info"><div class="name">Crash</div><div class="sub">Забери до взрыва</div></div><div class="game-badge updated">⚡ ОБНОВЛЕНО</div><span class="game-arrow">›</span></div>
+        <div class="game-card c4" data-game="mines"><div class="glow"></div><div class="game-icon css-game-icon mines-lobby-icon" aria-label="Мины"></div><div class="game-info"><div class="name">Мины</div><div class="sub">Найди алмазы, избегай бомб</div></div><div class="game-badge new">🔥 НОВОЕ</div><span class="game-arrow">›</span></div>
+        <div class="game-card c5" data-game="blackjack"><div class="glow"></div><div class="game-icon css-game-icon blackjack-lobby-icon" aria-label="Блекджек"></div><div class="game-info"><div class="name">Блекджек</div><div class="sub">Собери 21</div></div><span class="game-arrow">›</span></div>
+        <div class="game-card c6" data-game="crash"><div class="glow"></div><div class="game-icon css-game-icon crash-lobby-icon" aria-label="Crash"></div><div class="game-info"><div class="name">Crash</div><div class="sub">Забери до взрыва</div></div><div class="game-badge updated">⚡ ОБНОВЛЕНО</div><span class="game-arrow">›</span></div>
         <div class="game-card c2" data-game="roulette"><div class="glow"></div><div class="game-icon roulette-lobby-icon"></div><div class="game-info"><div class="name">Рулетка</div><div class="sub">Красное, чёрное или zero</div></div><span class="game-arrow">›</span></div>
-        <div class="game-card c1" data-game="rps"><div class="glow"></div><div class="game-icon">🪨</div><div class="game-info"><div class="name">Камень-Ножницы-Бумага</div><div class="sub">Дуэль на ставки</div></div><span class="game-arrow">›</span></div>
-        <div class="game-card c2" data-game="dice"><div class="glow"></div><div class="game-icon">🎲</div><div class="game-info"><div class="name">Кости</div><div class="sub">Больше/меньше/ровно</div></div><span class="game-arrow">›</span></div>
-        <div class="game-card c3" data-game="coin"><div class="glow"></div><div class="game-icon">🪙</div><div class="game-info"><div class="name">Монетка</div><div class="sub">Орёл или Решка</div></div><span class="game-arrow">›</span></div>
+        <div class="game-card c1" data-game="rps"><div class="glow"></div><div class="game-icon css-game-icon rps-lobby-icon" aria-label="Камень-Ножницы-Бумага"></div><div class="game-info"><div class="name">Камень-Ножницы-Бумага</div><div class="sub">Дуэль на ставки</div></div><span class="game-arrow">›</span></div>
+        <div class="game-card c2" data-game="dice"><div class="glow"></div><div class="game-icon css-game-icon dice-lobby-icon" aria-label="Кости"></div><div class="game-info"><div class="name">Кости</div><div class="sub">Больше/меньше/ровно</div></div><span class="game-arrow">›</span></div>
+        <div class="game-card c3" data-game="coin"><div class="glow"></div><div class="game-icon css-game-icon coin-lobby-icon" aria-label="Монетка"></div><div class="game-info"><div class="name">Монетка</div><div class="sub">Орёл или Решка</div></div><span class="game-arrow">›</span></div>
     </div>
 
     <div class="modal-overlay" id="authModal">
