@@ -20,7 +20,6 @@ async function withMinesTransaction(userId, work) {
   const client = await getClient();
   try {
     await client.query('BEGIN');
-    await client.query('SELECT id FROM users WHERE id = $1 FOR UPDATE', [userId]);
     const result = await work(client);
     await client.query('COMMIT');
     return result;
