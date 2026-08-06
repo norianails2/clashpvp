@@ -746,8 +746,23 @@
                 <div class="modal-error" id="starsError"></div>
             </div>
             <div class="modal-error" id="depositError"></div>
+            <button class="modal-confirm history" onclick="closeModal('depositModal');openModal('withdrawModal')">Withdraw to TON</button>
             <button class="modal-confirm history" onclick="showHistory()">📜 История</button>
             <button class="modal-cancel" onclick="closeModal('depositModal')">Закрыть</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="withdrawModal">
+        <div class="modal-box">
+            <h2>Withdraw to TON</h2>
+            <p>Requests are processed manually. The completed transfer hash will be stored in the request.</p>
+            <label for="withdrawAmount">Amount in Stars</label>
+            <input id="withdrawAmount" type="number" min="100" step="1" placeholder="Minimum 100">
+            <label for="withdrawWallet">TON wallet address</label>
+            <input id="withdrawWallet" type="text" autocomplete="off" placeholder="UQ... or EQ...">
+            <div class="modal-error" id="withdrawError"></div>
+            <button class="modal-confirm" onclick="createTonWithdrawal()">Create request</button>
+            <button class="modal-cancel" onclick="closeModal('withdrawModal')">Close</button>
         </div>
     </div>
 
@@ -936,6 +951,20 @@ let uiLanguage = 'ru';
 function t(key, values = {}) {
     const text = (LANGUAGES[uiLanguage] || LANGUAGES.en)[key] || LANGUAGES.ru[key] || key;
     return text.replace(/\{(\w+)\}/g, (_, name) => values[name] ?? '');
+}
+function createTonWithdrawal() {
+    const amount = Number.parseInt(document.getElementById('withdrawAmount')?.value, 10);
+    const walletAddress = document.getElementById('withdrawWallet')?.value.trim();
+    const error = document.getElementById('withdrawError');
+    if (!Number.isSafeInteger(amount) || amount < 100) { error.textContent = 'Minimum withdrawal: 100 Stars'; return; }
+    if (!walletAddress) { error.textContent = 'Enter a TON wallet address'; return; }
+    error.textContent = '';
+    socket?.emit('withdrawals:create', { amount, walletAddress }, (res) => {
+        if (res?.error) { error.textContent = res.error; return; }
+        addHistory('withdraw', -amount);
+        closeModal('withdrawModal');
+        showToast('TON withdrawal request created', 'success');
+    });
 }
 const UI_PHRASES = {
     ru: { betsOpen:'ПРИЁМ СТАВОК ОТКРЫТ', betsClosed:'СТАВКИ ЗАКРЫТЫ', betting:'ПРИЁМ СТАВОК...', flying:'ПОЛЁТ...', crashed:'КРАШ!', launching:'ЗАПУСК...', watching:'НАБЛЮДАЮ', cashout:'ЗАБРАТЬ', betMade:'СТАВКА СДЕЛАНА', waitingPlayers:'ОЖИДАНИЕ ИГРОКОВ...', secondsToClose:'СЕКУНД ДО ЗАКРЫТИЯ', spinning:'КРУТИМ', result:'РЕЗУЛЬТАТ', betAccepted:'Ставка принята', betWon:'Ваша ставка сыграла', landed:'Выпало {number}', deciding:'Ставки закрыты, определяем результат', cancelBet:'ОТМЕНИТЬ СТАВКУ', noConnection:'НЕТ СОЕДИНЕНИЯ', noLink:'НЕТ СВЯЗИ', payout:'ПРИ ВЫИГРЫШЕ:' },

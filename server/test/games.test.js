@@ -9,6 +9,7 @@ import { resolve as resolveRps } from '../src/games/rps.js';
 import { getMultiplier, isValidColor, spinRoulette } from '../src/games/roulette.js';
 import { isValidAutoCashoutAt } from '../src/socket/crashHandler.js';
 import { generateReferralLink } from '../src/services/referralService.js';
+import { isValidTonWalletAddress } from '../src/socket/withdrawalHandler.js';
 
 test('blackjack scores aces correctly', () => {
   assert.equal(calculateScore(['Ah', '9d']), 20);
@@ -25,6 +26,12 @@ test('referral links open the bot main mini app with startapp payload', () => {
     generateReferralLink('11111111-1111-4111-8111-111111111111', 'ClashPVPbot'),
     'https://t.me/ClashPVPbot?startapp=ref_11111111-1111-4111-8111-111111111111'
   );
+});
+
+test('TON withdrawal accepts friendly and raw wallet addresses only', () => {
+  assert.equal(isValidTonWalletAddress('UQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJKZ'), true);
+  assert.equal(isValidTonWalletAddress('0:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'), true);
+  assert.equal(isValidTonWalletAddress('not-a-wallet'), false);
 });
 
 test('mines multiplier increases with safe cells', () => {

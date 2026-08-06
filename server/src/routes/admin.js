@@ -101,6 +101,68 @@ router.post('/users/:id/balance', async (req, res, next) => {
   }
 });
 
+router.get('/withdrawals', async (req, res, next) => {
+  try {
+    const { rows } = await query(
+      `SELECT w.id, w.stars_amount, w.wallet_address, w.status, w.ton_tx_hash, w.created_at, w.processed_at,
+              u.username, u.telegram_id
+       FROM ton_withdrawal_requests w
+       JOIN users u ON u.id = w.user_id
+       ORDER BY CASE WHEN w.status = 'pending' THEN 0 ELSE 1 END, w.created_at DESC
+       LIMIT 100`
+    );
+    res.json({ withdrawals: rows });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/withdrawals/:id/paid', async (req, res, next) => {
+  try {
+    const tonTxHash = typeof req.body?.tonTxHash === 'string' ? req.body.tonTxHash.trim() : '';
+    if (!tonTxHash || tonTxHash.length > 128) return res.status(400).json({ error: 'TON transaction hash is required' });
+    const { rows } = await query(
+      `UPDATE ton_withdrawal_requests SET status = 'paid', ton_tx_hash = $2, processed_at = NOW()
+       WHERE id = $1 AND status = 'pending' RETURNING id, status`,
+      [req.params.id, tonTxHash]
+    );
+    if (!rows.length) return res.status(409).json({ error: 'Withdrawal is no longer pending' });
+    res.json({ withdrawal: rows[0] });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/withdrawals/:id/reject', async (req, res, next) => {
+  const client = await getClient();
+  try {
+    await client.query('BEGIN');
+    const { rows: requests } = await client.query(
+      `SELECT id, user_id, stars_amount FROM ton_withdrawal_requests WHERE id = $1 AND status = 'pending' FOR UPDATE`,
+      [req.params.id]
+    );
+    if (!requests.length) { await client.query('ROLLBACK'); return res.status(409).json({ error: 'Withdrawal is no longer pending' }); }
+    const withdrawal = requests[0];
+    const { rows: users } = await client.query('SELECT balance FROM users WHERE id = $1 FOR UPDATE', [withdrawal.user_id]);
+    const balanceBefore = Number(users[0].balance);
+    const balanceAfter = balanceBefore + Number(withdrawal.stars_amount);
+    await client.query("UPDATE ton_withdrawal_requests SET status = 'rejected', processed_at = NOW() WHERE id = $1", [withdrawal.id]);
+    await client.query('UPDATE users SET balance = $1 WHERE id = $2', [balanceAfter, withdrawal.user_id]);
+    await client.query(
+      `INSERT INTO transactions (user_id, type, amount, balance_before, balance_after, metadata)
+       VALUES ($1, 'refund', $2, $3, $4, $5)`,
+      [withdrawal.user_id, withdrawal.stars_amount, balanceBefore, balanceAfter, JSON.stringify({ withdrawalId: withdrawal.id, reason: 'withdrawal_rejected' })]
+    );
+    await client.query('COMMIT');
+    res.json({ withdrawal: { id: withdrawal.id, status: 'rejected' }, balance: balanceAfter });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    next(err);
+  } finally {
+    client.release();
+  }
+});
+
 // Game stats
 router.get('/games', async (req, res, next) => {
   try {
