@@ -82,6 +82,9 @@ export function registerMinesHandlers(io, socket) {
         active: true,
       };
       const { balanceAfter } = await withMinesTransaction(userId, async (client) => {
+        // Serialize game creation per player. Without this lock, two rapid requests
+        // can both observe an empty solo_mines_games row and each hold the bet.
+        await client.query('SELECT id FROM users WHERE id = $1 FOR UPDATE', [userId]);
         if (await loadGameForUpdate(client, userId)) {
           throw new Error('Finish the active mines game first');
         }

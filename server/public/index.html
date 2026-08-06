@@ -2262,6 +2262,7 @@ window.crVerifyHash = async function(serverSeed, expectedHash, clientSeed, nonce
 };
 
 let _minesGame = null;
+let _minesStartPending = false;
 function renderSoloMines(area) {
     document.getElementById('gameTitle').textContent = '💣 Мины';
     _minesGame = null;
@@ -2341,6 +2342,7 @@ function minesAdjBet(type) {
     inp.value = val;
 }
 function minesStart() {
+    if (_minesGame || _minesStartPending) return;
     const bet = parseInt(document.getElementById('minesBetInput')?.value) || 10;
     if (bet < 1) return showToast('❌ Минимум 1 ★', 'error');
     if (bet > balance) return showToast('❌ Недостаточно ★', 'error');
@@ -2355,9 +2357,10 @@ function minesStart() {
     document.getElementById('minesCashoutBtn').style.display = 'none';
     document.getElementById('minesStatus').textContent = '💎 Открывай клетки!';
     document.querySelectorAll('#minesGrid .pvp-mine-cell').forEach(c => c.style.cursor = 'pointer');
-    balance -= bet; updateBalance();
+    _minesStartPending = true;
     socket?.emit('mines:start', { betAmount: bet, minesCount: count }, (res) => {
-        if (res?.error) { _minesGame = null; balance += bet; updateBalance(); document.getElementById('minesStartBtn').disabled = false; document.getElementById('minesStartBtn').textContent = '💣 СТАРТ'; document.getElementById('minesStartBtn').style.display = ''; return showToast('❌ ' + res.error, 'error'); }
+        _minesStartPending = false;
+        if (res?.error) { _minesGame = null; document.getElementById('minesStartBtn').disabled = false; document.getElementById('minesStartBtn').textContent = '💣 СТАРТ'; document.getElementById('minesStartBtn').style.display = ''; return showToast('❌ ' + res.error, 'error'); }
         // Server ack succeeded — game is already set up
     });
 }
