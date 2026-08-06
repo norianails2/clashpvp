@@ -396,6 +396,13 @@
         .nav-modal h2 { text-align:left;margin:0 0 6px;font-size:19px; }
         .nav-modal p { text-align:left;margin:0 0 14px;font-size:12px;line-height:1.45; }
         .nav-modal label { display:block;margin:14px 0 6px;color:rgba(196,181,253,.7);font:800 10px 'Fredoka',sans-serif;letter-spacing:1px;text-transform:uppercase; }
+        .tab-screen { position:absolute;inset:0 0 109px;z-index:7;display:none;overflow-y:auto;padding:20px 16px 28px;background:radial-gradient(ellipse 70% 45% at 50% -5%,rgba(139,92,246,.14),rgba(236,72,153,.05),transparent 70%),#0a0a14;scrollbar-width:none; }
+        .tab-screen.show { display:block; }.tab-screen::-webkit-scrollbar { display:none; }
+        .tab-title { margin:2px 0 4px;color:#fff;font:800 24px 'Fredoka',sans-serif; }.tab-subtitle { margin:0 0 18px;color:rgba(255,255,255,.42);font-size:12px;line-height:1.45; }
+        .tab-hero { padding:16px;border:1px solid rgba(167,139,250,.22);border-radius:10px;background:rgba(139,92,246,.07); }.tab-hero strong { display:block;color:#fff;font-size:14px; }.tab-hero small { display:block;margin-top:4px;color:rgba(255,255,255,.42);font-size:11px; }
+        .tab-link { width:100%;margin:14px 0 9px;padding:12px;border:1px solid rgba(167,139,250,.28);border-radius:8px;background:#11101a;color:#c4b5fd;font:700 11px monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+        .tab-action { width:100%;min-height:46px;border:0;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font:800 13px 'Fredoka',sans-serif;cursor:pointer; }.tab-action.gold { background:#f7c948;color:#1d1529; }.tab-action:disabled { opacity:.45;cursor:default; }
+        .tab-section { margin-top:20px;color:rgba(196,181,253,.65);font:800 10px 'Fredoka',sans-serif;letter-spacing:1.2px;text-transform:uppercase; }
         .nav-stat-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:14px 0; }
         .nav-stat { border:1px solid rgba(167,139,250,.18);background:rgba(255,255,255,.035);padding:12px;border-radius:8px; }
         .nav-stat b { display:block;color:#f7c948;font:800 22px 'Fredoka',sans-serif; }.nav-stat span { color:rgba(255,255,255,.42);font-size:10px; }
@@ -841,6 +848,8 @@
         <div class="game-area" id="gameArea"></div>
     </div>
 
+    <section class="tab-screen" id="tabScreen" aria-live="polite"></section>
+
 
 
     <div class="bottom-nav">
@@ -1113,23 +1122,42 @@ function closeRules() { document.getElementById('rulesPopup').classList.remove('
 
 function navTo(el, idx) {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); el.classList.add('active');
-    if (idx === 0) return playSound('click');
-    if (idx === 1) { loadReferral(); openModal('earningsModal'); return; }
-    if (idx === 2) { loadDailyTask(); openModal('tasksModal'); return; }
-    if (idx === 3) { openModal('leaderboardModal'); loadLeaderboard(); return; }
-    if (idx === 4) { renderProfile(); openModal('profileModal'); }
+    if (idx === 0) { document.getElementById('tabScreen').classList.remove('show'); return playSound('click'); }
+    showTab(['games','earnings','tasks','leaders','profile'][idx]);
+}
+function showTab(view) {
+    const screen = document.getElementById('tabScreen'); screen.classList.add('show'); screen.scrollTop = 0;
+    if (view === 'earnings') {
+        screen.innerHTML = '<h1 class="tab-title">Заработок</h1><p class="tab-subtitle">Приглашай друзей и получай Stars за каждого нового игрока.</p><div class="tab-hero"><strong>Реферальная программа</strong><small>Бонус начисляется после регистрации друга.</small><div class="nav-stat-grid"><div class="nav-stat"><b id="tabFriends">0</b><span>приглашено</span></div><div class="nav-stat"><b id="tabEarned">0</b><span>заработано Stars</span></div></div></div><div class="tab-section">Твоя ссылка</div><div class="tab-link" id="tabReferralLink">Загрузка...</div><button class="tab-action" onclick="shareReferral()">Пригласить друзей</button>';
+        loadReferral(); return;
+    }
+    if (view === 'tasks') {
+        screen.innerHTML = '<h1 class="tab-title">Задания</h1><p class="tab-subtitle">Выполняй простые действия и пополняй баланс.</p><div class="nav-list"><div class="nav-row"><div><b>Ежедневный бонус</b><small id="tabDailyText">Проверяем статус...</small></div><span class="right">10 Stars</span></div><div class="nav-row"><div><b>Пригласи друга</b><small>Получи бонус за регистрацию по ссылке</small></div><span class="right">50 Stars</span></div></div><button class="tab-action gold" id="tabDailyButton" onclick="claimDailyReward()">Забрать бонус</button>';
+        loadDailyTask(); return;
+    }
+    if (view === 'leaders') {
+        screen.innerHTML = '<h1 class="tab-title">Лидеры</h1><p class="tab-subtitle">Топ игроков по текущему балансу Stars.</p><div class="nav-list" id="tabLeadersList"><div class="loading">Загрузка...</div></div>';
+        loadTabLeaderboard(); return;
+    }
+    screen.innerHTML = '<h1 class="tab-title">Профиль</h1><p class="tab-subtitle" id="tabProfileName">Player</p><div class="nav-stat-grid"><div class="nav-stat"><b id="tabProfileBalance">0</b><span>Stars на балансе</span></div><div class="nav-stat"><b id="tabProfileRefs">0</b><span>приглашено</span></div></div><div class="tab-section">Настройки</div><div class="tab-hero"><strong>Язык приложения</strong><small>Изменить язык можно в настройках профиля.</small></div><button class="tab-action" style="margin-top:10px;" onclick="openModal(\'profileModal\')">Открыть настройки</button>';
+    renderProfile(); loadReferral();
 }
 function renderProfile() {
     const name = document.getElementById('profileName'); const amount = document.getElementById('profileBalance');
     if (name) name.textContent = myUserName || 'Player'; if (amount) amount.textContent = Math.floor(balance || 0);
     const refs = document.getElementById('profileReferrals'); if (refs) refs.textContent = document.getElementById('earningsFriends')?.textContent || '0';
+    const tabName = document.getElementById('tabProfileName'); const tabBalance = document.getElementById('tabProfileBalance'); const tabRefs = document.getElementById('tabProfileRefs');
+    if (tabName) tabName.textContent = myUserName || 'Player'; if (tabBalance) tabBalance.textContent = Math.floor(balance || 0); if (tabRefs) tabRefs.textContent = refs?.textContent || '0';
 }
 function loadDailyTask() {
     socket?.emit('engagement:daily_status', {}, (res) => {
         const button = document.getElementById('dailyClaimBtn'); const text = document.getElementById('dailyTaskText');
-        if (!button || !text || res?.error) return;
-        button.disabled = Boolean(res.claimed); button.textContent = res.claimed ? 'Бонус получен' : 'Забрать бонус';
-        text.textContent = res.claimed ? 'Возвращайся завтра' : 'Забрать ' + res.reward + ' Stars';
+        if (res?.error) return;
+        if (button) { button.disabled = Boolean(res.claimed); button.textContent = res.claimed ? 'Бонус получен' : 'Забрать бонус'; }
+        if (text) text.textContent = res.claimed ? 'Возвращайся завтра' : 'Забрать ' + res.reward + ' Stars';
+        const tabButton = document.getElementById('tabDailyButton'); const tabText = document.getElementById('tabDailyText');
+        if (tabButton) { tabButton.disabled = Boolean(res.claimed); tabButton.textContent = res.claimed ? 'Бонус получен' : 'Забрать бонус'; }
+        if (tabText) tabText.textContent = res.claimed ? 'Возвращайся завтра' : 'Забрать ' + res.reward + ' Stars';
     });
 }
 function claimDailyReward() {
@@ -2852,6 +2880,11 @@ async function loadReferral() {
         if (total) total.textContent = stats.totalEarned || 0;
         if (bonus) bonus.textContent = (stats.bonusPerReferral || 50) + ' Stars';
         if (profileRefs) profileRefs.textContent = stats.totalReferrals || 0;
+        const tabFriends = document.getElementById('tabFriends'); const tabEarned = document.getElementById('tabEarned'); const tabLink = document.getElementById('tabReferralLink'); const tabProfileRefs = document.getElementById('tabProfileRefs');
+        if (tabFriends) tabFriends.textContent = stats.totalReferrals || 0;
+        if (tabEarned) tabEarned.textContent = stats.totalEarned || 0;
+        if (tabLink) tabLink.textContent = referralLink;
+        if (tabProfileRefs) tabProfileRefs.textContent = stats.totalReferrals || 0;
     } catch (err) {
         console.warn('Referral data unavailable:', err.message);
     }
@@ -3203,6 +3236,15 @@ window.loadLeaderboard = function() {
         list.innerHTML = '<div style="text-align:center;padding:20px;color:rgba(255,255,255,0.3);font-size:13px;">🏆 Лидерборд скоро</div>';
     });
 };
+
+function loadTabLeaderboard() {
+    const list = document.getElementById('tabLeadersList');
+    if (!list) return;
+    socket?.emit('engagement:leaderboard', {}, (res) => {
+        if (res?.error) { list.innerHTML = '<div class="loading">Не удалось загрузить рейтинг</div>'; return; }
+        list.innerHTML = (res?.players || []).map(player => '<div class="nav-row"><b>#' + player.rank + '</b><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + String(player.name).replace(/[&<>]/g, '') + '</span><span class="right">' + player.balance + ' Stars</span></div>').join('') || '<div class="loading">Пока нет игроков</div>';
+    });
+}
 
 setupLanguage();
 startConnection();
