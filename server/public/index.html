@@ -392,6 +392,14 @@
         .ton-submit { margin-top:6px!important;margin-bottom:4px!important;padding:13px!important;border-radius:8px!important;background:linear-gradient(135deg,#7c3aed,#a855f7)!important;color:#fff!important;box-shadow:0 7px 18px rgba(124,58,237,.32);font-size:14px!important;letter-spacing:.4px; }
         .ton-submit:active { transform:scale(.98)!important; }
         .settings-language { display:block;width:100%;height:46px;border:1px solid rgba(167,139,250,.28);border-radius:8px;background:#12101c;color:#fff;padding:0 12px;font:700 14px 'Fredoka',sans-serif;outline:none; }
+        .nav-modal .modal-box { max-width:340px;padding:20px;border-radius:16px;background:linear-gradient(160deg,#211b35,#14131e);border:1px solid rgba(167,139,250,.28); }
+        .nav-modal h2 { text-align:left;margin:0 0 6px;font-size:19px; }
+        .nav-modal p { text-align:left;margin:0 0 14px;font-size:12px;line-height:1.45; }
+        .nav-modal label { display:block;margin:14px 0 6px;color:rgba(196,181,253,.7);font:800 10px 'Fredoka',sans-serif;letter-spacing:1px;text-transform:uppercase; }
+        .nav-stat-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:14px 0; }
+        .nav-stat { border:1px solid rgba(167,139,250,.18);background:rgba(255,255,255,.035);padding:12px;border-radius:8px; }
+        .nav-stat b { display:block;color:#f7c948;font:800 22px 'Fredoka',sans-serif; }.nav-stat span { color:rgba(255,255,255,.42);font-size:10px; }
+        .nav-list { display:flex;flex-direction:column;gap:7px;margin:12px 0; }.nav-row { display:flex;align-items:center;gap:10px;padding:10px;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.025); }.nav-row b { font-size:12px; }.nav-row small { display:block;margin-top:2px;color:rgba(255,255,255,.4);font-size:10px; }.nav-row .right { margin-left:auto;color:#c4b5fd;font-weight:800; }.nav-claim { margin:0!important;padding:10px!important;border-radius:8px!important;background:#f7c948!important;color:#1d1529!important;font-size:12px!important; }
 
         .history-list { max-height:200px;overflow-y:auto;margin-bottom:12px; }
         .history-item { display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12px; }
@@ -782,9 +790,26 @@
         <div class="modal-box" style="max-width:300px;">
             <h2>Язык</h2>
             <p>Выбери язык приложения</p>
-            <select class="settings-language" id="languageSelect" aria-label="Language"><option value="ru">Русский</option><option value="en">English</option><option value="de">Deutsch</option><option value="es">Español</option></select>
+            <select class="settings-language" id="legacyLanguageSelect" aria-label="Language"><option value="ru">Русский</option><option value="en">English</option><option value="de">Deutsch</option><option value="es">Español</option></select>
             <button class="modal-cancel" onclick="closeModal('settingsModal')">Закрыть</button>
         </div>
+    </div>
+
+    <div class="modal-overlay nav-modal" id="earningsModal">
+        <div class="modal-box"><h2>Заработок</h2><p>Приглашай друзей и получай Stars за каждого нового игрока.</p>
+            <div class="nav-stat-grid"><div class="nav-stat"><b id="earningsFriends">0</b><span>приглашено</span></div><div class="nav-stat"><b id="earningsTotal">0</b><span>заработано Stars</span></div></div>
+            <div class="nav-row"><div><b>За одного друга</b><small>Бонус после регистрации</small></div><span class="right" id="earningsBonus">50 Stars</span></div>
+            <button class="modal-confirm ton-submit" onclick="shareReferral()">Пригласить друзей</button><button class="modal-cancel" onclick="closeModal('earningsModal')">Закрыть</button></div>
+    </div>
+    <div class="modal-overlay nav-modal" id="tasksModal">
+        <div class="modal-box"><h2>Задания</h2><p>Небольшие ежедневные бонусы для активных игроков.</p>
+            <div class="nav-list"><div class="nav-row"><div><b>Ежедневный бонус</b><small id="dailyTaskText">Забрать 10 Stars</small></div><span class="right">10 Stars</span></div><div class="nav-row"><div><b>Пригласи друга</b><small>Перейди в раздел «Заработок»</small></div><span class="right">50 Stars</span></div></div>
+            <button class="modal-confirm nav-claim" id="dailyClaimBtn" onclick="claimDailyReward()">Забрать бонус</button><button class="modal-cancel" onclick="closeModal('tasksModal')">Закрыть</button></div>
+    </div>
+    <div class="modal-overlay nav-modal" id="profileModal">
+        <div class="modal-box"><h2>Профиль</h2><p id="profileName">Player</p>
+            <div class="nav-stat-grid"><div class="nav-stat"><b id="profileBalance">0</b><span>Stars на балансе</span></div><div class="nav-stat"><b id="profileReferrals">0</b><span>друзей</span></div></div>
+            <label for="languageSelect">Язык</label><select class="settings-language" id="languageSelect" aria-label="Language"><option value="ru">Русский</option><option value="en">English</option><option value="de">Deutsch</option><option value="es">Español</option></select><button class="modal-cancel" onclick="closeModal('profileModal')">Закрыть</button></div>
     </div>
 
     <div class="modal-overlay" id="historyModal">
@@ -820,7 +845,7 @@
 
     <div class="bottom-nav">
         <div class="nav-item active" onclick="navTo(this,0)"><span class="icon">🕹️</span><span class="label">Игры</span></div>
-        <div class="nav-item" onclick="navTo(this,1)"><span class="icon">🏆</span><span class="label">Конкурсы</span></div>
+        <div class="nav-item" onclick="navTo(this,1)"><span class="icon">✦</span><span class="label">Заработок</span></div>
         <div class="nav-item" onclick="navTo(this,2)"><span class="icon">📋</span><span class="label">Задания</span></div>
         <div class="nav-item" onclick="navTo(this,3)"><span class="icon">👑</span><span class="label">Лидеры</span></div>
         <div class="nav-item" onclick="navTo(this,4)"><span class="icon">👤</span><span class="label">Профиль</span></div>
@@ -1086,7 +1111,33 @@ const rulesData = {
 function showRules() { const d = rulesData[currentGameId] || rulesData.rps; document.getElementById('rulesTitle').textContent = d.title; document.getElementById('rulesBody').innerHTML = d.body; document.getElementById('rulesPopup').classList.add('show'); }
 function closeRules() { document.getElementById('rulesPopup').classList.remove('show'); }
 
-function navTo(el, idx) { if (idx === 4) { openModal('settingsModal'); return; } document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); el.classList.add('active'); showToast('🔄 Раздел в разработке', 'info'); playSound('click'); }
+function navTo(el, idx) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); el.classList.add('active');
+    if (idx === 0) return playSound('click');
+    if (idx === 1) { loadReferral(); openModal('earningsModal'); return; }
+    if (idx === 2) { loadDailyTask(); openModal('tasksModal'); return; }
+    if (idx === 3) { openModal('leaderboardModal'); loadLeaderboard(); return; }
+    if (idx === 4) { renderProfile(); openModal('profileModal'); }
+}
+function renderProfile() {
+    const name = document.getElementById('profileName'); const amount = document.getElementById('profileBalance');
+    if (name) name.textContent = myUserName || 'Player'; if (amount) amount.textContent = Math.floor(balance || 0);
+    const refs = document.getElementById('profileReferrals'); if (refs) refs.textContent = document.getElementById('earningsFriends')?.textContent || '0';
+}
+function loadDailyTask() {
+    socket?.emit('engagement:daily_status', {}, (res) => {
+        const button = document.getElementById('dailyClaimBtn'); const text = document.getElementById('dailyTaskText');
+        if (!button || !text || res?.error) return;
+        button.disabled = Boolean(res.claimed); button.textContent = res.claimed ? 'Бонус получен' : 'Забрать бонус';
+        text.textContent = res.claimed ? 'Возвращайся завтра' : 'Забрать ' + res.reward + ' Stars';
+    });
+}
+function claimDailyReward() {
+    socket?.emit('engagement:claim_daily', {}, (res) => {
+        if (res?.error) return showToast(res.error, 'error');
+        showToast('+' + res.reward + ' Stars', 'success'); loadDailyTask();
+    });
+}
 
 
 
@@ -2795,6 +2846,12 @@ async function loadReferral() {
         referralLink = linkData.link;
         document.getElementById('referralStats').textContent = t('invited', { count: stats.totalReferrals || 0 });
         document.getElementById('referralBlock').hidden = false;
+        const friends = document.getElementById('earningsFriends'); const total = document.getElementById('earningsTotal');
+        const bonus = document.getElementById('earningsBonus'); const profileRefs = document.getElementById('profileReferrals');
+        if (friends) friends.textContent = stats.totalReferrals || 0;
+        if (total) total.textContent = stats.totalEarned || 0;
+        if (bonus) bonus.textContent = (stats.bonusPerReferral || 50) + ' Stars';
+        if (profileRefs) profileRefs.textContent = stats.totalReferrals || 0;
     } catch (err) {
         console.warn('Referral data unavailable:', err.message);
     }
@@ -3135,11 +3192,14 @@ function startConnection() {
 }
 
 // Leaderboard via direct DB query (or keep simple)
-window.loadLeaderboard = async function() {
+window.loadLeaderboard = function() {
     const list = document.getElementById('leaderboardList');
     if (!list) return;
     list.innerHTML = '<div style="text-align:center;padding:20px;color:rgba(255,255,255,0.3);font-size:13px;">⏳ Загрузка...</div>';
-    socket?.emit('lobby:list', { gameType: 'rps' }, () => {
+    socket?.emit('engagement:leaderboard', {}, (res) => {
+        if (res?.error) { list.innerHTML = '<div class="loading">Не удалось загрузить рейтинг</div>'; return; }
+        list.innerHTML = (res?.players || []).map(player => '<div class="nav-row"><b>#' + player.rank + '</b><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + String(player.name).replace(/[&<>]/g, '') + '</span><span class="right">' + player.balance + ' Stars</span></div>').join('') || '<div class="loading">Пока нет игроков</div>';
+        return;
         list.innerHTML = '<div style="text-align:center;padding:20px;color:rgba(255,255,255,0.3);font-size:13px;">🏆 Лидерборд скоро</div>';
     });
 };

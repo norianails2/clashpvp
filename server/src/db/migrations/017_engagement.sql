@@ -1,0 +1,7 @@
+ALTER TYPE tx_type ADD VALUE IF NOT EXISTS 'task_reward';
+
+CREATE TABLE IF NOT EXISTS daily_reward_claims (
+  user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  claim_date DATE NOT NULL,
+  claimed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
