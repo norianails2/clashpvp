@@ -377,6 +377,19 @@
         .modal-confirm.history { background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.1); }
         .modal-cancel { background:none;border:none;color:rgba(255,255,255,0.4);font-family:'Fredoka',sans-serif;font-size:14px;font-weight:600;cursor:pointer;width:100%;padding:8px; }
         .modal-cancel:active { color:rgba(255,255,255,0.6); }
+        #withdrawModal .modal-box { max-width:340px;padding:20px;border-radius:16px;border:1px solid rgba(167,139,250,.32);background:linear-gradient(160deg,#211b35,#14131e);box-shadow:0 22px 60px rgba(0,0,0,.5); }
+        .ton-withdraw-head { display:flex;align-items:center;gap:10px;margin-bottom:8px; }
+        .ton-withdraw-mark { width:34px;height:34px;display:grid;place-items:center;flex:0 0 34px;border:1px solid rgba(56,211,255,.35);border-radius:9px;background:rgba(56,211,255,.12);color:#53d8ff;font:900 15px Arial,sans-serif; }
+        .ton-withdraw-title { margin:0!important;color:#fff!important;text-align:left!important;font:800 18px 'Fredoka',sans-serif!important; }
+        .ton-withdraw-copy { margin:0 0 16px!important;text-align:left!important;color:rgba(255,255,255,.46)!important;font-size:11px!important;line-height:1.45; }
+        .ton-available { color:#c4b5fd;font-weight:800; }
+        .ton-field { display:flex;flex-direction:column;gap:6px;margin:12px 0; }
+        .ton-field label { display:block;margin:0;color:rgba(196,181,253,.7);font:800 10px 'Fredoka',sans-serif;letter-spacing:1px;text-transform:uppercase; }
+        .ton-field input { display:block;width:100%;height:44px;min-width:0;border:1px solid rgba(167,139,250,.28);border-radius:8px;background:rgba(8,8,15,.62);color:#fff;padding:0 12px;font:700 14px 'Fredoka',sans-serif;outline:none;box-sizing:border-box; }
+        .ton-field input:focus { border-color:#a78bfa;box-shadow:0 0 0 3px rgba(167,139,250,.12); }
+        .ton-field input::placeholder { color:rgba(255,255,255,.22); }
+        .ton-submit { margin-top:6px!important;margin-bottom:4px!important;padding:13px!important;border-radius:8px!important;background:linear-gradient(135deg,#7c3aed,#a855f7)!important;color:#fff!important;box-shadow:0 7px 18px rgba(124,58,237,.32);font-size:14px!important;letter-spacing:.4px; }
+        .ton-submit:active { transform:scale(.98)!important; }
 
         .history-list { max-height:200px;overflow-y:auto;margin-bottom:12px; }
         .history-item { display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12px; }
@@ -753,15 +766,13 @@
     </div>
 
     <div class="modal-overlay" id="withdrawModal">
-        <div class="modal-box">
-            <h2>Withdraw to TON</h2>
-            <p>Requests are processed manually. The completed transfer hash will be stored in the request.</p>
-            <label for="withdrawAmount">Amount in Stars</label>
-            <input id="withdrawAmount" type="number" min="100" step="1" placeholder="Minimum 100">
-            <label for="withdrawWallet">TON wallet address</label>
-            <input id="withdrawWallet" type="text" autocomplete="off" placeholder="UQ... or EQ...">
+        <div class="modal-box ton-withdraw-box">
+            <div class="ton-withdraw-head"><span class="ton-withdraw-mark">TON</span><h2 class="ton-withdraw-title">Withdraw TON</h2></div>
+            <p class="ton-withdraw-copy">Available: <span class="ton-available"><span id="withdrawAvailable">0</span> Stars</span>. Your balance is reserved until the request is completed or rejected.</p>
+            <div class="ton-field"><label for="withdrawAmount">Amount</label><input id="withdrawAmount" type="number" min="100" step="1" inputmode="numeric" placeholder="Minimum 100 Stars"></div>
+            <div class="ton-field"><label for="withdrawWallet">TON wallet address</label><input id="withdrawWallet" type="text" autocomplete="off" spellcheck="false" placeholder="UQ... or EQ..."></div>
             <div class="modal-error" id="withdrawError"></div>
-            <button class="modal-confirm" onclick="createTonWithdrawal()">Create request</button>
+            <button class="modal-confirm ton-submit" onclick="createTonWithdrawal()">Create withdrawal request</button>
             <button class="modal-cancel" onclick="closeModal('withdrawModal')">Close</button>
         </div>
     </div>
@@ -900,7 +911,7 @@ function showBalFlash(parent, amount, isPlus) {
     setTimeout(() => el.remove(), 1000);
 }
 
-function openModal(id) { document.getElementById(id).classList.add('show'); const e = document.querySelector('#' + id + ' .modal-error'); if (e) e.classList.remove('show'); playSound('click'); }
+function openModal(id) { document.getElementById(id).classList.add('show'); const e = document.querySelector('#' + id + ' .modal-error'); if (e) { e.classList.remove('show'); e.textContent = ''; } if (id === 'withdrawModal') { const available = document.getElementById('withdrawAvailable'); if (available) available.textContent = Math.floor(balance || 0); } playSound('click'); }
 function closeModal(id) { document.getElementById(id).classList.remove('show'); const e = document.querySelector('#' + id + ' .modal-error'); if (e) e.classList.remove('show'); }
 function addHistory(type, amount) {
     const icons = {deposit:'💰',withdraw:'💸',game:'🎮',win:'🏆',lose:'💔',draw:'🤝'}, titles = {deposit:'Пополнение',withdraw:'Вывод',game:'Ставка',win:'Выигрыш',lose:'Проигрыш',draw:'Ничья'};
@@ -956,11 +967,11 @@ function createTonWithdrawal() {
     const amount = Number.parseInt(document.getElementById('withdrawAmount')?.value, 10);
     const walletAddress = document.getElementById('withdrawWallet')?.value.trim();
     const error = document.getElementById('withdrawError');
-    if (!Number.isSafeInteger(amount) || amount < 100) { error.textContent = 'Minimum withdrawal: 100 Stars'; return; }
-    if (!walletAddress) { error.textContent = 'Enter a TON wallet address'; return; }
-    error.textContent = '';
+    if (!Number.isSafeInteger(amount) || amount < 100) { error.textContent = 'Minimum withdrawal: 100 Stars'; error.classList.add('show'); return; }
+    if (!walletAddress) { error.textContent = 'Enter a TON wallet address'; error.classList.add('show'); return; }
+    error.textContent = ''; error.classList.remove('show');
     socket?.emit('withdrawals:create', { amount, walletAddress }, (res) => {
-        if (res?.error) { error.textContent = res.error; return; }
+        if (res?.error) { error.textContent = res.error; error.classList.add('show'); return; }
         addHistory('withdraw', -amount);
         closeModal('withdrawModal');
         showToast('TON withdrawal request created', 'success');
