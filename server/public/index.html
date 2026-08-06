@@ -390,6 +390,7 @@
         .ton-field input::placeholder { color:rgba(255,255,255,.22); }
         .ton-submit { margin-top:6px!important;margin-bottom:4px!important;padding:13px!important;border-radius:8px!important;background:linear-gradient(135deg,#7c3aed,#a855f7)!important;color:#fff!important;box-shadow:0 7px 18px rgba(124,58,237,.32);font-size:14px!important;letter-spacing:.4px; }
         .ton-submit:active { transform:scale(.98)!important; }
+        .settings-language { display:block;width:100%;height:46px;border:1px solid rgba(167,139,250,.28);border-radius:8px;background:#12101c;color:#fff;padding:0 12px;font:700 14px 'Fredoka',sans-serif;outline:none; }
 
         .history-list { max-height:200px;overflow-y:auto;margin-bottom:12px; }
         .history-item { display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12px; }
@@ -695,7 +696,6 @@
             </div>
             <div class="balance-actions">
                 <div class="balance-actions-top">
-                    <select class="language-select" id="languageSelect" aria-label="Language"><option value="ru">RU Русский</option><option value="en">EN English</option><option value="de">DE Deutsch</option><option value="es">ES Español</option></select>
                     <button class="bal-btn deposit" onclick="playSound('click');openModal('depositModal')">💰 Депозит</button>
                 </div>
             </div>
@@ -774,6 +774,15 @@
             <div class="modal-error" id="withdrawError"></div>
             <button class="modal-confirm ton-submit" onclick="createTonWithdrawal()">Create withdrawal request</button>
             <button class="modal-cancel" onclick="closeModal('withdrawModal')">Close</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-box" style="max-width:300px;">
+            <h2>Язык</h2>
+            <p>Выбери язык приложения</p>
+            <select class="settings-language" id="languageSelect" aria-label="Language"><option value="ru">Русский</option><option value="en">English</option><option value="de">Deutsch</option><option value="es">Español</option></select>
+            <button class="modal-cancel" onclick="closeModal('settingsModal')">Закрыть</button>
         </div>
     </div>
 
@@ -1075,7 +1084,7 @@ const rulesData = {
 function showRules() { const d = rulesData[currentGameId] || rulesData.rps; document.getElementById('rulesTitle').textContent = d.title; document.getElementById('rulesBody').innerHTML = d.body; document.getElementById('rulesPopup').classList.add('show'); }
 function closeRules() { document.getElementById('rulesPopup').classList.remove('show'); }
 
-function navTo(el, idx) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); el.classList.add('active'); showToast('🔄 Раздел в разработке', 'info'); playSound('click'); }
+function navTo(el, idx) { if (idx === 4) { openModal('settingsModal'); return; } document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); el.classList.add('active'); showToast('🔄 Раздел в разработке', 'info'); playSound('click'); }
 
 
 
