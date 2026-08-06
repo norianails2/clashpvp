@@ -33,9 +33,9 @@
         .balance-left .label::before { content:'✦';font-size:7px;color:#fbbf24;opacity:0.4; }
         .balance-row { display:flex;align-items:baseline;gap:8px; }
         .balance-row .amount { font-family:'Fredoka',sans-serif;font-size:32px;font-weight:800;color:#fbbf24;white-space:nowrap;letter-spacing:-0.5px;line-height:1;text-shadow:0 0 30px rgba(251,191,36,0.12); }
-        .balance-row .currency { font-size:12px;font-weight:700;color:rgba(255,255,255,0.2);letter-spacing:0.3px; }
+        .balance-row .currency { font-size:12px;font-weight:700;color:rgba(255,255,255,0.2);letter-spacing:0.3px;white-space:nowrap; }
         .balance-actions { display:flex;gap:8px;flex-shrink:0; }
-        .bal-btn { padding:9px 18px;border-radius:12px;border:none;font-family:'Fredoka',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all 0.15s;white-space:nowrap;letter-spacing:0.3px; }
+        .bal-btn { padding:8px 11px;border-radius:10px;border:none;font-family:'Fredoka',sans-serif;font-size:10px;font-weight:800;cursor:pointer;transition:all 0.15s;white-space:nowrap;letter-spacing:0.2px; }
         .bal-btn:active { transform:scale(0.95); }
         .bal-btn.deposit { background:#fbbf24;color:#1a0a2e;box-shadow:0 4px 16px rgba(251,191,36,0.2); }
         .bal-btn.withdraw { background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.38);color:#c4b5fd;box-shadow:none; }
@@ -43,7 +43,6 @@
         .bal-btn.dev-add:hover { background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.5); }
         .tg-s { display:inline-block;width:1em;height:1em;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%2332B6E8;stop-opacity:1' /%3E%3Cstop offset='50%25' style='stop-color:%23D332D3;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23FF6AB0;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M12 2c.22 0 .43.1.58.28l2.94 4.54a1 1 0 0 0 .84.45h5.4c.3 0 .58.17.7.46s.08.62-.12.82l-4.1 4a1 1 0 0 0 -.3.96l1.37 5.25c.08.31-.03.65-.29.84a.78.78 0 0 1-.9 0L12 17a1 1 0 0 0 -1.18 0l-4.66 3a.78.78 0 0 1-.9 0c-.26-.2-.37-.53-.29-.84l1.37-5.25a1 1 0 0 0 -.3-.96l-4.1-4c-.2-.2-.24-.53-.12-.82.12-.3.4-.46.7-.46h5.4a1 1 0 0 0 .84-.45l2.94-4.54c.15-.18.36-.28.58-.28z' fill='url(%23grad)' stroke='%23ffffff' stroke-width='0.7' stroke-linejoin='round' /%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center;background-size:contain;vertical-align:text-bottom;filter:drop-shadow(0 0 2px rgba(211,50,211,0.5)) drop-shadow(0 0 5px rgba(50,182,232,0.3)); }
         .balance-actions-top { display:flex;align-items:center;gap:6px; }
-        @media (max-width:390px) { .balance-block { flex-wrap:wrap;gap:10px; }.balance-actions { width:100%;justify-content:flex-end; }.balance-actions-top { width:100%;justify-content:flex-end; }.balance-row .currency { white-space:nowrap; } }
         .language-select { height:24px;max-width:94px;border:1px solid rgba(255,255,255,.1);border-radius:5px;background:transparent;color:rgba(255,255,255,.58);font:800 9px 'Fredoka',sans-serif;letter-spacing:.4px;outline:0;padding:0 5px; }
         .language-select option { background:#151523;color:#fff; }
         .referral-block { background:rgba(255,255,255,0.03);border:1px solid rgba(251,191,36,0.14);border-radius:18px;padding:14px 16px;margin-bottom:18px;display:flex;align-items:center;gap:12px; }
