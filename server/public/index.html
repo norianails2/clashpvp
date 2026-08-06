@@ -398,7 +398,7 @@
         .nav-modal label { display:block;margin:14px 0 6px;color:rgba(196,181,253,.7);font:800 10px 'Fredoka',sans-serif;letter-spacing:1px;text-transform:uppercase; }
         .tab-screen { position:absolute;inset:0 0 109px;z-index:7;display:none;overflow-y:auto;padding:20px 16px 28px;background:radial-gradient(ellipse 70% 45% at 50% -5%,rgba(139,92,246,.14),rgba(236,72,153,.05),transparent 70%),var(--tg-bg);scrollbar-width:none; }
         .tab-screen.show { display:block; }.tab-screen::-webkit-scrollbar { display:none; }
-        .tab-home-balance { display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding:14px 16px;border:1px solid rgba(255,255,255,.06);border-radius:18px;background:rgba(255,255,255,.03); }.tab-home-balance small { display:block;color:rgba(255,255,255,.25);font:800 9px 'Fredoka',sans-serif;letter-spacing:1.5px;text-transform:uppercase; }.tab-home-balance b { display:block;margin-top:2px;color:#f7c948;font:800 28px 'Fredoka',sans-serif; }.tab-home-balance span { color:rgba(255,255,255,.28);font-size:11px; }
+        .tab-screen .balance-block { margin-bottom:18px; }.tab-screen .balance-left .label { margin:0; }.tab-screen .balance-row .amount { font-size:32px; }
         .tab-title { margin:2px 0 4px;color:rgba(255,255,255,.9);font:800 18px 'Fredoka',sans-serif; }.tab-subtitle { margin:0 0 16px;color:rgba(255,255,255,.42);font-size:12px;line-height:1.45; }
         .tab-hero { padding:16px;border:1px solid rgba(251,191,36,.14);border-radius:18px;background:rgba(255,255,255,.03); }.tab-hero strong { display:block;color:#fff;font-size:14px; }.tab-hero small { display:block;margin-top:4px;color:rgba(255,255,255,.42);font-size:11px; }
         .tab-link { width:100%;margin:12px 0 9px;padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.035);color:#c4b5fd;font:700 11px monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
@@ -1129,7 +1129,7 @@ function navTo(el, idx) {
 }
 function showTab(view) {
     const screen = document.getElementById('tabScreen'); screen.classList.add('show'); screen.scrollTop = 0;
-    const tabChrome = () => '<div class="tab-home-balance"><div><small>Баланс</small><b><i class="tg-s"></i> ' + Math.floor(balance || 0) + '</b></div><span>Stars</span></div>';
+    const tabChrome = () => '<div class="balance-block"><div class="balance-left"><div class="label">Баланс</div><div class="balance-row"><span style="font-size:22px;line-height:1;margin-right:2px;"><i class="tg-s"></i></span><span class="amount">' + Math.floor(balance || 0) + '</span><span class="currency">Stars</span></div></div></div>';
     if (view === 'earnings') {
         screen.innerHTML = tabChrome() + '<h1 class="tab-title">Заработок</h1><p class="tab-subtitle">Приглашай друзей и получай Stars за каждого нового игрока.</p><div class="tab-hero"><strong>Реферальная программа</strong><small>Бонус начисляется после регистрации друга.</small><div class="nav-stat-grid"><div class="nav-stat"><b id="tabFriends">0</b><span>приглашено</span></div><div class="nav-stat"><b id="tabEarned">0</b><span>заработано Stars</span></div></div></div><div class="tab-section">Твоя ссылка</div><div class="tab-link" id="tabReferralLink">Загрузка...</div><button class="tab-action" onclick="shareReferral()">Пригласить друзей</button>';
         loadReferral(); return;
