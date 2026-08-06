@@ -20,9 +20,10 @@ export async function verifyConnection(socket, next) {
           `INSERT INTO users (telegram_id, username)
            VALUES ($1, $2)
            ON CONFLICT (telegram_id) DO UPDATE SET username = EXCLUDED.username
-           RETURNING id, telegram_id, username, photo_url, balance`,
+           RETURNING id, telegram_id, username, photo_url, balance, is_banned`,
           [telegramId, telegramId]
         );
+        if (rows[0].is_banned) return next(new Error('Account suspended'));
         socket.data.user = rows[0];
         return next();
       } catch (dbErr) {
@@ -88,7 +89,7 @@ export async function verifyConnection(socket, next) {
            first_name = COALESCE(NULLIF(EXCLUDED.first_name, ''), users.first_name),
            last_name  = COALESCE(NULLIF(EXCLUDED.last_name, ''), users.last_name),
            photo_url  = COALESCE(NULLIF(EXCLUDED.photo_url, ''), users.photo_url)
-         RETURNING id, telegram_id, username, photo_url, balance`,
+         RETURNING id, telegram_id, username, photo_url, balance, is_banned`,
         [telegramId, tgUser.username || null, tgUser.first_name || null, tgUser.last_name || null, tgUser.photo_url || null]
       );
       rows = result.rows;
@@ -97,6 +98,7 @@ export async function verifyConnection(socket, next) {
       return next(new Error('Authentication temporarily unavailable'));
     }
 
+    if (rows[0].is_banned) return next(new Error('Account suspended'));
     socket.data.user = rows[0];
     next();
   } catch (err) {

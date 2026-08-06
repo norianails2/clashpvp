@@ -27,8 +27,9 @@ export async function telegramRestAuth(req, res, next) {
     if (!valid) return res.status(401).json({ error: 'Invalid Telegram initData signature' });
 
     const telegramUser = JSON.parse(params.get('user') || '');
-    const { rows } = await query('SELECT id FROM users WHERE telegram_id = $1', [String(telegramUser.id)]);
+    const { rows } = await query('SELECT id, is_banned FROM users WHERE telegram_id = $1', [String(telegramUser.id)]);
     if (!rows.length) return res.status(401).json({ error: 'Telegram user not found' });
+    if (rows[0].is_banned) return res.status(403).json({ error: 'Account suspended' });
     req.userId = rows[0].id;
     next();
   } catch {

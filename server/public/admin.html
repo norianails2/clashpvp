@@ -17,7 +17,8 @@
     .alerts { display:flex;gap:8px;flex-wrap:wrap;padding:14px; } .alert { border:1px solid var(--line);border-radius:5px;padding:8px 10px;color:var(--muted);font-size:12px; } .alert b { color:var(--text);margin-left:5px; } .alert.bad b { color:var(--red); }
     .login { min-height:100vh;display:grid;place-items:center;padding:20px; } .login-box { width:min(390px,100%);border:1px solid var(--line);border-radius:9px;background:rgba(21,21,35,.94);padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.35); } .login-box h1 { font-size:24px; } label { display:block;margin:24px 0 7px;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.7px;text-transform:uppercase; } input { width:100%;height:43px;border:1px solid var(--line);border-radius:6px;background:#0e0e18;color:var(--text);outline:0;padding:0 12px; } input:focus { border-color:var(--purple); } .primary { width:100%;height:43px;margin-top:12px;border:0;border-radius:6px;background:var(--gold);color:#17120a;font-weight:900; } .error { min-height:20px;color:var(--red);font-size:12px;margin-top:10px; }
     .hidden { display:none!important; } .loading { color:var(--muted);padding:24px;text-align:center; }
-    @media (max-width:720px) { .shell { padding:20px 12px 38px; }.topbar { align-items:flex-start; }.metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }.metric { min-height:94px;padding:12px; }.metric dd { font-size:22px; }.layout { grid-template-columns:1fr; }.panel.wide { grid-column:auto; } }
+    .admin-tools { display:flex;gap:8px;align-items:center;flex-wrap:wrap; }.admin-tools input,.admin-tools select { height:34px;width:auto;min-width:160px;padding:0 9px;font-size:12px; }.admin-tools select { border:1px solid var(--line);border-radius:6px;background:#0e0e18;color:var(--text); }.action { height:34px;border:1px solid rgba(167,139,250,.42);border-radius:6px;background:rgba(167,139,250,.09);color:#ddd4ff;padding:0 10px;font-size:11px;font-weight:800; }.action.danger { border-color:rgba(227,93,113,.45);background:rgba(227,93,113,.08);color:#ffafbd; }.action.good { border-color:rgba(67,184,129,.42);background:rgba(67,184,129,.09);color:#9ce5c2; }.admin-extra { display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px; }.admin-extra .wide { grid-column:1/-1; }.kpi-row { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:12px; }.mini-kpi { border:1px solid rgba(255,255,255,.07);background:#10101b;padding:10px;border-radius:6px; }.mini-kpi span { display:block;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.55px; }.mini-kpi b { display:block;margin-top:5px;font-size:18px;color:var(--gold); }.mini-kpi b.green { color:var(--green); }.mini-kpi b.red { color:var(--red); }.pager { display:flex;align-items:center;gap:7px;color:var(--muted);font-size:11px; }.modal { position:fixed;inset:0;z-index:30;background:rgba(4,4,10,.76);display:none;align-items:flex-end;justify-content:center;padding:20px; }.modal.show { display:flex; }.modal-card { width:min(900px,100%);max-height:88vh;overflow:auto;border:1px solid var(--line);border-radius:9px;background:#12121f;box-shadow:0 24px 90px rgba(0,0,0,.55); }.modal-head { display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#12121f;z-index:1; }.profile-head { display:flex;gap:12px;align-items:center; }.profile-photo { width:44px;height:44px;border-radius:50%;background:#28263b;object-fit:cover;display:grid;place-items:center;color:var(--purple);font-weight:900; }.profile-body { padding:16px; }.profile-summary { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:16px; }.profile-summary div { border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:9px;color:var(--muted);font-size:10px; }.profile-summary b { display:block;margin-top:4px;color:var(--text);font-size:16px; }.row-actions { display:flex;gap:8px;flex-wrap:wrap; }.status-banned { color:#ffafbd; }.status-active { color:#9ce5c2; }.small-table td,.small-table th { padding:8px 10px; }
+    @media (max-width:720px) { .shell { padding:20px 12px 38px; }.topbar { align-items:flex-start; }.metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }.metric { min-height:94px;padding:12px; }.metric dd { font-size:22px; }.layout,.admin-extra { grid-template-columns:1fr; }.panel.wide,.admin-extra .wide { grid-column:auto; }.kpi-row,.profile-summary { grid-template-columns:repeat(2,minmax(0,1fr)); }.admin-tools { width:100%; }.admin-tools input { flex:1;min-width:140px; } }
   </style>
 </head>
 <body>
@@ -45,7 +46,15 @@
       <article class="panel wide"><header class="panel-head"><span class="panel-title">Пользователи</span><span class="panel-meta">Топ-50 по балансу</span></header><div class="scroll"><table><thead><tr><th>Пользователь</th><th>Telegram ID</th><th>Баланс</th><th>Регистрация</th><th>Действие</th></tr></thead><tbody id="usersTable"><tr><td colspan="5" class="loading">Загрузка...</td></tr></tbody></table></div></article>
       <article class="panel wide"><header class="panel-head"><span class="panel-title">TON-выплаты</span><span class="panel-meta">Отмечай выполненной только после перевода TON</span></header><div class="scroll"><table><thead><tr><th>Время</th><th>Игрок</th><th>Stars</th><th>TON-адрес</th><th>Статус</th><th>Действие</th></tr></thead><tbody id="withdrawalsTable"><tr><td colspan="6" class="loading">Загрузка...</td></tr></tbody></table></div></article>
     </section>
+    <section class="admin-extra">
+      <article class="panel wide"><header class="panel-head"><span class="panel-title">Центр игроков</span><div class="admin-tools"><input id="playerSearch" placeholder="Ник или Telegram ID"><button class="action" id="playerSearchButton">Найти</button><button class="action" id="playerPrev">←</button><span class="pager" id="playerPage">Страница 1</span><button class="action" id="playerNext">→</button></div></header><div class="scroll"><table><thead><tr><th>Игрок</th><th>Telegram ID</th><th>Баланс</th><th>Статус</th><th>Регистрация</th><th></th></tr></thead><tbody id="playerDirectory"><tr><td colspan="6" class="loading">Загрузка...</td></tr></tbody></table></div></article>
+      <article class="panel"><header class="panel-head"><span class="panel-title">Сегодня</span><span class="panel-meta" id="todayActiveUsers">- активных</span></header><div class="kpi-row"><div class="mini-kpi"><span>Депозиты</span><b id="todayDeposits">-</b></div><div class="mini-kpi"><span>Оборот</span><b id="todayTurnover">-</b></div><div class="mini-kpi"><span>Выигрыши</span><b class="green" id="todayPayouts">-</b></div><div class="mini-kpi"><span>Выводы</span><b class="red" id="todayWithdrawals">-</b></div></div></article>
+      <article class="panel"><header class="panel-head"><span class="panel-title">Риск и выплаты</span><span class="panel-meta">контроль</span></header><div class="alerts"><span class="alert">Ожидают TON<b id="pendingWithdrawals">-</b></span><span class="alert bad">Stars к выплате<b id="pendingWithdrawalStars">-</b></span><span class="alert">Крупные ставки<b id="largestBetCount">-</b></span></div><div class="scroll"><table class="small-table"><thead><tr><th>Игрок</th><th>Ставка</th><th>Игра</th></tr></thead><tbody id="largestBets"><tr><td colspan="3" class="loading">Загрузка...</td></tr></tbody></table></div></article>
+      <article class="panel wide"><header class="panel-head"><span class="panel-title">Финансовый журнал</span><div class="admin-tools"><input id="transactionSearch" placeholder="Ник или Telegram ID"><select id="transactionType"><option value="">Все операции</option><option value="deposit">Депозиты</option><option value="withdraw">Выводы</option><option value="bet">Ставки</option><option value="win">Выигрыши</option><option value="refund">Возвраты</option><option value="admin">Админ</option></select><button class="action" id="transactionFilter">Фильтр</button><button class="action good" id="exportTransactions">CSV</button></div></header><div class="scroll"><table><thead><tr><th>Время</th><th>Игрок</th><th>Тип</th><th>Игра</th><th>Изменение</th><th>Баланс после</th></tr></thead><tbody id="adminTransactions"><tr><td colspan="6" class="loading">Загрузка...</td></tr></tbody></table></div></article>
+      <article class="panel wide"><header class="panel-head"><span class="panel-title">Аудит администратора</span><span class="panel-meta">Последние действия</span></header><div class="scroll"><table class="small-table"><thead><tr><th>Время</th><th>Действие</th><th>Игрок</th><th>Детали</th></tr></thead><tbody id="auditLog"><tr><td colspan="4" class="loading">Загрузка...</td></tr></tbody></table></div></article>
+    </section>
   </main>
+  <div class="modal" id="playerModal"><section class="modal-card"><header class="modal-head"><div class="profile-head" id="playerModalHead"></div><button class="action" onclick="closePlayerModal()">Закрыть</button></header><div class="profile-body" id="playerModalBody"></div></section></div>
   <script>
     const keyName = 'clashpvp-admin-key';
     const $ = id => document.getElementById(id);
@@ -85,10 +94,79 @@
         loadDashboard();
       } catch (error) { window.alert(error.message); }
     }
+    const adminState = { playerOffset: 0, playerTotal: 0, transactions: [], transactionOffset: 0 };
+    async function adminPost(path, body) {
+      const response = await fetch(path, { method:'POST', headers:{...authHeaders(),'content-type':'application/json'}, body:JSON.stringify(body || {}) });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'Операция не выполнена');
+      return data;
+    }
+    function playerName(user) { return user.username || user.first_name || 'Без имени'; }
+    function playerPhoto(user) { const url = typeof user.photo_url === 'string' && /^https:\/\//.test(user.photo_url) ? user.photo_url : ''; return url ? `<img class="profile-photo" src="${escapeHtml(url)}" alt="">` : `<div class="profile-photo">${escapeHtml(playerName(user).slice(0,1).toUpperCase())}</div>`; }
+    async function loadPlayerDirectory(reset=false) {
+      if (reset) adminState.playerOffset = 0;
+      const search = $('playerSearch').value.trim();
+      const data = await api(`/api/admin/users?limit=25&offset=${adminState.playerOffset}&search=${encodeURIComponent(search)}`);
+      adminState.playerTotal = data.total;
+      $('playerPage').textContent = `Страница ${Math.floor(adminState.playerOffset / 25) + 1} из ${Math.max(1, Math.ceil(data.total / 25))}`;
+      $('playerPrev').disabled = adminState.playerOffset === 0;
+      $('playerNext').disabled = adminState.playerOffset + data.users.length >= data.total;
+      $('playerDirectory').innerHTML = data.users.length ? data.users.map(user => `<tr><td>${escapeHtml(playerName(user))}</td><td>${escapeHtml(user.telegram_id)}</td><td class="amount">${stars(user.balance)}</td><td class="${user.is_banned ? 'status-banned' : 'status-active'}">${user.is_banned ? 'Заблокирован' : 'Активен'}</td><td>${date(user.created_at)}</td><td><button class="action" onclick="openPlayer('${user.id}')">Открыть</button></td></tr>`).join('') : '<tr><td colspan="6" class="loading">Игроки не найдены</td></tr>';
+    }
+    async function loadTransactions(reset=false) {
+      if (reset) adminState.transactionOffset = 0;
+      const search = $('transactionSearch').value.trim();
+      const type = $('transactionType').value;
+      const data = await api(`/api/admin/transactions?limit=100&offset=${adminState.transactionOffset}&search=${encodeURIComponent(search)}&type=${encodeURIComponent(type)}`);
+      adminState.transactions = data.transactions;
+      $('adminTransactions').innerHTML = data.transactions.length ? data.transactions.map(tx => `<tr><td>${date(tx.created_at)}</td><td>${escapeHtml(tx.username || tx.telegram_id)}</td><td><span class="type ${escapeHtml(tx.type)}">${escapeHtml(tx.type)}</span></td><td>${escapeHtml(tx.game_type || '—')}</td><td class="${Number(tx.amount) >= 0 ? 'amount' : 'status-banned'}">${Number(tx.amount) > 0 ? '+' : ''}${stars(tx.amount)}</td><td>${stars(tx.balance_after)}</td></tr>`).join('') : '<tr><td colspan="6" class="loading">Операций не найдено</td></tr>';
+    }
+    function exportTransactions() {
+      const rows = [['Время','Игрок','Telegram ID','Тип','Игра','Stars','Баланс после'], ...adminState.transactions.map(tx => [date(tx.created_at), tx.username || '', tx.telegram_id || '', tx.type, tx.game_type || '', tx.amount, tx.balance_after])];
+      const csv = rows.map(row => row.map(value => `"${String(value ?? '').replaceAll('"','""')}"`).join(',')).join('\n');
+      const url = URL.createObjectURL(new Blob([csv], { type:'text/csv;charset=utf-8' }));
+      const link = document.createElement('a'); link.href = url; link.download = `starqc-transactions-${new Date().toISOString().slice(0,10)}.csv`; link.click(); URL.revokeObjectURL(url);
+    }
+    function renderAnalytics(data) {
+      const today = data.today || {};
+      setText('todayDeposits', stars(today.deposits)); setText('todayTurnover', stars(today.turnover)); setText('todayPayouts', stars(today.payouts)); setText('todayWithdrawals', stars(today.withdrawals));
+      setText('todayActiveUsers', `${today.active_users || 0} активных`);
+      setText('pendingWithdrawals', data.pendingWithdrawals?.count || 0); setText('pendingWithdrawalStars', stars(data.pendingWithdrawals?.stars)); setText('largestBetCount', data.largestBets?.length || 0);
+      $('largestBets').innerHTML = data.largestBets?.length ? data.largestBets.map(bet => `<tr><td>${escapeHtml(bet.username || bet.telegram_id)}</td><td class="amount">${stars(bet.amount)}</td><td>${escapeHtml(bet.game_type || '—')}</td></tr>`).join('') : '<tr><td colspan="3" class="loading">Крупных ставок пока нет</td></tr>';
+      $('auditLog').innerHTML = data.auditLog?.length ? data.auditLog.map(item => `<tr><td>${date(item.created_at)}</td><td>${escapeHtml(item.action)}</td><td>${escapeHtml(item.username || '—')}</td><td>${escapeHtml(JSON.stringify(item.metadata || {}))}</td></tr>`).join('') : '<tr><td colspan="4" class="loading">Админских действий пока нет</td></tr>';
+    }
+    async function loadAdminExtras() {
+      try { const [analytics] = await Promise.all([api('/api/admin/analytics'), loadPlayerDirectory(), loadTransactions()]); renderAnalytics(analytics); }
+      catch (error) { console.error(error); }
+    }
+    async function loadAllAdminData() { await loadDashboard(); await loadAdminExtras(); }
+    async function openPlayer(id) {
+      try {
+        const data = await api(`/api/admin/users/${id}`); const user = data.user;
+        $('playerModalHead').innerHTML = `${playerPhoto(user)}<div><strong>${escapeHtml(playerName(user))}</strong><div class="sub">${escapeHtml(user.telegram_id)} · ${user.is_banned ? 'Заблокирован' : 'Активен'}</div></div>`;
+        $('playerModalBody').innerHTML = `<div class="profile-summary"><div>Баланс<b>${stars(user.balance)}</b></div><div>Депозиты<b>${stars(data.summary.deposits)}</b></div><div>Ставки<b>${stars(data.summary.bets)}</b></div><div>Выигрыши<b>${stars(data.summary.wins)}</b></div></div><div class="row-actions"><button class="action good" onclick="adjustBalance('${user.id}')">Изменить баланс</button><button class="action ${user.is_banned ? 'good' : 'danger'}" onclick="setPlayerBan('${user.id}', ${!user.is_banned})">${user.is_banned ? 'Разблокировать' : 'Заблокировать'}</button></div><h3>Последние операции</h3><div class="scroll"><table class="small-table"><thead><tr><th>Время</th><th>Тип</th><th>Stars</th><th>Баланс</th></tr></thead><tbody>${data.transactions.length ? data.transactions.map(tx => `<tr><td>${date(tx.created_at)}</td><td><span class="type ${escapeHtml(tx.type)}">${escapeHtml(tx.type)}</span></td><td class="${Number(tx.amount) >= 0 ? 'amount' : 'status-banned'}">${Number(tx.amount) > 0 ? '+' : ''}${stars(tx.amount)}</td><td>${stars(tx.balance_after)}</td></tr>`).join('') : '<tr><td colspan="4" class="loading">Нет операций</td></tr>'}</tbody></table></div>`;
+        $('playerModal').classList.add('show');
+      } catch (error) { window.alert(error.message); }
+    }
+    function closePlayerModal() { $('playerModal').classList.remove('show'); }
+    async function setPlayerBan(id, banned) {
+      const reason = banned ? window.prompt('Причина блокировки:', '') : '';
+      if (banned && reason === null) return;
+      try { await adminPost(`/api/admin/users/${id}/ban`, { banned, reason }); closePlayerModal(); await loadAllAdminData(); }
+      catch (error) { window.alert(error.message); }
+    }
     function showLogin(message='') { $('dashboardView').classList.add('hidden'); $('loginView').classList.remove('hidden'); $('loginError').textContent = message; }
-    function showDashboard() { $('loginView').classList.add('hidden'); $('dashboardView').classList.remove('hidden'); loadDashboard(); }
+    function showDashboard() { $('loginView').classList.add('hidden'); $('dashboardView').classList.remove('hidden'); loadAllAdminData(); }
     $('loginForm').addEventListener('submit', event => { event.preventDefault(); sessionStorage.setItem(keyName,$('adminKey').value); showDashboard(); });
-    $('refresh').addEventListener('click',loadDashboard); $('logout').addEventListener('click',() => { sessionStorage.removeItem(keyName); $('adminKey').value=''; showLogin(); });
+    $('refresh').addEventListener('click',loadAllAdminData); $('logout').addEventListener('click',() => { sessionStorage.removeItem(keyName); $('adminKey').value=''; showLogin(); });
+    $('playerSearchButton').addEventListener('click',() => loadPlayerDirectory(true));
+    $('playerSearch').addEventListener('keydown',event => { if (event.key === 'Enter') loadPlayerDirectory(true); });
+    $('playerPrev').addEventListener('click',() => { adminState.playerOffset = Math.max(0, adminState.playerOffset - 25); loadPlayerDirectory(); });
+    $('playerNext').addEventListener('click',() => { adminState.playerOffset += 25; loadPlayerDirectory(); });
+    $('transactionFilter').addEventListener('click',() => loadTransactions(true));
+    $('transactionSearch').addEventListener('keydown',event => { if (event.key === 'Enter') loadTransactions(true); });
+    $('exportTransactions').addEventListener('click',exportTransactions);
+    $('playerModal').addEventListener('click',event => { if (event.target === $('playerModal')) closePlayerModal(); });
     if (sessionStorage.getItem(keyName)) showDashboard();
   </script>
 </body>
