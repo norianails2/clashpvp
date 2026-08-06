@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
-  <title>Clash PVP Admin</title>
+  <title>Starqc Admin</title>
   <style>
     :root { color-scheme:dark; --bg:#0a0a14; --panel:#151523; --line:#2c2940; --muted:#9793aa; --text:#f7f5ff; --purple:#a78bfa; --gold:#f7c948; --green:#43b881; --red:#e35d71; }
     * { box-sizing:border-box; } body { margin:0;min-width:320px;background:radial-gradient(ellipse 80% 48% at 50% -10%,rgba(139,92,246,.16),transparent 68%),var(--bg);color:var(--text);font:14px/1.4 Inter,Arial,sans-serif; }
@@ -23,13 +23,13 @@
 <body>
   <main id="loginView" class="login">
     <form id="loginForm" class="login-box">
-      <div class="brand">CLASH PVP</div><h1>Админ-панель</h1><p class="sub">Операционная статистика платформы.</p>
+      <div class="brand">STARQC</div><h1>Админ-панель</h1><p class="sub">Операционная статистика платформы.</p>
       <label for="adminKey">Ключ администратора</label><input id="adminKey" type="password" autocomplete="current-password" required>
       <button class="primary" type="submit">ВОЙТИ</button><div id="loginError" class="error"></div>
     </form>
   </main>
   <main id="dashboardView" class="shell hidden">
-    <header class="topbar"><div><div class="brand">CLASH PVP</div><h1>Бизнес-статистика</h1><p class="sub" id="updatedAt">Загрузка данных...</p></div><div class="actions"><button class="icon-btn" id="refresh" title="Обновить" aria-label="Обновить">↻</button><button class="logout" id="logout">Выйти</button></div></header>
+    <header class="topbar"><div><div class="brand">STARQC</div><h1>Бизнес-статистика</h1><p class="sub" id="updatedAt">Загрузка данных...</p></div><div class="actions"><button class="icon-btn" id="refresh" title="Обновить" aria-label="Обновить">↻</button><button class="logout" id="logout">Выйти</button></div></header>
     <section class="metrics" aria-label="Ключевые показатели">
       <dl class="metric"><dt>Пользователи</dt><dd id="totalUsers">-</dd><small><span id="newUsers">-</span> новых сегодня</small></dl>
       <dl class="metric"><dt>Баланс игроков</dt><dd class="gold" id="totalBalance">-</dd><small>Stars внутри платформы</small></dl>

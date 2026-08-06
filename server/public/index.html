@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="color-scheme" content="dark">
-    <title>ClashPVP</title>
+    <title>Starqc</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js?22"></script>
     <script src="/socket.io/socket.io.js"></script>
@@ -873,7 +873,7 @@
         <h2>🔞 Подтверждение возраста</h2>
         <p style="font-size:13px;color:rgba(255,255,255,0.6);margin:12px 0;line-height:1.5;">
             Вам есть 18 лет?<br>
-            Clash PVP содержит азартные игры на Telegram Stars.<br>
+            Starqc содержит азартные игры на Telegram Stars.<br>
             Играйте ответственно.
         </p>
         <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;">
@@ -2905,7 +2905,7 @@ async function applyStartReferral() {
         if (!response.ok) return;
         const result = await response.json();
         sessionStorage.setItem(`referral-applied:${referrerId}`, '1');
-        if (result.applied) showToast('Referral applied. Welcome to Clash PVP!', 'success');
+        if (result.applied) showToast('Referral applied. Welcome to Starqc!', 'success');
     } catch (err) {
         console.warn('Referral apply failed:', err.message);
     }
@@ -2914,7 +2914,7 @@ async function applyStartReferral() {
 window.shareReferral = async function() {
     if (!referralLink) return;
     const tg = window.Telegram?.WebApp;
-    const message = 'Join me in Clash PVP and play PvP games!';
+    const message = 'Join me in Starqc and play PvP games!';
     const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(message)}`;
     if (tg?.openTelegramLink) {
         tg.openTelegramLink(shareUrl);
@@ -2965,7 +2965,7 @@ function connectSocket(initData) {
     socket.on('connect_error', (err) => {
         console.error('Socket error:', err.message);
         const message = err.message === 'Missing Telegram initData'
-            ? 'Откройте Clash PVP через Telegram'
+            ? 'Откройте Starqc через Telegram'
             : 'Ошибка подключения: ' + err.message;
         setRouletteUnavailable(message);
         showToast(message, 'error');

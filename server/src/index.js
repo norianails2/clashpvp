@@ -67,7 +67,7 @@ async function main() {
   invoiceExpiryInterval.unref();
 
   server.listen(config.port, () => {
-    console.log(`[server] Clash PVP backend running on port ${config.port}`);
+    console.log(`[server] Starqc backend running on port ${config.port}`);
     console.log(`[server] Environment: ${config.nodeEnv}`);
     startBotPolling().catch((err) => {
       console.error('[telegramBot] initial polling start failed:', err.message);

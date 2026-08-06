@@ -189,7 +189,7 @@ export function initSocket(httpServer) {
         );
         const botToken = config.telegram.botToken;
         const body = JSON.stringify({
-          title: `Clash PVP — ${amount} Stars`,
+          title: `Starqc — ${amount} Stars`,
           description: `Пополнение игрового баланса`,
           payload: JSON.stringify({ action: 'deposit', invoiceId }),
           currency: 'XTR',
