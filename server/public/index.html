@@ -698,7 +698,7 @@
             <div class="balance-actions">
                 <div class="balance-actions-top">
                     <button class="bal-btn withdraw" onclick="playSound('click');openModal('withdrawModal')">Вывод</button>
-                    <button class="bal-btn deposit" onclick="playSound('click');openModal('depositModal')">💰 Депозит</button>
+                    <button class="bal-btn deposit" onclick="playSound('click');openModal('depositModal')">Депозит</button>
                 </div>
             </div>
         </div>
@@ -747,7 +747,7 @@
 
     <div class="modal-overlay" id="depositModal">
         <div class="modal-box">
-            <h2>💰 Пополнение</h2>
+            <h2>Пополнение</h2>
             <div id="depositStars">
                 <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px;">Выбери сумму для пополнения</p>
                 <div class="modal-btns" style="margin-bottom:10px;">
@@ -1001,7 +1001,7 @@ function applyLanguage() {
     const pack = LANGUAGES[uiLanguage] || LANGUAGES.en;
     document.documentElement.lang = uiLanguage;
     const label = document.getElementById('balanceLabel'); if (label) label.textContent = t('balance');
-    const topUp = document.querySelector('.bal-btn.deposit'); if (topUp) topUp.textContent = '💰 ' + t('topUp');
+    const topUp = document.querySelector('.bal-btn.deposit'); if (topUp) topUp.textContent = t('topUp');
     const withdraw = document.querySelector('.bal-btn.withdraw'); if (withdraw) withdraw.textContent = t('withdraw');
     const section = document.querySelector('.section-title'); if (section) section.childNodes[0].nodeValue = '🎮 ' + t('allGames') + ' ';
     const count = document.querySelector('.section-title span'); if (count) count.textContent = t('games');
