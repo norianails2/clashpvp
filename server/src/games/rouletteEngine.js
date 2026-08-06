@@ -39,7 +39,7 @@ class RouletteEngine {
       serverSeed: this.phase === 'settled' ? this.serverSeed : null,
       history: this.history,
       stats: this.stats,
-      bets: this.bets.map(({ userId, username, amount, color }) => ({ userId, username, amount, color })),
+      bets: this.bets.map(({ userId, username, photoUrl, amount, color }) => ({ userId, username, photoUrl, amount, color })),
     };
   }
 
@@ -168,7 +168,7 @@ class RouletteEngine {
     } catch (err) { await client.query('ROLLBACK'); throw err; } finally { client.release(); }
   }
 
-  async placeBet(userId, username, amount, color) {
+  async placeBet(userId, username, photoUrl, amount, color) {
     if (this.shuttingDown) return { error: 'Game is restarting' };
     if (this.phase !== 'betting') return { error: 'Betting is closed' };
     if (!Number.isSafeInteger(amount) || amount < MIN_BET || amount > MAX_BET) return { error: `Bet must be between ${MIN_BET} and ${MAX_BET}` };
@@ -193,7 +193,7 @@ class RouletteEngine {
         if (!insert.rowCount) throw new Error('A bet on this color already exists');
         await client.query('COMMIT');
       } catch (err) { await client.query('ROLLBACK'); throw err; } finally { client.release(); }
-      this.bets.push({ userId, username, amount, color });
+      this.bets.push({ userId, username, photoUrl, amount, color });
       this.io?.to(`user:${userId}`).emit('balance:update', { balance: balanceAfter });
       this.broadcast();
       return { success: true, balance: balanceAfter };

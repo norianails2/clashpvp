@@ -9,7 +9,7 @@ export function registerRouletteHandlers(_io, socket) {
   });
   socket.on('roulette:leave', () => socket.leave('game:roulette'));
   socket.on('roulette:bet', async (payload, ack) => {
-    const result = await rouletteEngine.placeBet(userId, socket.data.user.username || 'Player', payload?.betAmount, payload?.color);
+    const result = await rouletteEngine.placeBet(userId, socket.data.user.username || 'Player', socket.data.user.photo_url || null, payload?.betAmount, payload?.color);
     ack?.(result);
   });
   socket.on('roulette:cancel_bet', async (payload, ack) => {

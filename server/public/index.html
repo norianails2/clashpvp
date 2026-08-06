@@ -709,8 +709,9 @@
         .roulette-avatar { width:19px!important;height:19px!important;flex-basis:19px!important;border-radius:4px!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.16); }
         .roulette-bet.me { border-color:rgba(167,139,250,.72)!important;background:rgba(167,139,250,.075)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 0 0 1px rgba(167,139,250,.16)!important; }
         .roulette-bet { min-height:29px;padding:4px 6px 4px 9px!important;gap:5px!important;justify-content:space-between; }
-        .roulette-bet span { display:none!important; }
+        .roulette-bet span { display:block!important;min-width:0;flex:1;color:rgba(255,255,255,.88)!important;font-size:9px!important;font-weight:700!important; }
         .roulette-avatar { width:21px!important;height:21px!important;flex-basis:21px!important;font-size:10px!important; }
+        .roulette-avatar img { width:100%;height:100%;display:block;object-fit:cover;border-radius:3px; }
         .roulette-bet b { margin-left:auto;font-size:11px!important;letter-spacing:0; }
     </style>
 </head>
@@ -2595,6 +2596,7 @@ function setRouletteUnavailable(message) {
 
 function rouletteEscape(value) { const node = document.createElement('span'); node.textContent = value || 'Player'; return node.innerHTML; }
 function rouletteInitial(value) { return rouletteEscape(String(value || 'P').trim().slice(0, 1).toUpperCase()); }
+function rouletteAvatar(photoUrl, color, name) { const safeUrl = typeof photoUrl === 'string' && /^https:\/\//.test(photoUrl) ? photoUrl : ''; return '<i class="roulette-avatar ' + color + '">' + (safeUrl ? '<img src="' + rouletteEscape(safeUrl) + '" alt="">' : rouletteInitial(name)) + '</i>'; }
 function rouletteMultiplier(color) { return color === 'green' ? 14 : 2; }
 function updateRoulettePreview() { const preview = document.getElementById('roulettePreview'); const input = document.getElementById('rouletteBet'); if (!preview || !input) return; const amount = Math.max(0, Math.floor(Number(input.value) || 0)); preview.innerHTML = phrase('payout') + '<b>' + (amount * rouletteMultiplier(rouletteColor)) + '</b><i class="tg-s"></i>'; const hasSelectedBet = window._rouletteState?.bets?.some(bet => bet.userId === myUserId && bet.color === rouletteColor); const button = document.getElementById('rouletteSpin'); if (button && !button.disabled) button.textContent = hasSelectedBet ? phrase('cancelBet') : t('place') + ' ' + amount + ' STARS'; }
 function rouletteAdjust(multiplier, max) { const input = document.getElementById('rouletteBet'); if (!input) return; input.value = max ? Math.max(1, Math.floor(balance || 1)) : Math.max(1, Math.floor((Number(input.value) || 1) * multiplier)); updateRoulettePreview(); }
@@ -2679,7 +2681,7 @@ function updateRoulette(state) {
     const history = state.history || [];
     const historyEl = document.getElementById('rouletteHistory');
     historyEl.innerHTML = history.length ? history.slice(0, 13).map((item, index) => '<span class="' + item.color + (state.phase === 'settled' && index === 0 ? ' latest' : '') + '" aria-label="' + resultLabel[item.color] + '"></span>').join('') : '<span class="empty"></span><span class="empty"></span><span class="empty"></span><span class="empty"></span><span class="empty"></span>';
-    ['red', 'green', 'black'].forEach(color => { const bets = state.bets.filter(bet => bet.color === color); const prefix = 'roulette' + color[0].toUpperCase() + color.slice(1); document.getElementById(prefix + 'Count').textContent = bets.length; document.getElementById(prefix + 'Total').textContent = bets.reduce((sum, bet) => sum + bet.amount, 0); document.getElementById(prefix + 'Bets').innerHTML = bets.length ? bets.map(bet => { const name = bet.userId === myUserId ? 'Вы' : bet.username; return '<div class="roulette-bet' + (bet.userId === myUserId ? ' me' : '') + '"><i class="roulette-avatar ' + color + '">' + rouletteInitial(name) + '</i><span>' + rouletteEscape(name) + '</span><b><i class="tg-s"></i>' + bet.amount + '</b></div>'; }).join('') : ''; document.getElementById(prefix + 'Bets').closest('.roulette-column').classList.toggle('winner', state.phase === 'settled' && state.result?.color === color); });
+    ['red', 'green', 'black'].forEach(color => { const bets = state.bets.filter(bet => bet.color === color); const prefix = 'roulette' + color[0].toUpperCase() + color.slice(1); document.getElementById(prefix + 'Count').textContent = bets.length; document.getElementById(prefix + 'Total').textContent = bets.reduce((sum, bet) => sum + bet.amount, 0); document.getElementById(prefix + 'Bets').innerHTML = bets.length ? bets.map(bet => { const name = bet.userId === myUserId ? 'Вы' : bet.username; return '<div class="roulette-bet' + (bet.userId === myUserId ? ' me' : '') + '">' + rouletteAvatar(bet.photoUrl, color, name) + '<span>' + rouletteEscape(name) + '</span><b><i class="tg-s"></i>' + bet.amount + '</b></div>'; }).join('') : ''; document.getElementById(prefix + 'Bets').closest('.roulette-column').classList.toggle('winner', state.phase === 'settled' && state.result?.color === color); });
 }
 
 async function verifyRouletteFair() {
