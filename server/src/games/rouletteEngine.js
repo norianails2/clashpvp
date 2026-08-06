@@ -46,14 +46,14 @@ class RouletteEngine {
   broadcast() { this.io?.to('game:roulette').emit('roulette:state', this.state()); }
 
   async restore() {
-    const { rows: active } = await query("SELECT round_number, user_id, amount FROM roulette_bets WHERE status = 'active'");
+    const { rows: active } = await query("SELECT round_number, user_id, color, amount FROM roulette_bets WHERE status = 'active'");
     for (const bet of active) {
       const client = await getClient();
       try {
         await client.query('BEGIN');
         const updated = await client.query(
-          "UPDATE roulette_bets SET status = 'refunded', settled_at = NOW() WHERE round_number = $1 AND user_id = $2 AND status = 'active' RETURNING amount",
-          [bet.round_number, bet.user_id]
+          "UPDATE roulette_bets SET status = 'refunded', settled_at = NOW() WHERE round_number = $1 AND user_id = $2 AND color = $3 AND status = 'active' RETURNING amount",
+          [bet.round_number, bet.user_id, bet.color]
         );
         if (updated.rowCount) await refund(bet.user_id, Number(updated.rows[0].amount), 'roulette', null, client);
         await client.query('COMMIT');
@@ -150,8 +150,8 @@ class RouletteEngine {
         ({ balanceAfter } = await payout(bet.userId, payoutAmount, 'roulette', null, client, 0));
       }
       const update = await client.query(
-        "UPDATE roulette_bets SET status = $3, payout = $4, settled_at = NOW() WHERE round_number = $1 AND user_id = $2 AND status = 'active'",
-        [this.round, bet.userId, won ? 'won' : 'lost', payoutAmount]
+        "UPDATE roulette_bets SET status = $4, payout = $5, settled_at = NOW() WHERE round_number = $1 AND user_id = $2 AND color = $3 AND status = 'active'",
+        [this.round, bet.userId, bet.color, won ? 'won' : 'lost', payoutAmount]
       );
       if (update.rowCount !== 1) throw new Error('Bet is already settled');
       await client.query('COMMIT');
@@ -162,6 +162,7 @@ class RouletteEngine {
         payout: payoutAmount,
         bet: bet.amount,
         result: this.result,
+        balance: balanceAfter,
       });
       return { userId: bet.userId, won, payout: payoutAmount };
     } catch (err) { await client.query('ROLLBACK'); throw err; } finally { client.release(); }
@@ -172,8 +173,9 @@ class RouletteEngine {
     if (this.phase !== 'betting') return { error: 'Betting is closed' };
     if (!Number.isSafeInteger(amount) || amount < MIN_BET || amount > MAX_BET) return { error: `Bet must be between ${MIN_BET} and ${MAX_BET}` };
     if (!isValidColor(color)) return { error: 'Invalid roulette color' };
-    if (this.bets.some(bet => bet.userId === userId) || this.pendingBets.has(userId)) return { error: 'Only one bet per round' };
-    this.pendingBets.add(userId);
+    const betKey = `${userId}:${color}`;
+    if (this.bets.some(bet => bet.userId === userId && bet.color === color) || this.pendingBets.has(betKey)) return { error: 'A bet on this color already exists' };
+    this.pendingBets.add(betKey);
     try {
       const client = await getClient();
       let balanceAfter;
@@ -181,40 +183,41 @@ class RouletteEngine {
         await client.query('BEGIN');
         ({ balanceAfter } = await holdBet(userId, amount, 'roulette', null, client));
         if (this.phase !== 'betting') throw new Error('Betting is closed');
-        await client.query(
+        const insert = await client.query(
           `INSERT INTO roulette_bets (round_number, user_id, username, color, amount)
            VALUES ($1, $2, $3, $4, $5)
-           ON CONFLICT (round_number, user_id) DO UPDATE
-             SET username = EXCLUDED.username, color = EXCLUDED.color, amount = EXCLUDED.amount,
-                 status = 'active', payout = 0, created_at = NOW(), settled_at = NULL`,
+          ON CONFLICT (round_number, user_id, color) DO NOTHING
+          RETURNING id`,
           [this.round, userId, username, color, amount]
         );
+        if (!insert.rowCount) throw new Error('A bet on this color already exists');
         await client.query('COMMIT');
       } catch (err) { await client.query('ROLLBACK'); throw err; } finally { client.release(); }
       this.bets.push({ userId, username, amount, color });
       this.io?.to(`user:${userId}`).emit('balance:update', { balance: balanceAfter });
       this.broadcast();
       return { success: true, balance: balanceAfter };
-    } catch (err) { return { error: err.message }; } finally { this.pendingBets.delete(userId); }
+    } catch (err) { return { error: err.message }; } finally { this.pendingBets.delete(betKey); }
   }
 
-  async cancelBet(userId) {
+  async cancelBet(userId, color) {
     if (this.phase !== 'betting') return { error: 'Betting is closed' };
-    const bet = this.bets.find(entry => entry.userId === userId);
+    if (!isValidColor(color)) return { error: 'Invalid roulette color' };
+    const bet = this.bets.find(entry => entry.userId === userId && entry.color === color);
     if (!bet) return { error: 'No active bet' };
     const client = await getClient();
     try {
       await client.query('BEGIN');
       const updated = await client.query(
-        "UPDATE roulette_bets SET status = 'refunded', settled_at = NOW() WHERE round_number = $1 AND user_id = $2 AND status = 'active' RETURNING amount",
-        [this.round, userId]
+        "UPDATE roulette_bets SET status = 'refunded', settled_at = NOW() WHERE round_number = $1 AND user_id = $2 AND color = $3 AND status = 'active' RETURNING amount",
+        [this.round, userId, color]
       );
       if (updated.rowCount !== 1) throw new Error('Bet is already settled');
       if (this.phase !== 'betting') throw new Error('Betting is closed');
       const { balanceAfter } = await refund(userId, Number(updated.rows[0].amount), 'roulette', null, client);
       if (this.phase !== 'betting') throw new Error('Betting is closed');
       await client.query('COMMIT');
-      this.bets = this.bets.filter(entry => entry.userId !== userId);
+      this.bets = this.bets.filter(entry => entry.userId !== userId || entry.color !== color);
       this.io?.to(`user:${userId}`).emit('balance:update', { balance: balanceAfter });
       this.broadcast();
       return { success: true, balance: balanceAfter };
@@ -244,8 +247,8 @@ class RouletteEngine {
     try {
       await client.query('BEGIN');
       const updated = await client.query(
-        "UPDATE roulette_bets SET status = 'refunded', settled_at = NOW() WHERE round_number = $1 AND user_id = $2 AND status = 'active' RETURNING amount",
-        [this.round, bet.userId]
+        "UPDATE roulette_bets SET status = 'refunded', settled_at = NOW() WHERE round_number = $1 AND user_id = $2 AND color = $3 AND status = 'active' RETURNING amount",
+        [this.round, bet.userId, bet.color]
       );
       let balanceAfter = null;
       if (updated.rowCount) ({ balanceAfter } = await refund(bet.userId, Number(updated.rows[0].amount), 'roulette', null, client));

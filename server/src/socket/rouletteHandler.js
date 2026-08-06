@@ -12,8 +12,8 @@ export function registerRouletteHandlers(_io, socket) {
     const result = await rouletteEngine.placeBet(userId, socket.data.user.username || 'Player', payload?.betAmount, payload?.color);
     ack?.(result);
   });
-  socket.on('roulette:cancel_bet', async (_payload, ack) => {
-    const result = await rouletteEngine.cancelBet(userId);
+  socket.on('roulette:cancel_bet', async (payload, ack) => {
+    const result = await rouletteEngine.cancelBet(userId, payload?.color);
     ack?.(result);
   });
 }

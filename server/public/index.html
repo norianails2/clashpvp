@@ -2580,7 +2580,7 @@ function setRouletteUnavailable(message) {
 function rouletteEscape(value) { const node = document.createElement('span'); node.textContent = value || 'Player'; return node.innerHTML; }
 function rouletteInitial(value) { return rouletteEscape(String(value || 'P').trim().slice(0, 1).toUpperCase()); }
 function rouletteMultiplier(color) { return color === 'green' ? 14 : 2; }
-function updateRoulettePreview() { const preview = document.getElementById('roulettePreview'); const input = document.getElementById('rouletteBet'); if (!preview || !input) return; const amount = Math.max(0, Math.floor(Number(input.value) || 0)); preview.innerHTML = phrase('payout') + '<b>' + (amount * rouletteMultiplier(rouletteColor)) + '</b><i class="tg-s"></i>'; const button = document.getElementById('rouletteSpin'); if (button && !button.disabled && !window._rouletteState?.bets?.some(bet => bet.userId === myUserId)) button.textContent = t('place') + ' ' + amount + ' STARS'; }
+function updateRoulettePreview() { const preview = document.getElementById('roulettePreview'); const input = document.getElementById('rouletteBet'); if (!preview || !input) return; const amount = Math.max(0, Math.floor(Number(input.value) || 0)); preview.innerHTML = phrase('payout') + '<b>' + (amount * rouletteMultiplier(rouletteColor)) + '</b><i class="tg-s"></i>'; const hasSelectedBet = window._rouletteState?.bets?.some(bet => bet.userId === myUserId && bet.color === rouletteColor); const button = document.getElementById('rouletteSpin'); if (button && !button.disabled) button.textContent = hasSelectedBet ? phrase('cancelBet') : t('place') + ' ' + amount + ' STARS'; }
 function rouletteAdjust(multiplier, max) { const input = document.getElementById('rouletteBet'); if (!input) return; input.value = max ? Math.max(1, Math.floor(balance || 1)) : Math.max(1, Math.floor((Number(input.value) || 1) * multiplier)); updateRoulettePreview(); }
 function rouletteSetMinimum() { const input = document.getElementById('rouletteBet'); if (input) { input.value = 1; updateRoulettePreview(); } }
 function rouletteHaptic(kind) {
@@ -2591,19 +2591,27 @@ function rouletteHaptic(kind) {
         else haptic.notificationOccurred(kind);
     } catch (_) {}
 }
-function prepareRouletteStrip(color) {
+function rouletteVisualRandom(seed) {
+    let value = 2166136261;
+    for (const character of String(seed)) value = Math.imul(value ^ character.charCodeAt(0), 16777619);
+    return () => { value += 0x6D2B79F5; let next = value; next = Math.imul(next ^ next >>> 15, next | 1); next ^= next + Math.imul(next ^ next >>> 7, next | 61); return ((next ^ next >>> 14) >>> 0) / 4294967296; };
+}
+function prepareRouletteStrip(color, round, seedHash) {
     const track = document.querySelector('.roulette-strip-track');
     const strip = document.querySelector('.roulette-strip');
     if (!track || !strip || !color) return;
-    const targetIndex = 20;
-    const sequence = Array.from({ length: 32 }, (_, index) => index % 2 ? 'red' : 'black');
-    if (color !== 'green') sequence[4] = 'green';
+    const random = rouletteVisualRandom(`${round}:${seedHash || color}`);
+    const targetIndex = 14 + Math.floor(random() * 9);
+    const sequence = Array.from({ length: 40 }, () => {
+        const roll = random();
+        return roll < 1 / 15 ? 'green' : roll < 8 / 15 ? 'red' : 'black';
+    });
     sequence[targetIndex] = color;
     track.innerHTML = sequence.map((item, index) => '<i class="' + item + (index === targetIndex ? ' landing' : '') + '"></i>').join('');
     const markerRatio = 0.5;
     const markerPosition = (strip.clientWidth || 320) * markerRatio;
     const landingTile = track.querySelector('.landing');
-    const landingPoint = landingTile.offsetLeft + landingTile.offsetWidth * (0.25 + Math.random() * 0.5);
+    const landingPoint = landingTile.offsetLeft + landingTile.offsetWidth * (0.2 + random() * 0.6);
     strip.style.setProperty('--roulette-marker', (markerRatio * 100).toFixed(1) + '%');
     document.querySelector('.roulette-stage')?.style.setProperty('--roulette-marker', (markerRatio * 100).toFixed(1) + '%');
     track.style.setProperty('--roulette-stop', Math.round(markerPosition - landingPoint) + 'px');
@@ -2612,7 +2620,8 @@ function updateRoulette(state) {
     window._rouletteState = state;
     const timer = document.getElementById('rouletteTimer');
     if (!timer) return;
-    const mine = state.bets.some(bet => bet.userId === myUserId);
+    const myBets = state.bets.filter(bet => bet.userId === myUserId);
+    const mine = myBets.length > 0;
     if (state.phase === 'betting' && state.countdown <= 5) {
         const tickId = state.round + ':' + state.countdown;
         if (window._rouletteHapticTick !== tickId) { window._rouletteHapticTick = tickId; rouletteHaptic('tick'); }
@@ -2631,7 +2640,7 @@ function updateRoulette(state) {
     document.getElementById('rouletteTimerLabel').textContent = state.phase === 'betting' ? phrase('secondsToClose') : state.phase === 'spinning' ? phrase('spinning') : state.result ? phrase('result') : '';
     timer.className = 'word ' + (state.phase === 'betting' ? 'countdown ' : '') + (state.phase === 'settled' && state.result ? state.result.color : state.phase === 'spinning' ? 'spinning' : (state.phase === 'betting' && state.countdown <= 5 ? 'urgent' : ''));
     const spinColor = state.spinResult?.color || state.result?.color;
-    if (spinColor && window._rouletteStripRound !== state.round) { window._rouletteStripRound = state.round; prepareRouletteStrip(spinColor); }
+    if (spinColor && window._rouletteStripRound !== state.round) { window._rouletteStripRound = state.round; prepareRouletteStrip(spinColor, state.round, state.serverSeedHash); }
     document.querySelector('.roulette-stage').className = 'roulette-stage' + (state.phase === 'spinning' ? ' spinning' : '') + (state.phase === 'settled' && state.result ? ' settled result-' + state.result.color : '');
     const status = document.getElementById('rouletteStatus');
     if (state.phase === 'settled' && state.result) {
@@ -2646,8 +2655,9 @@ function updateRoulette(state) {
     } else { status.textContent = mine ? phrase('betAccepted') : phrase('betsOpen'); }
     const button = document.getElementById('rouletteSpin');
     button.disabled = state.phase !== 'betting';
-    button.textContent = state.phase === 'betting' ? (mine ? phrase('cancelBet') : t('place') + ' ' + Math.max(0, Math.floor(Number(document.getElementById('rouletteBet')?.value) || 0)) + ' STARS') : phrase('betsClosed');
-    const canEditBet = state.phase === 'betting' && !mine;
+    const selectedBet = myBets.some(bet => bet.color === rouletteColor);
+    button.textContent = state.phase === 'betting' ? (selectedBet ? phrase('cancelBet') : t('place') + ' ' + Math.max(0, Math.floor(Number(document.getElementById('rouletteBet')?.value) || 0)) + ' STARS') : phrase('betsClosed');
+    const canEditBet = state.phase === 'betting';
     document.getElementById('rouletteBet').disabled = !canEditBet;
     document.querySelectorAll('.roulette-adjust button, .roulette-color').forEach(control => { control.disabled = !canEditBet; });
     const history = state.history || [];
@@ -2676,9 +2686,9 @@ async function verifyRouletteFair() {
 }
 
 function placeRouletteBet() {
-    if (window._rouletteState?.bets?.some(bet => bet.userId === myUserId)) {
+    if (window._rouletteState?.bets?.some(bet => bet.userId === myUserId && bet.color === rouletteColor)) {
         const button = document.getElementById('rouletteSpin'); button.disabled = true;
-        socket?.emit('roulette:cancel_bet', {}, result => { if (result?.error) { button.disabled = false; showToast(result.error, 'error'); } });
+        socket?.emit('roulette:cancel_bet', { color: rouletteColor }, result => { if (result?.error) { button.disabled = false; showToast(result.error, 'error'); } else if (result?.balance !== undefined) { balance = result.balance; updateBalance(); } });
         return;
     }
     const betAmount = Number(document.getElementById('rouletteBet')?.value);
@@ -2686,6 +2696,7 @@ function placeRouletteBet() {
     const button = document.getElementById('rouletteSpin'); button.disabled = true;
     socket?.emit('roulette:bet', { betAmount, color: rouletteColor }, result => {
         if (result?.error) { button.disabled = false; showToast(result.error, 'error'); }
+        else if (result?.balance !== undefined) { balance = result.balance; updateBalance(); }
     });
 }
 
@@ -3014,6 +3025,7 @@ function connectSocket(initData) {
 
     socket.on('roulette:state', (state) => updateRoulette(state));
     socket.on('roulette:result', (result) => {
+        if (result?.balance !== null && result?.balance !== undefined) { balance = result.balance; updateBalance(); }
         if (result?.refunded) showToast('Рулетка: ставка возвращена', 'info');
         else if (result?.won) { playSound('win'); showToast('Рулетка: выигрыш ' + result.payout + ' Stars', 'success'); }
         else { playSound('lose'); showToast('Рулетка: ставка ' + result.bet + ' не сыграла', 'error'); }
