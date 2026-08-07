@@ -77,6 +77,8 @@ export function initSocket(httpServer) {
       id: user.id,
       telegramId: user.telegram_id,
       username: user.username,
+      firstName: user.first_name || null,
+      lastName: user.last_name || null,
       photoUrl: user.photo_url || null,
       balance: Number(user.balance),
     });

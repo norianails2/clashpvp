@@ -1170,17 +1170,17 @@ function renderProfile() {
     if (name) name.textContent = myUserName || 'Player'; if (amount) amount.textContent = Math.floor(balance || 0);
     const refs = document.getElementById('profileReferrals'); if (refs) refs.textContent = document.getElementById('earningsFriends')?.textContent || '0';
     const tabName = document.getElementById('tabProfileName'); const tabBalance = document.getElementById('tabProfileBalance'); const tabRefs = document.getElementById('tabProfileRefs'); const handle = document.getElementById('tabProfileHandle'); const avatar = document.getElementById('tabProfileAvatar');
-    if (tabName) tabName.textContent = myUserName || 'Player'; if (tabBalance) tabBalance.textContent = Math.floor(balance || 0); if (tabRefs) tabRefs.textContent = refs?.textContent || '0';
-    if (handle) handle.textContent = myUserName ? '@' + myUserName.replace(/^@/, '') : 'Telegram account';
+    if (tabName) tabName.textContent = myUserDisplayName || myUserName || 'Player'; if (tabBalance) tabBalance.textContent = Math.floor(balance || 0); if (tabRefs) tabRefs.textContent = refs?.textContent || '0';
+    if (handle) handle.textContent = myUserName && myUserName !== 'Player' ? '@' + myUserName.replace(/^@/, '') : 'Telegram account';
     if (avatar) {
         avatar.replaceChildren();
         if (myUserPhoto) {
             const image = new Image();
             image.alt = 'Аватар Telegram';
             image.src = myUserPhoto;
-            image.onerror = () => { avatar.textContent = (myUserName || 'P').charAt(0).toUpperCase(); };
+            image.onerror = () => { avatar.textContent = (myUserDisplayName || myUserName || 'P').charAt(0).toUpperCase(); };
             avatar.appendChild(image);
-        } else avatar.textContent = (myUserName || 'P').charAt(0).toUpperCase();
+        } else avatar.textContent = (myUserDisplayName || myUserName || 'P').charAt(0).toUpperCase();
     }
 }
 function loadDailyTask() {
@@ -2922,6 +2922,7 @@ const SOCKET_URL = (location.protocol === 'https:' ? 'https:' : 'http:') + '//' 
 var socket = null;
 let myUserId = null;
 let myUserName = 'Player';
+let myUserDisplayName = '';
 let myUserPhoto = null;
 let isConnected = false;
 let referralLink = null;
@@ -3032,6 +3033,7 @@ function connectSocket(initData) {
     socket.on('user:info', (userData) => {
         myUserId = userData.id;
         myUserName = userData.username || 'Player';
+        myUserDisplayName = [userData.firstName, userData.lastName].filter(Boolean).join(' ') || myUserName;
         myUserPhoto = userData.photoUrl || null;
         if (userData.balance !== undefined) { balance = userData.balance; updateBalance(); }
         socket.emit('lobby:subscribe', { gameType: currentGameId });

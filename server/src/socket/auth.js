@@ -20,7 +20,7 @@ export async function verifyConnection(socket, next) {
           `INSERT INTO users (telegram_id, username)
            VALUES ($1, $2)
            ON CONFLICT (telegram_id) DO UPDATE SET username = EXCLUDED.username
-           RETURNING id, telegram_id, username, photo_url, balance, is_banned`,
+           RETURNING id, telegram_id, username, first_name, last_name, photo_url, balance, is_banned`,
           [telegramId, telegramId]
         );
         if (rows[0].is_banned) return next(new Error('Account suspended'));
@@ -89,7 +89,7 @@ export async function verifyConnection(socket, next) {
            first_name = COALESCE(NULLIF(EXCLUDED.first_name, ''), users.first_name),
            last_name  = COALESCE(NULLIF(EXCLUDED.last_name, ''), users.last_name),
            photo_url  = COALESCE(NULLIF(EXCLUDED.photo_url, ''), users.photo_url)
-         RETURNING id, telegram_id, username, photo_url, balance, is_banned`,
+         RETURNING id, telegram_id, username, first_name, last_name, photo_url, balance, is_banned`,
         [telegramId, tgUser.username || null, tgUser.first_name || null, tgUser.last_name || null, tgUser.photo_url || null]
       );
       rows = result.rows;
