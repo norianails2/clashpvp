@@ -1194,8 +1194,8 @@ function loadTasks() {
         const list = document.getElementById('tabTasksList');
         if (!list || res?.error) return;
         list.innerHTML = (res.tasks || []).map((task) => {
-            const progress = `${task.progress}/${task.target}`;
-            const percent = Math.max(0, Math.min(100, (task.progress / task.target) * 100));
+            const progress = task.progressLabel || `${task.progress}/${task.target}`;
+            const percent = Math.max(0, Math.min(100, task.progressPercent ?? ((task.progress / task.target) * 100)));
             const state = task.action ? 'is-share' : task.claimed ? 'is-done' : task.ready ? 'is-ready' : '';
             const action = task.action === 'share'
                 ? '<button class="task-button" onclick="shareReferral()">Пригласить</button>'

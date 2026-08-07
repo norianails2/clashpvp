@@ -1,11 +1,11 @@
 import { getClient, query } from '../db/pool.js';
 
-const DAILY_REWARD = 1;
+const DAILY_REWARD = 2;
 const DAILY_TASKS = [
   { key: 'daily', title: 'Ежедневный бонус', description: 'Зайди в игру и забери бонус', reward: DAILY_REWARD, target: 1 },
-  { key: 'bets_3', title: 'Сыграй 3 раунда', description: 'Сделай 3 ставки сегодня', reward: 1, target: 3 },
-  { key: 'turnover_100', title: 'Оборот 100 Stars', description: 'Поставь суммарно 100 Stars за день', reward: 2, target: 100 },
-  { key: 'win_1', title: 'Первая победа', description: 'Выиграй любой раунд сегодня', reward: 1, target: 1 },
+  { key: 'bets_3', title: 'Сыграй 3 раунда', description: '3 ставки с общим оборотом от 30 Stars', reward: 3, target: 3 },
+  { key: 'turnover_100', title: 'Оборот 250 Stars', description: 'Поставь суммарно 250 Stars за день', reward: 7, target: 250 },
+  { key: 'win_1', title: 'Первая победа', description: 'Выиграй любой раунд сегодня', reward: 2, target: 1 },
   { key: 'referral', title: 'Пригласи друга', description: 'Друг должен открыть приложение по твоей ссылке', reward: 50, target: 1, action: 'share' }
 ];
 
@@ -24,12 +24,23 @@ async function getTaskStatuses(client, userId) {
   const activity = activityRows[0] || {};
   const claimed = new Set(claimRows.map((row) => row.task_key));
   const values = { daily: 1, bets_3: Number(activity.bets || 0), turnover_100: Number(activity.turnover || 0), win_1: Number(activity.wins || 0), referral: Number(referralRows[0]?.total || 0) };
-  return DAILY_TASKS.map((task) => ({
-    ...task,
-    progress: Math.min(values[task.key] || 0, task.target),
-    claimed: task.key === 'daily' ? Boolean(dailyRows[0]?.claimed) : claimed.has(task.key),
-    ready: task.action ? false : (values[task.key] || 0) >= task.target
-  }));
+  return DAILY_TASKS.map((task) => {
+    const isThreeRounds = task.key === 'bets_3';
+    const progress = Math.min(values[task.key] || 0, task.target);
+    const ready = task.action ? false : isThreeRounds
+      ? values.bets_3 >= 3 && values.turnover_100 >= 30
+      : (values[task.key] || 0) >= task.target;
+    return {
+      ...task,
+      progress,
+      progressLabel: isThreeRounds ? `${Math.min(values.bets_3, 3)}/3 ставок · ${Math.min(values.turnover_100, 30)}/30` : `${progress}/${task.target}`,
+      progressPercent: isThreeRounds
+        ? Math.min(100, Math.min(values.bets_3 / 3, values.turnover_100 / 30) * 100)
+        : Math.min(100, ((values[task.key] || 0) / task.target) * 100),
+      claimed: task.key === 'daily' ? Boolean(dailyRows[0]?.claimed) : claimed.has(task.key),
+      ready
+    };
+  });
 }
 
 async function creditTaskReward(client, userId, task) {
