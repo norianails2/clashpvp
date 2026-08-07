@@ -404,6 +404,7 @@
         .tab-link { width:100%;margin:12px 0 9px;padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.035);color:#c4b5fd;font:700 11px monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
         .tab-action { width:100%;min-height:46px;border:0;border-radius:12px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font:800 13px 'Fredoka',sans-serif;cursor:pointer; }.tab-action.gold { background:#f7c948;color:#1d1529; }.tab-action:disabled { opacity:.45;cursor:default; }
         .tab-section { margin:20px 0 9px;color:rgba(255,255,255,.7);font:800 14px 'Fredoka',sans-serif; }
+        .earn-hero { position:relative;overflow:hidden;padding:17px;border:1px solid rgba(192,132,252,.32);border-radius:14px;background:linear-gradient(125deg,rgba(91,54,158,.3),rgba(24,21,39,.76)); }.earn-hero::after { content:'';position:absolute;width:130px;height:130px;right:-54px;top:-60px;border-radius:50%;background:rgba(217,70,239,.14); }.earn-hero > * { position:relative;z-index:1; }.earn-kicker { display:flex;align-items:center;gap:6px;color:#c4b5fd;font:800 10px 'Fredoka',sans-serif;letter-spacing:.8px;text-transform:uppercase; }.earn-kicker .tg-s { width:14px;height:14px; }.earn-hero strong { display:block;margin-top:7px;color:#fff;font:800 22px 'Fredoka',sans-serif; }.earn-hero small { display:block;max-width:220px;margin-top:5px;color:rgba(255,255,255,.58);font-size:11px;line-height:1.35; }.earn-levels { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px; }.earn-level { min-width:0;padding:10px 8px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.025);text-align:center; }.earn-level b { display:block;color:#f7c948;font:800 19px 'Fredoka',sans-serif;line-height:1; }.earn-level span { display:block;margin-top:3px;color:#f8fafc;font:800 10px 'Fredoka',sans-serif; }.earn-level small { display:block;margin-top:5px;color:rgba(255,255,255,.38);font-size:9px;white-space:nowrap; }
         .tab-screen .nav-row { padding:13px 12px;border-radius:14px;background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.06); }.tab-screen .nav-stat { border-radius:14px;background:rgba(255,255,255,.035);border-color:rgba(255,255,255,.06); }.tab-screen .nav-stat b { color:#f7c948; }
         .nav-stat-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:14px 0; }
         .nav-stat { border:1px solid rgba(167,139,250,.18);background:rgba(255,255,255,.035);padding:12px;border-radius:8px; }
@@ -1150,7 +1151,7 @@ function showTab(view) {
     const screen = document.getElementById('tabScreen'); screen.classList.add('show'); screen.scrollTop = 0;
     const tabChrome = () => '';
     if (view === 'earnings') {
-        screen.innerHTML = tabChrome() + '<h1 class="tab-title">Заработок</h1><p class="tab-subtitle">Приглашай друзей и получай Stars за каждого нового игрока.</p><div class="tab-hero"><strong>Реферальная программа</strong><small>Бонус начисляется после регистрации друга.</small><div class="nav-stat-grid"><div class="nav-stat"><b id="tabFriends">0</b><span>приглашено</span></div><div class="nav-stat"><b id="tabEarned">0</b><span>заработано Stars</span></div></div></div><div class="tab-section">Твоя ссылка</div><div class="tab-link" id="tabReferralLink">Загрузка...</div><button class="tab-action" onclick="shareReferral()">Пригласить друзей</button>';
+        screen.innerHTML = tabChrome() + '<h1 class="tab-title">Заработок</h1><p class="tab-subtitle">Получай комиссию с проигрышей игроков в своей сети.</p><div class="earn-hero"><div class="earn-kicker"><i class="tg-s"></i> реферальная программа</div><strong>До 4.5% с проигрышей</strong><small>Комиссия начисляется автоматически после завершения раунда.</small></div><div class="nav-stat-grid"><div class="nav-stat"><b id="tabFriends">0</b><span>1 уровень</span></div><div class="nav-stat"><b id="tabCommission">0</b><span>комиссий Stars</span></div></div><div class="tab-section">Уровни сети</div><div class="earn-levels"><div class="earn-level"><b>3%</b><span>1 уровень</span><small id="levelOneCount">0 игроков</small></div><div class="earn-level"><b>1%</b><span>2 уровень</span><small id="levelTwoCount">0 игроков</small></div><div class="earn-level"><b>0.5%</b><span>3 уровень</span><small id="levelThreeCount">0 игроков</small></div></div><div class="tab-section">Твоя ссылка</div><div class="tab-link" id="tabReferralLink">Загрузка...</div><button class="tab-action" onclick="shareReferral()">Пригласить друзей</button>';
         loadReferral(); return;
     }
     if (view === 'tasks') {
@@ -2945,11 +2946,17 @@ async function loadReferral() {
         if (total) total.textContent = stats.totalEarned || 0;
         if (bonus) bonus.textContent = (stats.bonusPerReferral || 50) + ' Stars';
         if (profileRefs) profileRefs.textContent = stats.totalReferrals || 0;
-        const tabFriends = document.getElementById('tabFriends'); const tabEarned = document.getElementById('tabEarned'); const tabLink = document.getElementById('tabReferralLink'); const tabProfileRefs = document.getElementById('tabProfileRefs');
+        const tabFriends = document.getElementById('tabFriends'); const tabEarned = document.getElementById('tabEarned'); const tabCommission = document.getElementById('tabCommission'); const tabLink = document.getElementById('tabReferralLink'); const tabProfileRefs = document.getElementById('tabProfileRefs');
         if (tabFriends) tabFriends.textContent = stats.totalReferrals || 0;
         if (tabEarned) tabEarned.textContent = stats.totalEarned || 0;
+        if (tabCommission) tabCommission.textContent = stats.commissionEarned || 0;
         if (tabLink) tabLink.textContent = referralLink;
         if (tabProfileRefs) tabProfileRefs.textContent = stats.totalReferrals || 0;
+        const levels = stats.levelCounts || {};
+        const levelOne = document.getElementById('levelOneCount'); const levelTwo = document.getElementById('levelTwoCount'); const levelThree = document.getElementById('levelThreeCount');
+        if (levelOne) levelOne.textContent = (levels[1] || 0) + ' игроков';
+        if (levelTwo) levelTwo.textContent = (levels[2] || 0) + ' игроков';
+        if (levelThree) levelThree.textContent = (levels[3] || 0) + ' игроков';
     } catch (err) {
         console.warn('Referral data unavailable:', err.message);
     }

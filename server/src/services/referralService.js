@@ -50,11 +50,26 @@ export async function getReferralStats(userId) {
     [userId]
   );
 
+  const { rows: levelRows } = await query(
+    `WITH RECURSIVE network AS (
+       SELECT id, 1 AS level FROM users WHERE referrer_id = $1
+       UNION ALL
+       SELECT u.id, network.level + 1
+       FROM users u JOIN network ON u.referrer_id = network.id
+       WHERE network.level < 3
+     )
+     SELECT level, COUNT(*)::int AS count FROM network GROUP BY level ORDER BY level`,
+    [userId]
+  );
+  const levelCounts = { 1: 0, 2: 0, 3: 0 };
+  for (const row of levelRows) levelCounts[row.level] = Number(row.count);
+
   return {
     totalReferrals: rows[0]?.total_referrals || 0,
     recentReferrals: rows[0]?.recent_referrals || 0,
     totalEarned: bonusRows[0]?.total_earned || 0,
     commissionEarned: bonusRows[0]?.commission_earned || 0,
+    levelCounts,
     bonusPerReferral: REFERRAL_BONUS,
   };
 }
