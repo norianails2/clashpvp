@@ -405,6 +405,7 @@
         .tab-action { width:100%;min-height:46px;border:0;border-radius:12px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font:800 13px 'Fredoka',sans-serif;cursor:pointer; }.tab-action.gold { background:#f7c948;color:#1d1529; }.tab-action:disabled { opacity:.45;cursor:default; }
         .tab-section { margin:20px 0 9px;color:rgba(255,255,255,.7);font:800 14px 'Fredoka',sans-serif; }
         .earn-hero { position:relative;overflow:hidden;padding:17px;border:1px solid rgba(192,132,252,.32);border-radius:14px;background:linear-gradient(125deg,rgba(91,54,158,.3),rgba(24,21,39,.76)); }.earn-hero::after { content:'';position:absolute;width:130px;height:130px;right:-54px;top:-60px;border-radius:50%;background:rgba(217,70,239,.14); }.earn-hero > * { position:relative;z-index:1; }.earn-kicker { display:flex;align-items:center;gap:6px;color:#c4b5fd;font:800 10px 'Fredoka',sans-serif;letter-spacing:.8px;text-transform:uppercase; }.earn-kicker .tg-s { width:14px;height:14px; }.earn-hero strong { display:block;margin-top:7px;color:#fff;font:800 22px 'Fredoka',sans-serif; }.earn-hero small { display:block;max-width:220px;margin-top:5px;color:rgba(255,255,255,.58);font-size:11px;line-height:1.35; }.earn-levels { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px; }.earn-level { min-width:0;padding:10px 8px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.025);text-align:center; }.earn-level b { display:block;color:#f7c948;font:800 19px 'Fredoka',sans-serif;line-height:1; }.earn-level span { display:block;margin-top:3px;color:#f8fafc;font:800 10px 'Fredoka',sans-serif; }.earn-level small { display:block;margin-top:5px;color:rgba(255,255,255,.38);font-size:9px;white-space:nowrap; }
+        .profile-hero { display:flex;align-items:center;gap:13px;padding:16px 0 18px;border-bottom:1px solid rgba(255,255,255,.08); }.profile-avatar { width:62px;height:62px;flex:0 0 62px;overflow:hidden;border:2px solid rgba(196,181,253,.75);border-radius:50%;background:linear-gradient(145deg,#6d4ac5,#2d1d62);box-shadow:inset 0 0 0 3px rgba(11,7,28,.55),0 5px 16px rgba(0,0,0,.32);display:grid;place-items:center;color:#fff;font:800 24px 'Fredoka',sans-serif; }.profile-avatar img { width:100%;height:100%;object-fit:cover;display:block; }.profile-identity { min-width:0; }.profile-identity b { display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff;font:800 18px 'Fredoka',sans-serif; }.profile-identity span { display:block;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:rgba(196,181,253,.72);font:700 11px 'Fredoka',sans-serif; }.profile-identity small { display:block;margin-top:5px;color:rgba(255,255,255,.34);font-size:10px; }.profile-settings { display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.025); }.profile-settings b { display:block;color:#f8fafc;font:800 13px 'Fredoka',sans-serif; }.profile-settings small { display:block;margin-top:4px;color:rgba(255,255,255,.4);font-size:10px; }.profile-settings button { width:34px;height:34px;flex:0 0 34px;border:1px solid rgba(167,139,250,.4);border-radius:8px;background:rgba(139,92,246,.13);color:#d8ccff;font-size:18px;cursor:pointer; }
         .tab-screen .nav-row { padding:13px 12px;border-radius:14px;background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.06); }.tab-screen .nav-stat { border-radius:14px;background:rgba(255,255,255,.035);border-color:rgba(255,255,255,.06); }.tab-screen .nav-stat b { color:#f7c948; }
         .nav-stat-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:14px 0; }
         .nav-stat { border:1px solid rgba(167,139,250,.18);background:rgba(255,255,255,.035);padding:12px;border-radius:8px; }
@@ -1162,15 +1163,26 @@ function showTab(view) {
         screen.innerHTML = tabChrome() + '<h1 class="tab-title">Лидеры</h1><p class="tab-subtitle">Топ игроков по общему количеству выигранных Stars.</p><div class="nav-list" id="tabLeadersList"><div class="loading">Загрузка...</div></div>';
         loadTabLeaderboard(); return;
     }
-    screen.innerHTML = tabChrome() + '<h1 class="tab-title">Профиль</h1><p class="tab-subtitle" id="tabProfileName">Player</p><div class="nav-stat-grid"><div class="nav-stat"><b id="tabProfileBalance">0</b><span>Stars на балансе</span></div><div class="nav-stat"><b id="tabProfileRefs">0</b><span>приглашено</span></div></div><div class="tab-section">Настройки</div><div class="tab-hero"><strong>Язык приложения</strong><small>Изменить язык можно в настройках профиля.</small></div><button class="tab-action" style="margin-top:10px;" onclick="openModal(\'profileModal\')">Открыть настройки</button>';
+    screen.innerHTML = tabChrome() + '<div class="profile-hero"><div class="profile-avatar" id="tabProfileAvatar">P</div><div class="profile-identity"><b id="tabProfileName">Player</b><span id="tabProfileHandle">Telegram account</span><small>Аккаунт Telegram</small></div></div><div class="tab-section">Статистика</div><div class="nav-stat-grid"><div class="nav-stat"><b id="tabProfileBalance">0</b><span>Stars на балансе</span></div><div class="nav-stat"><b id="tabProfileRefs">0</b><span>приглашено</span></div></div><div class="tab-section">Настройки</div><div class="profile-settings"><div><b>Язык приложения</b><small>Русский, English, Deutsch, Español</small></div><button type="button" onclick="openModal(\'profileModal\')" aria-label="Открыть настройки">›</button></div>';
     renderProfile(); loadReferral();
 }
 function renderProfile() {
     const name = document.getElementById('profileName'); const amount = document.getElementById('profileBalance');
     if (name) name.textContent = myUserName || 'Player'; if (amount) amount.textContent = Math.floor(balance || 0);
     const refs = document.getElementById('profileReferrals'); if (refs) refs.textContent = document.getElementById('earningsFriends')?.textContent || '0';
-    const tabName = document.getElementById('tabProfileName'); const tabBalance = document.getElementById('tabProfileBalance'); const tabRefs = document.getElementById('tabProfileRefs');
+    const tabName = document.getElementById('tabProfileName'); const tabBalance = document.getElementById('tabProfileBalance'); const tabRefs = document.getElementById('tabProfileRefs'); const handle = document.getElementById('tabProfileHandle'); const avatar = document.getElementById('tabProfileAvatar');
     if (tabName) tabName.textContent = myUserName || 'Player'; if (tabBalance) tabBalance.textContent = Math.floor(balance || 0); if (tabRefs) tabRefs.textContent = refs?.textContent || '0';
+    if (handle) handle.textContent = myUserName ? '@' + myUserName.replace(/^@/, '') : 'Telegram account';
+    if (avatar) {
+        avatar.replaceChildren();
+        if (myUserPhoto) {
+            const image = new Image();
+            image.alt = 'Аватар Telegram';
+            image.src = myUserPhoto;
+            image.onerror = () => { avatar.textContent = (myUserName || 'P').charAt(0).toUpperCase(); };
+            avatar.appendChild(image);
+        } else avatar.textContent = (myUserName || 'P').charAt(0).toUpperCase();
+    }
 }
 function loadDailyTask() {
     socket?.emit('engagement:daily_status', {}, (res) => {
@@ -2911,6 +2923,7 @@ const SOCKET_URL = (location.protocol === 'https:' ? 'https:' : 'http:') + '//' 
 var socket = null;
 let myUserId = null;
 let myUserName = 'Player';
+let myUserPhoto = null;
 let isConnected = false;
 let referralLink = null;
 
@@ -3020,6 +3033,7 @@ function connectSocket(initData) {
     socket.on('user:info', (userData) => {
         myUserId = userData.id;
         myUserName = userData.username || 'Player';
+        myUserPhoto = userData.photoUrl || null;
         if (userData.balance !== undefined) { balance = userData.balance; updateBalance(); }
         socket.emit('lobby:subscribe', { gameType: currentGameId });
         updateUI();
