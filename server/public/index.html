@@ -1371,14 +1371,14 @@ function setPvpPlayMode(mode) {
 
 function renderSystemLobby() {
     const game = currentGameId || 'rps';
-    const title = game === 'rps' ? 'КНБ против системы' : game === 'dice' ? 'Кости против системы' : 'Монетка против системы';
-    const description = game === 'rps' ? 'Выбери ход, система сделает свой выбор.' : game === 'dice' ? 'Брось кость против системы. Большее число побеждает.' : 'Выбери сторону, затем система сделает серверный бросок.';
+    const title = game === 'rps' ? 'КНБ' : game === 'dice' ? 'Кости' : 'Монетка';
     const choices = game === 'rps'
         ? '<div class="system-choice"><button onclick="systemPlay(\'rps\',\'rock\')">Камень</button><button onclick="systemPlay(\'rps\',\'paper\')">Бумага</button><button onclick="systemPlay(\'rps\',\'scissors\')">Ножницы</button></div>'
         : game === 'coin'
             ? '<div class="system-choice"><button onclick="systemPlay(\'coin\',\'heads\')">Орёл</button><button onclick="systemPlay(\'coin\',\'tails\')">Решка</button></div>'
-            : '<button class="system-play" id="systemPlayBtn" onclick="systemPlay(\'dice\')">Бросить кости</button>';
-    return '<div class="play-mode"><button onclick="setPvpPlayMode(\'pvp\')">PvP</button><button class="active" onclick="setPvpPlayMode(\'system\')">ПРОТИВ СИСТЕМЫ</button></div><div class="system-panel"><h3>' + title + '</h3><p>' + description + '</p><div class="pvc-row"><div class="pvc-input-wrap"><span class="pvc-star"><i class="tg-s"></i></span><input type="number" id="systemBet" value="' + MIN_BET + '" min="' + MIN_BET + '"></div><div class="pvc-adj"><button onclick="systemAdjust(\'min\')">MIN</button><button onclick="systemAdjust(\'half\')">½</button><button onclick="systemAdjust(\'double\')">2×</button><button onclick="systemAdjust(\'max\')">MAX</button></div></div>' + choices + '<div id="systemResult"></div></div>';
+            : '';
+    const action = game === 'dice' ? '<button class="pvp-join" onclick="systemPlay(\'dice\')">⚔</button>' : '<span class="pv-waiting">ГОТОВ</span>';
+    return '<div class="play-mode"><button onclick="setPvpPlayMode(\'pvp\')">PvP</button><button class="active" onclick="setPvpPlayMode(\'system\')">ПРОТИВ СИСТЕМЫ</button></div><div class="pvp-title"><span class="live"></span> Комнаты <span style="color:rgba(255,255,255,.2);font-weight:400;text-transform:none;letter-spacing:0;">— выбери соперника</span></div><div class="pvp-create"><div class="pvc-label">✦ СТАВКА</div><div class="pvc-row"><div class="pvc-input-wrap"><span class="pvc-star"><i class="tg-s"></i></span><input type="number" id="systemBet" value="' + MIN_BET + '" min="' + MIN_BET + '"></div><div class="pvc-adj"><button onclick="systemAdjust(\'min\')">MIN</button><button onclick="systemAdjust(\'half\')">½</button><button onclick="systemAdjust(\'double\')">2×</button><button onclick="systemAdjust(\'max\')">MAX</button></div></div></div><div class="pvp-list-wrap"><div class="pvp-list"><div class="pvp-room"><span class="pv-avatar">✦</span><div class="pv-info"><div class="pv-name">Система</div><div class="pv-desc">Готова сыграть в ' + title + '</div></div><div class="pv-bet-block"><span class="pv-bet">x1.8</span><span class="pv-coin"><i class="tg-s"></i></span></div>' + action + '</div></div>' + choices + '<div id="systemResult"></div></div>';
 }
 
 function systemAdjust(type) {
