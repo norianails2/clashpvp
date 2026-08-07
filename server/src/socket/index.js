@@ -36,6 +36,7 @@ import { registerRouletteHandlers } from './rouletteHandler.js';
 import { registerCrashHandlers, startCrashEngine } from './crashHandler.js';
 import { registerWithdrawalHandlers } from './withdrawalHandler.js';
 import { registerEngagementHandlers } from './engagementHandler.js';
+import { registerSystemGameHandlers } from './systemGameHandler.js';
 import rouletteEngine from '../games/rouletteEngine.js';
 import https from 'https';
 import { randomUUID } from 'crypto';
@@ -124,6 +125,7 @@ export function initSocket(httpServer) {
     registerCrashHandlers(io, socket);
     registerWithdrawalHandlers(io, socket);
     registerEngagementHandlers(io, socket);
+    registerSystemGameHandlers(io, socket);
 
     // Add balance (dev & test)
     if (config.isDev) socket.on('balance:add', async (payload, ack) => {
