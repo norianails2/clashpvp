@@ -1362,7 +1362,7 @@ function pvpCleanup() {
     currentRoom = null;
 }
 
-let pvpPlayMode = 'pvp';
+let pvpPlayMode = 'pvp', systemMatchBet = null;
 
 function setPvpPlayMode(mode) {
     pvpPlayMode = mode === 'system' ? 'system' : 'pvp';
@@ -1372,13 +1372,8 @@ function setPvpPlayMode(mode) {
 function renderSystemLobby() {
     const game = currentGameId || 'rps';
     const title = game === 'rps' ? 'КНБ' : game === 'dice' ? 'Кости' : 'Монетка';
-    const choices = game === 'rps'
-        ? '<div class="system-choice"><button onclick="systemPlay(\'rps\',\'rock\')">Камень</button><button onclick="systemPlay(\'rps\',\'paper\')">Бумага</button><button onclick="systemPlay(\'rps\',\'scissors\')">Ножницы</button></div>'
-        : game === 'coin'
-            ? '<div class="system-choice"><button onclick="systemPlay(\'coin\',\'heads\')">Орёл</button><button onclick="systemPlay(\'coin\',\'tails\')">Решка</button></div>'
-            : '';
-    const action = game === 'dice' ? '<button class="pvp-join" onclick="systemPlay(\'dice\')">⚔</button>' : '<span class="pv-waiting">ГОТОВ</span>';
-    return '<div class="play-mode"><button onclick="setPvpPlayMode(\'pvp\')">PvP</button><button class="active" onclick="setPvpPlayMode(\'system\')">ПРОТИВ СИСТЕМЫ</button></div><div class="pvp-title"><span class="live"></span> Комнаты <span style="color:rgba(255,255,255,.2);font-weight:400;text-transform:none;letter-spacing:0;">— выбери соперника</span></div><div class="pvp-create"><div class="pvc-label">✦ СТАВКА</div><div class="pvc-row"><div class="pvc-input-wrap"><span class="pvc-star"><i class="tg-s"></i></span><input type="number" id="systemBet" value="' + MIN_BET + '" min="' + MIN_BET + '"></div><div class="pvc-adj"><button onclick="systemAdjust(\'min\')">MIN</button><button onclick="systemAdjust(\'half\')">½</button><button onclick="systemAdjust(\'double\')">2×</button><button onclick="systemAdjust(\'max\')">MAX</button></div></div></div><div class="pvp-list-wrap"><div class="pvp-list"><div class="pvp-room"><span class="pv-avatar">✦</span><div class="pv-info"><div class="pv-name">Система</div><div class="pv-desc">Готова сыграть в ' + title + '</div></div><div class="pv-bet-block"><span class="pv-bet">x1.8</span><span class="pv-coin"><i class="tg-s"></i></span></div>' + action + '</div></div>' + choices + '<div id="systemResult"></div></div>';
+    const action = '<span class="pv-waiting">ГОТОВ</span>';
+    return '<div class="play-mode"><button onclick="setPvpPlayMode(\'pvp\')">PvP</button><button class="active" onclick="setPvpPlayMode(\'system\')">ПРОТИВ СИСТЕМЫ</button></div><div class="pvp-title"><span class="live"></span> Комнаты <span style="color:rgba(255,255,255,.2);font-weight:400;text-transform:none;letter-spacing:0;">— выбери соперника</span></div><div class="pvp-create"><div class="pvc-label">✦ СТАВКА</div><div class="pvc-row"><div class="pvc-input-wrap"><span class="pvc-star"><i class="tg-s"></i></span><input type="number" id="systemBet" value="' + MIN_BET + '" min="' + MIN_BET + '"></div><div class="pvc-adj"><button onclick="systemAdjust(\'min\')">MIN</button><button onclick="systemAdjust(\'half\')">½</button><button onclick="systemAdjust(\'double\')">2×</button><button onclick="systemAdjust(\'max\')">MAX</button></div></div><button class="pvp-create-btn" onclick="systemCreateRoom()">✦ СОЗДАТЬ КОМНАТУ</button></div><div class="pvp-list-wrap"><div class="pvp-list"><div class="pvp-room"><span class="pv-avatar">✦</span><div class="pv-info"><div class="pv-name">Система</div><div class="pv-desc">Готова сыграть в ' + title + '</div></div><div class="pv-bet-block"><span class="pv-bet">СРАЗУ</span><span class="pv-coin"><i class="tg-s"></i></span></div>' + action + '</div></div><div id="systemResult"></div></div>';
 }
 
 function systemAdjust(type) {
@@ -1392,27 +1387,47 @@ function systemAdjust(type) {
     input.value = amount;
 }
 
-function systemPlay(gameType, choice) {
+function systemCreateRoom() {
     const input = document.getElementById('systemBet');
     const betAmount = Number.parseInt(input?.value, 10);
     if (!Number.isSafeInteger(betAmount) || betAmount < MIN_BET) return showToast('Минимальная ставка: ' + MIN_BET, 'warn');
     if (betAmount > balance) return showToast('Недостаточно Stars', 'error');
-    const panel = document.querySelector('.system-panel');
-    if (panel) panel.querySelectorAll('button').forEach(button => button.disabled = true);
+    systemMatchBet = betAmount;
+    renderSystemMatch(currentGameId, betAmount);
+}
+
+function renderSystemMatch(gameType, betAmount) {
+    const area = document.getElementById('gameArea');
+    if (!area) return;
+    const bank = betAmount * 2;
+    const duel = '<div class="rps-duel-block"><div class="rps-player-box"><div class="rps-player-avatar">Ты</div><div class="rps-player-name">ТЫ</div><div class="rps-player-status ready">ГОТОВ</div></div><div class="rps-bank-badge"><span class="rps-bank-title">Банк</span><span class="rps-bank-val">' + bank + ' ★</span></div><div class="rps-player-box"><div class="rps-player-avatar">✦</div><div class="rps-player-name">СИСТЕМА</div><div class="rps-player-status thinking" id="systemOpponentState">ДУМАЕТ</div></div></div>';
+    if (gameType === 'rps') {
+        area.innerHTML = '<div class="rps-screen-container"><div class="rps-status-text" id="systemMatchStatus">Выбери ход</div><div class="rps-cards-grid"><div class="rps-choice-card rock" data-system-choice onclick="systemPlay(\'rps\',\'rock\')"><div class="card-icon">✊</div><div class="card-title">КАМЕНЬ</div></div><div class="rps-choice-card paper" data-system-choice onclick="systemPlay(\'rps\',\'paper\')"><div class="card-icon">✋</div><div class="card-title">БУМАГА</div></div><div class="rps-choice-card scissors" data-system-choice onclick="systemPlay(\'rps\',\'scissors\')"><div class="card-icon">✌</div><div class="card-title">НОЖНИЦЫ</div></div></div>' + duel + '<div id="systemMatchResult"></div></div>';
+    } else if (gameType === 'dice') {
+        area.innerHTML = '<div class="pvp-dice-screen"><div class="pvp-dice-duo"><div class="pvp-dice-side"><div class="pvp-dice-box" id="systemDicePlayer">?</div><div class="pvp-dice-label">ТЫ</div></div><div class="pvp-dice-vs">VS</div><div class="pvp-dice-side"><div class="pvp-dice-box opp" id="systemDiceOpponent">?</div><div class="pvp-dice-label">СИСТЕМА</div></div></div>' + duel + '<button class="pvp-dice-btn" data-system-choice onclick="systemPlay(\'dice\')">БРОСИТЬ</button><div id="systemMatchResult"></div></div>';
+    } else {
+        area.innerHTML = '<div class="pvp-coin-screen"><div class="pvp-coin-stage"><div class="pvp-coin-flip" id="systemCoinFlip">?</div><div class="pvp-coin-cards"><button class="pvp-coin-btn" data-system-choice onclick="systemPlay(\'coin\',\'heads\')"><span class="coin-icon">🦅</span><span>Орёл</span></button><button class="pvp-coin-btn" data-system-choice onclick="systemPlay(\'coin\',\'tails\')"><span class="coin-icon">🪙</span><span>Решка</span></button></div></div>' + duel + '<div id="systemMatchResult"></div></div>';
+    }
+}
+
+function systemPlay(gameType, choice) {
+    const betAmount = systemMatchBet;
+    if (!Number.isSafeInteger(betAmount)) return systemCreateRoom();
+    document.querySelectorAll('[data-system-choice]').forEach(button => button.disabled = true);
     socket?.emit('system:play', { gameType, betAmount, choice }, res => {
-        if (panel) panel.querySelectorAll('button').forEach(button => button.disabled = false);
+        document.querySelectorAll('[data-system-choice]').forEach(button => button.disabled = false);
         if (res?.error) return showToast(res.error, 'error');
         if (res?.balance !== undefined) { balance = res.balance; updateBalance(); }
-        const result = document.getElementById('systemResult');
+        const result = document.getElementById('systemMatchResult');
         if (!result) return;
         let detail = '';
-        if (gameType === 'rps') detail = 'Ты: ' + systemMoveLabel(res.choice) + ' · Система: ' + systemMoveLabel(res.systemChoice);
-        if (gameType === 'dice') detail = 'Ты: ' + res.playerRoll + ' · Система: ' + res.systemRoll;
-        if (gameType === 'coin') detail = 'Выпало: ' + (res.flip === 'heads' ? 'Орёл' : 'Решка');
+        if (gameType === 'rps') { detail = 'Ты: ' + systemMoveLabel(res.choice) + ' · Система: ' + systemMoveLabel(res.systemChoice); const state = document.getElementById('systemOpponentState'); if (state) state.textContent = systemMoveLabel(res.systemChoice).toUpperCase(); }
+        if (gameType === 'dice') { detail = 'Ты: ' + res.playerRoll + ' · Система: ' + res.systemRoll; const player = document.getElementById('systemDicePlayer'); const opponent = document.getElementById('systemDiceOpponent'); if (player) player.textContent = ['⚀','⚁','⚂','⚃','⚄','⚅'][res.playerRoll - 1]; if (opponent) opponent.textContent = ['⚀','⚁','⚂','⚃','⚄','⚅'][res.systemRoll - 1]; }
+        if (gameType === 'coin') { detail = 'Выпало: ' + (res.flip === 'heads' ? 'Орёл' : 'Решка'); const coin = document.getElementById('systemCoinFlip'); if (coin) coin.textContent = res.flip === 'heads' ? '🦅' : '🪙'; }
         const state = res.draw ? 'draw' : res.won ? 'win' : 'loss';
         const headline = res.draw ? 'Ничья, ставка возвращена' : res.won ? 'Победа +' + res.payout + ' Stars' : 'В этот раз система победила';
         result.className = 'system-result ' + state;
-        result.textContent = headline + ' · ' + detail;
+        result.innerHTML = headline + '<br><small>' + detail + '</small><button class="system-play" onclick="systemMatchBet=null;renderLobby()">К комнатам</button>';
         showGameResult(gameType, Boolean(res.draw), Boolean(res.won), res.payout || 0);
     });
 }
