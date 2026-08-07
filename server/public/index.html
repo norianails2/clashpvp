@@ -409,6 +409,7 @@
         .nav-stat { border:1px solid rgba(167,139,250,.18);background:rgba(255,255,255,.035);padding:12px;border-radius:8px; }
         .nav-stat b { display:block;color:#f7c948;font:800 22px 'Fredoka',sans-serif; }.nav-stat span { color:rgba(255,255,255,.42);font-size:10px; }
         .nav-list { display:flex;flex-direction:column;gap:7px;margin:12px 0; }.nav-row { display:flex;align-items:center;gap:10px;padding:10px;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.025); }.nav-row b { font-size:12px; }.nav-row small { display:block;margin-top:2px;color:rgba(255,255,255,.4);font-size:10px; }.nav-row .right { margin-left:auto;color:#c4b5fd;font-weight:800; }.nav-claim { margin:0!important;padding:10px!important;border-radius:8px!important;background:#f7c948!important;color:#1d1529!important;font-size:12px!important; }
+        .task-row { min-height:62px;align-items:center; }.task-side { display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex:0 0 auto; }.task-side .right { display:inline-flex;align-items:center;gap:3px;margin:0;color:#f7c948;font:800 11px 'Fredoka',sans-serif; }.task-side .tg-s { width:11px;height:11px; }.task-button { min-width:72px;height:25px;padding:0 9px;border:1px solid rgba(167,139,250,.5);border-radius:6px;background:rgba(139,92,246,.15);color:#d8ccff;font:800 9px 'Fredoka',sans-serif;cursor:pointer; }.task-button:active { transform:scale(.96); }.task-done,.task-progress { font:800 9px 'Fredoka',sans-serif; }.task-done { color:#65d69e; }.task-progress { color:rgba(255,255,255,.34); }
 
         .history-list { max-height:200px;overflow-y:auto;margin-bottom:12px; }
         .history-item { display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12px; }
@@ -1153,8 +1154,8 @@ function showTab(view) {
         loadReferral(); return;
     }
     if (view === 'tasks') {
-        screen.innerHTML = tabChrome() + '<h1 class="tab-title">Задания</h1><p class="tab-subtitle">Выполняй простые действия и пополняй баланс.</p><div class="nav-list"><div class="nav-row"><div><b>Ежедневный бонус</b><small id="tabDailyText">Проверяем статус...</small></div><span class="right">10 Stars</span></div><div class="nav-row"><div><b>Пригласи друга</b><small>Получи бонус за регистрацию по ссылке</small></div><span class="right">50 Stars</span></div></div><button class="tab-action gold" id="tabDailyButton" onclick="claimDailyReward()">Забрать бонус</button>';
-        loadDailyTask(); return;
+        screen.innerHTML = tabChrome() + '<h1 class="tab-title">Задания</h1><p class="tab-subtitle">Ежедневные задания с небольшими наградами за реальную активность.</p><div class="nav-list" id="tabTasksList"><div class="loading">Загрузка заданий...</div></div>';
+        loadTasks(); return;
     }
     if (view === 'leaders') {
         screen.innerHTML = tabChrome() + '<h1 class="tab-title">Лидеры</h1><p class="tab-subtitle">Топ игроков по текущему балансу Stars.</p><div class="nav-list" id="tabLeadersList"><div class="loading">Загрузка...</div></div>';
@@ -1185,6 +1186,32 @@ function claimDailyReward() {
     socket?.emit('engagement:claim_daily', {}, (res) => {
         if (res?.error) return showToast(res.error, 'error');
         showToast('+' + res.reward + ' Stars', 'success'); loadDailyTask();
+    });
+}
+
+function loadTasks() {
+    socket?.emit('engagement:tasks_status', {}, (res) => {
+        const list = document.getElementById('tabTasksList');
+        if (!list || res?.error) return;
+        list.innerHTML = (res.tasks || []).map((task) => {
+            const progress = `${task.progress}/${task.target}`;
+            const action = task.action === 'share'
+                ? '<button class="task-button" onclick="shareReferral()">Пригласить</button>'
+                : task.claimed
+                    ? '<span class="task-done">Получено</span>'
+                    : task.ready
+                        ? `<button class="task-button" onclick="claimTask('${task.key}')">Забрать</button>`
+                        : `<span class="task-progress">${progress}</span>`;
+            return `<div class="nav-row task-row"><div><b>${task.title}</b><small>${task.description}</small></div><div class="task-side"><span class="right">+${task.reward} <i class="tg-s"></i></span>${action}</div></div>`;
+        }).join('');
+    });
+}
+
+function claimTask(key) {
+    socket?.emit('engagement:claim_task', { key }, (res) => {
+        if (res?.error) return showToast(res.error, 'error');
+        showToast('+' + res.reward + ' Stars', 'success');
+        loadTasks();
     });
 }
 
