@@ -62,8 +62,13 @@ export function registerEngagementHandlers(io, socket) {
   socket.on('engagement:leaderboard', async (_payload, ack) => {
     try {
       const { rows } = await query(
-        `SELECT COALESCE(NULLIF(username, ''), NULLIF(first_name, ''), 'Player') AS name, balance
-         FROM users ORDER BY balance DESC, created_at ASC LIMIT 20`
+        `SELECT COALESCE(NULLIF(u.username, ''), NULLIF(u.first_name, ''), 'Player') AS name,
+                COALESCE(SUM(t.amount), 0)::bigint AS won_stars
+         FROM users u
+         JOIN transactions t ON t.user_id = u.id AND t.type = 'win'
+         GROUP BY u.id, u.username, u.first_name
+         ORDER BY won_stars DESC, u.created_at ASC
+         LIMIT 20`
       );
       ack?.({ players: rows.map((row, index) => ({ rank: index + 1, ...row })) });
     } catch (err) { ack?.({ error: 'Failed to load leaderboard' }); }

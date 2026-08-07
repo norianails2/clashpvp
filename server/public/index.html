@@ -1159,7 +1159,7 @@ function showTab(view) {
         loadTasks(); return;
     }
     if (view === 'leaders') {
-        screen.innerHTML = tabChrome() + '<h1 class="tab-title">Лидеры</h1><p class="tab-subtitle">Топ игроков по текущему балансу Stars.</p><div class="nav-list" id="tabLeadersList"><div class="loading">Загрузка...</div></div>';
+        screen.innerHTML = tabChrome() + '<h1 class="tab-title">Лидеры</h1><p class="tab-subtitle">Топ игроков по общему количеству выигранных Stars.</p><div class="nav-list" id="tabLeadersList"><div class="loading">Загрузка...</div></div>';
         loadTabLeaderboard(); return;
     }
     screen.innerHTML = tabChrome() + '<h1 class="tab-title">Профиль</h1><p class="tab-subtitle" id="tabProfileName">Player</p><div class="nav-stat-grid"><div class="nav-stat"><b id="tabProfileBalance">0</b><span>Stars на балансе</span></div><div class="nav-stat"><b id="tabProfileRefs">0</b><span>приглашено</span></div></div><div class="tab-section">Настройки</div><div class="tab-hero"><strong>Язык приложения</strong><small>Изменить язык можно в настройках профиля.</small></div><button class="tab-action" style="margin-top:10px;" onclick="openModal(\'profileModal\')">Открыть настройки</button>';
@@ -3304,7 +3304,7 @@ window.loadLeaderboard = function() {
     list.innerHTML = '<div style="text-align:center;padding:20px;color:rgba(255,255,255,0.3);font-size:13px;">⏳ Загрузка...</div>';
     socket?.emit('engagement:leaderboard', {}, (res) => {
         if (res?.error) { list.innerHTML = '<div class="loading">Не удалось загрузить рейтинг</div>'; return; }
-        list.innerHTML = (res?.players || []).map(player => '<div class="nav-row"><b>#' + player.rank + '</b><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + String(player.name).replace(/[&<>]/g, '') + '</span><span class="right">' + player.balance + ' Stars</span></div>').join('') || '<div class="loading">Пока нет игроков</div>';
+        list.innerHTML = (res?.players || []).map(player => '<div class="nav-row"><b>#' + player.rank + '</b><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + String(player.name).replace(/[&<>]/g, '') + '</span><span class="right">' + player.won_stars + ' Stars</span></div>').join('') || '<div class="loading">Пока нет игроков</div>';
         return;
         list.innerHTML = '<div style="text-align:center;padding:20px;color:rgba(255,255,255,0.3);font-size:13px;">🏆 Лидерборд скоро</div>';
     });
@@ -3315,7 +3315,7 @@ function loadTabLeaderboard() {
     if (!list) return;
     socket?.emit('engagement:leaderboard', {}, (res) => {
         if (res?.error) { list.innerHTML = '<div class="loading">Не удалось загрузить рейтинг</div>'; return; }
-        list.innerHTML = (res?.players || []).map(player => '<div class="nav-row"><b>#' + player.rank + '</b><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + String(player.name).replace(/[&<>]/g, '') + '</span><span class="right">' + player.balance + ' Stars</span></div>').join('') || '<div class="loading">Пока нет игроков</div>';
+        list.innerHTML = (res?.players || []).map(player => '<div class="nav-row"><b>#' + player.rank + '</b><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + String(player.name).replace(/[&<>]/g, '') + '</span><span class="right">' + player.won_stars + ' Stars</span></div>').join('') || '<div class="loading">Пока нет игроков</div>';
     });
 }
 
