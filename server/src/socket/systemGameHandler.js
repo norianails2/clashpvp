@@ -32,43 +32,101 @@ function resolveSystemRound(gameType, choice) {
 export function registerSystemGameHandlers(_io, socket) {
   const { user } = socket.data;
 
-  socket.on('system:play', async (payload, ack) => {
+  socket.on('system:resume', async (_payload, ack) => {
+    try {
+      const client = await getClient();
+      try {
+        const { rows } = await client.query(
+          'SELECT round_id, game_type, bet_amount FROM system_game_rooms WHERE user_id = $1',
+          [user.id]
+        );
+        const room = rows[0];
+        ack?.(room ? { active: true, roundId: room.round_id, gameType: room.game_type, betAmount: Number(room.bet_amount) } : { active: false });
+      } finally {
+        client.release();
+      }
+    } catch (err) {
+      console.error('[system:resume]', err?.message || err);
+      ack?.({ error: 'Failed to resume system room' });
+    }
+  });
+
+  socket.on('system:create_room', async (payload, ack) => {
     const gameType = payload?.gameType;
     const betAmount = payload?.betAmount;
-    const roundId = crypto.randomUUID();
-
     try {
       if (!['rps', 'dice', 'coin'].includes(gameType)) return ack?.({ error: 'Unsupported system game' });
       if (!Number.isSafeInteger(betAmount) || betAmount < MIN_BET || betAmount > MAX_BET) {
         return ack?.({ error: `Bet must be between ${MIN_BET} and ${MAX_BET}` });
       }
 
-      const outcome = resolveSystemRound(gameType, payload?.choice);
       const client = await getClient();
+      let held;
+      const roundId = crypto.randomUUID();
+      try {
+        await client.query('BEGIN');
+        const existing = await client.query('SELECT round_id FROM system_game_rooms WHERE user_id = $1 FOR UPDATE', [user.id]);
+        if (existing.rows.length) throw new Error('Finish your current system game first');
+        held = await holdBet(user.id, betAmount, gameType, roundId, client);
+        await client.query(
+          `INSERT INTO system_game_rooms (user_id, round_id, game_type, bet_amount)
+           VALUES ($1, $2, $3, $4)`,
+          [user.id, roundId, gameType, betAmount]
+        );
+        await client.query('COMMIT');
+      } catch (err) {
+        await client.query('ROLLBACK');
+        throw err;
+      } finally {
+        client.release();
+      }
+
+      socket.emit('balance:update', { balance: held.balanceAfter });
+      ack?.({ roundId, gameType, betAmount, balance: held.balanceAfter });
+    } catch (err) {
+      console.error('[system:create_room]', err?.message || err);
+      ack?.({ error: err?.message || 'Failed to create system room' });
+    }
+  });
+
+  socket.on('system:play', async (payload, ack) => {
+    try {
+      const client = await getClient();
+      let outcome;
+      let room;
       let balanceAfter;
       let payoutAmount = 0;
       try {
         await client.query('BEGIN');
-        const held = await holdBet(user.id, betAmount, gameType, roundId, client);
-        balanceAfter = held.balanceAfter;
+        const { rows } = await client.query(
+          'SELECT * FROM system_game_rooms WHERE user_id = $1 FOR UPDATE',
+          [user.id]
+        );
+        room = rows[0];
+        if (!room) throw new Error('Create a system room first');
+        if (payload?.gameType !== room.game_type) throw new Error('Game type does not match the room');
 
+        outcome = resolveSystemRound(room.game_type, payload?.choice);
+        const betAmount = Number(room.bet_amount);
         if (outcome.draw) {
-          const refunded = await refund(user.id, betAmount, gameType, roundId, client);
+          const refunded = await refund(user.id, betAmount, room.game_type, room.round_id, client);
           payoutAmount = betAmount;
           balanceAfter = refunded.balanceAfter;
         } else if (outcome.won) {
-          const paid = await payout(user.id, betAmount * 2, gameType, roundId, client, HOUSE_EDGE);
+          const paid = await payout(user.id, betAmount * 2, room.game_type, room.round_id, client, HOUSE_EDGE);
           payoutAmount = paid.netAmount;
           balanceAfter = paid.balanceAfter;
         } else {
+          const current = await client.query('SELECT balance FROM users WHERE id = $1', [user.id]);
+          balanceAfter = Number(current.rows[0].balance);
           await distributeLossCommissions(client, {
-            lossKey: `system:${roundId}`,
+            lossKey: `system:${room.round_id}`,
             sourceUserId: user.id,
             lossAmount: betAmount,
-            gameType,
+            gameType: room.game_type,
           });
         }
-
+        await client.query('DELETE FROM system_game_rooms WHERE user_id = $1', [user.id]);
         await client.query('COMMIT');
       } catch (err) {
         await client.query('ROLLBACK');
@@ -78,11 +136,10 @@ export function registerSystemGameHandlers(_io, socket) {
       }
 
       socket.emit('balance:update', { balance: balanceAfter });
-      ack?.({ gameType, betAmount, payout: payoutAmount, balance: balanceAfter, ...outcome });
+      ack?.({ gameType: room.game_type, betAmount: Number(room.bet_amount), payout: payoutAmount, balance: balanceAfter, ...outcome });
     } catch (err) {
       console.error('[system:play]', err?.message || err);
       ack?.({ error: err?.message || 'Failed to play against system' });
     }
   });
 }
-

@@ -1366,6 +1366,13 @@ let pvpPlayMode = 'pvp', systemMatchBet = null;
 
 function setPvpPlayMode(mode) {
     pvpPlayMode = mode === 'system' ? 'system' : 'pvp';
+    if (pvpPlayMode === 'system') {
+        socket?.emit('system:resume', {}, res => {
+            if (res?.active) { systemMatchBet = res.betAmount; renderSystemMatch(res.gameType, res.betAmount); }
+            else renderLobby();
+        });
+        return;
+    }
     renderLobby();
 }
 
@@ -1392,8 +1399,15 @@ function systemCreateRoom() {
     const betAmount = Number.parseInt(input?.value, 10);
     if (!Number.isSafeInteger(betAmount) || betAmount < MIN_BET) return showToast('Минимальная ставка: ' + MIN_BET, 'warn');
     if (betAmount > balance) return showToast('Недостаточно Stars', 'error');
-    systemMatchBet = betAmount;
-    renderSystemMatch(currentGameId, betAmount);
+    const createButton = document.querySelector('.pvp-create-btn');
+    if (createButton) createButton.disabled = true;
+    socket?.emit('system:create_room', { gameType: currentGameId, betAmount }, res => {
+        if (createButton) createButton.disabled = false;
+        if (res?.error) return showToast(res.error, 'error');
+        systemMatchBet = res.betAmount;
+        if (res.balance !== undefined) { balance = res.balance; updateBalance(); }
+        renderSystemMatch(res.gameType, res.betAmount);
+    });
 }
 
 function renderSystemMatch(gameType, betAmount) {
@@ -1414,7 +1428,11 @@ function systemPlay(gameType, choice) {
     const betAmount = systemMatchBet;
     if (!Number.isSafeInteger(betAmount)) return systemCreateRoom();
     document.querySelectorAll('[data-system-choice]').forEach(button => button.disabled = true);
-    socket?.emit('system:play', { gameType, betAmount, choice }, res => {
+    const thinking = document.getElementById('systemMatchStatus');
+    if (thinking) thinking.textContent = 'Система выбирает ход...';
+    const opponentState = document.getElementById('systemOpponentState');
+    if (opponentState) opponentState.textContent = 'ДУМАЕТ';
+    setTimeout(() => socket?.emit('system:play', { gameType, choice }, res => {
         document.querySelectorAll('[data-system-choice]').forEach(button => button.disabled = false);
         if (res?.error) return showToast(res.error, 'error');
         if (res?.balance !== undefined) { balance = res.balance; updateBalance(); }
@@ -1428,8 +1446,9 @@ function systemPlay(gameType, choice) {
         const headline = res.draw ? 'Ничья, ставка возвращена' : res.won ? 'Победа +' + res.payout + ' Stars' : 'В этот раз система победила';
         result.className = 'system-result ' + state;
         result.innerHTML = headline + '<br><small>' + detail + '</small><button class="system-play" onclick="systemMatchBet=null;renderLobby()">К комнатам</button>';
+        systemMatchBet = null;
         showGameResult(gameType, Boolean(res.draw), Boolean(res.won), res.payout || 0);
-    });
+    }), 900);
 }
 
 function systemMoveLabel(move) {
