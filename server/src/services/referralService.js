@@ -44,8 +44,9 @@ export async function getReferralStats(userId) {
   );
 
   const { rows: bonusRows } = await query(
-    `SELECT COALESCE(SUM(amount)::bigint, 0) AS total_earned
-     FROM transactions WHERE user_id = $1 AND type = 'referral_bonus'`,
+    `SELECT COALESCE(SUM(amount)::bigint, 0) AS total_earned,
+            COALESCE(SUM(amount) FILTER (WHERE type = 'referral_commission')::bigint, 0) AS commission_earned
+     FROM transactions WHERE user_id = $1 AND type IN ('referral_bonus', 'referral_commission')`,
     [userId]
   );
 
@@ -53,6 +54,7 @@ export async function getReferralStats(userId) {
     totalReferrals: rows[0]?.total_referrals || 0,
     recentReferrals: rows[0]?.recent_referrals || 0,
     totalEarned: bonusRows[0]?.total_earned || 0,
+    commissionEarned: bonusRows[0]?.commission_earned || 0,
     bonusPerReferral: REFERRAL_BONUS,
   };
 }

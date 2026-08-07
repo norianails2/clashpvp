@@ -1,6 +1,7 @@
 import { getClient } from '../db/pool.js';
 import { holdBet, payout, refund, HOUSE_EDGE } from '../services/balanceService.js';
 import { createRoom } from '../services/roomService.js';
+import { distributeLossCommissions } from '../services/referralCommissionService.js';
 import { broadcastLobbyUpdate } from './lobbyHandler.js';
 import {
   createDeck,
@@ -130,6 +131,8 @@ export function registerBlackjackHandlers(io, socket) {
             await refund(user.id, room.bet_amount, 'blackjack', room.id, client);
           } else {
             await payout(openingResult.winnerId, room.bet_amount * 2, 'blackjack', room.id, client, HOUSE_EDGE);
+            const loserId = openingResult.winnerId === room.creator_id ? user.id : room.creator_id;
+            await distributeLossCommissions(client, { lossKey: `room:${room.id}:${loserId}`, sourceUserId: loserId, lossAmount: Number(room.bet_amount), gameType: 'blackjack' });
           }
 
           updatedData.winnerId = openingResult.winnerId;
@@ -270,6 +273,8 @@ export function registerBlackjackHandlers(io, socket) {
             await refund(room.opponent_id, room.bet_amount, 'blackjack', room.id, client);
           } else {
             await payout(resolved.winnerId, room.bet_amount * 2, 'blackjack', room.id, client, HOUSE_EDGE);
+            const loserId = resolved.winnerId === room.creator_id ? room.opponent_id : room.creator_id;
+            await distributeLossCommissions(client, { lossKey: `room:${room.id}:${loserId}`, sourceUserId: loserId, lossAmount: Number(room.bet_amount), gameType: 'blackjack' });
           }
 
           updatedData.winnerId = resolved.winnerId;
@@ -413,6 +418,8 @@ export function registerBlackjackHandlers(io, socket) {
             await refund(room.opponent_id, room.bet_amount, 'blackjack', room.id, client);
           } else {
             await payout(resolved.winnerId, room.bet_amount * 2, 'blackjack', room.id, client, HOUSE_EDGE);
+            const loserId = resolved.winnerId === room.creator_id ? room.opponent_id : room.creator_id;
+            await distributeLossCommissions(client, { lossKey: `room:${room.id}:${loserId}`, sourceUserId: loserId, lossAmount: Number(room.bet_amount), gameType: 'blackjack' });
           }
 
             updatedData.winnerId = resolved.winnerId;

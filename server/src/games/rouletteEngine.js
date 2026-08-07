@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import { getClient, query } from '../db/pool.js';
 import { holdBet, payout, refund } from '../services/balanceService.js';
+import { distributeLossCommissions } from '../services/referralCommissionService.js';
 import { MAX_BET, MIN_BET, getMultiplier, isValidColor, spinRoulette } from './roulette.js';
 
 const BETTING_SECONDS = 10;
@@ -154,6 +155,14 @@ class RouletteEngine {
         [this.round, bet.userId, bet.color, won ? 'won' : 'lost', payoutAmount]
       );
       if (update.rowCount !== 1) throw new Error('Bet is already settled');
+      if (!won) {
+        await distributeLossCommissions(client, {
+          lossKey: `roulette:${this.round}:${bet.userId}:${bet.color}`,
+          sourceUserId: bet.userId,
+          lossAmount: Number(bet.amount),
+          gameType: 'roulette',
+        });
+      }
       await client.query('COMMIT');
       if (balanceAfter !== null) this.io?.to(`user:${bet.userId}`).emit('balance:update', { balance: balanceAfter });
       this.io?.to(`user:${bet.userId}`).emit('roulette:result', {

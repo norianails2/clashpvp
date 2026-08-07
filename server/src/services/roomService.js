@@ -1,5 +1,6 @@
 import { query, getClient } from '../db/pool.js';
 import { holdBet, refund, payout, HOUSE_EDGE } from './balanceService.js';
+import { distributeLossCommissions } from './referralCommissionService.js';
 
 const MIN_BET = 1;
 const MAX_BET = 100000;
@@ -388,6 +389,15 @@ export async function finishGame(roomId, winnerId, result, draw = false, commiss
       if (room.opponent_id) { await refund(room.opponent_id, room.bet_amount, room.game_type, room.id, client); }
     } else if (winnerId) {
       await payout(winnerId, room.bet_amount * 2, room.game_type, room.id, client, commission);
+      const loserId = room.creator_id === winnerId ? room.opponent_id : room.creator_id;
+      if (loserId) {
+        await distributeLossCommissions(client, {
+          lossKey: `room:${room.id}:${loserId}`,
+          sourceUserId: loserId,
+          lossAmount: Number(room.bet_amount),
+          gameType: room.game_type,
+        });
+      }
     }
 
     const gameData = room.game_data || {};

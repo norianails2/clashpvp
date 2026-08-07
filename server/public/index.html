@@ -742,8 +742,8 @@
         <div class="referral-block" id="referralBlock" hidden>
             <div class="referral-icon">🎁</div>
             <div class="referral-copy">
-                <div class="referral-title">Invite friends</div>
-                <div class="referral-subtitle">Earn 50 Stars for every friend</div>
+                <div class="referral-title">Реферальная программа</div>
+                <div class="referral-subtitle">До 4.5% с проигрышей друзей: 3% · 1% · 0.5%</div>
                 <div class="referral-stats" id="referralStats">0 friends invited</div>
             </div>
             <button class="referral-btn" type="button" onclick="shareReferral()" aria-label="Invite friends">&#8599;</button>
@@ -1003,22 +1003,22 @@ document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('cli
 
 const LANGUAGES = {
     ru: {
-        balance:'Баланс', topUp:'Депозит', withdraw:'Вывод', allGames:'Все игры', games:'7 ИГР', invite:'Пригласить друзей', inviteSub:'Получи 50 Stars за каждого друга', invited:'{count} приглашено',
+        balance:'Баланс', topUp:'Депозит', withdraw:'Вывод', allGames:'Все игры', games:'7 ИГР', invite:'Реферальная программа', inviteSub:'До 4.5% с проигрышей друзей: 3% · 1% · 0.5%', invited:'{count} приглашено',
         rps:'Камень-Ножницы-Бумага', rpsSub:'Дуэль на ставки', dice:'Кости', diceSub:'Больше/меньше/ровно', coin:'Монетка', coinSub:'Орёл или Решка', mines:'Мины', minesSub:'Найди алмазы, избегай бомб', blackjack:'Блекджек', blackjackSub:'Собери 21', crashSub:'Забери до взрыва', roulette:'Рулетка', rouletteSub:'Красное, чёрное или zero', new:'НОВОЕ', updated:'ОБНОВЛЕНО',
         game:'ИГРА', round:'РАУНД', players:'ИГРОКОВ', seconds:'СЕК', bet:'СТАВКА', nextRound:'НА СЛЕД. РАУНД', autoCashout:'АВТОВЫВОД', placeBet:'СТАВКА', verify:'ПРОВЕРИТЬ', participants:'УЧАСТНИКИ', dealer:'ДИЛЕР', you:'ТЫ', start:'НАЧАТЬ', more:'Ещё', enough:'Хватит', red:'КРАСНОЕ', black:'ЧЁРНОЕ', chooseColor:'ВЫБЕРИ ЦВЕТ', bank:'БАНК', loadingRound:'Загрузка раунда...', waiting:'ОЖИДАНИЕ', last100:'ПОСЛЕДНИЕ 100', place:'ПОСТАВИТЬ'
     },
     en: {
-        balance:'Balance', topUp:'Deposit', withdraw:'Withdraw', allGames:'All games', games:'7 GAMES', invite:'Invite friends', inviteSub:'Earn 50 Stars for every friend', invited:'{count} friends invited',
+        balance:'Balance', topUp:'Deposit', withdraw:'Withdraw', allGames:'All games', games:'7 GAMES', invite:'Referral program', inviteSub:'Up to 4.5% from friends losses: 3% · 1% · 0.5%', invited:'{count} friends invited',
         rps:'Rock-Paper-Scissors', rpsSub:'Head-to-head bets', dice:'Dice', diceSub:'Higher/lower/equal', coin:'Coin', coinSub:'Heads or tails', mines:'Mines', minesSub:'Find diamonds, avoid bombs', blackjack:'Blackjack', blackjackSub:'Reach 21', crashSub:'Cash out before the crash', roulette:'Roulette', rouletteSub:'Red, black or zero', new:'NEW', updated:'UPDATED',
         game:'GAME', round:'ROUND', players:'PLAYERS', seconds:'SEC', bet:'BET', nextRound:'NEXT ROUND', autoCashout:'AUTO CASHOUT', placeBet:'BET', verify:'VERIFY', participants:'PLAYERS', dealer:'DEALER', you:'YOU', start:'START', more:'Hit', enough:'Stand', red:'RED', black:'BLACK', chooseColor:'CHOOSE A COLOR', bank:'BANK', loadingRound:'Loading round...', waiting:'WAITING', last100:'LAST 100', place:'PLACE BET'
     },
     de: {
-        balance:'Guthaben', topUp:'Aufladen', withdraw:'Auszahlen', allGames:'Alle Spiele', games:'7 SPIELE', invite:'Freunde einladen', inviteSub:'50 Stars pro Freund erhalten', invited:'{count} Freunde eingeladen',
+        balance:'Guthaben', topUp:'Aufladen', withdraw:'Auszahlen', allGames:'Alle Spiele', games:'7 SPIELE', invite:'Empfehlungsprogramm', inviteSub:'Bis zu 4,5% aus Verlusten von Freunden', invited:'{count} Freunde eingeladen',
         rps:'Stein-Papier-Schere', rpsSub:'Duell mit Einsätzen', dice:'Würfel', diceSub:'Höher/niedriger/gleich', coin:'Münze', coinSub:'Kopf oder Zahl', mines:'Minen', minesSub:'Finde Diamanten, meide Bomben', blackjack:'Blackjack', blackjackSub:'Erreiche 21', crashSub:'Vor dem Crash auszahlen', roulette:'Roulette', rouletteSub:'Rot, schwarz oder zero', new:'NEU', updated:'AKTUALISIERT',
         game:'SPIEL', round:'RUNDE', players:'SPIELER', seconds:'SEK', bet:'EINSATZ', nextRound:'NÄCHSTE RUNDE', autoCashout:'AUTO-AUSZAHLUNG', placeBet:'EINSATZ', verify:'PRÜFEN', participants:'SPIELER', dealer:'DEALER', you:'DU', start:'START', more:'Karte', enough:'Halten', red:'ROT', black:'SCHWARZ', chooseColor:'FARBE WÄHLEN', bank:'POT', loadingRound:'Runde wird geladen...', waiting:'WARTEN', last100:'LETZTE 100', place:'SETZEN'
     },
     es: {
-        balance:'Saldo', topUp:'Recargar', withdraw:'Retirar', allGames:'Todos los juegos', games:'7 JUEGOS', invite:'Invitar amigos', inviteSub:'Gana 50 Stars por cada amigo', invited:'{count} amigos invitados',
+        balance:'Saldo', topUp:'Recargar', withdraw:'Retirar', allGames:'Todos los juegos', games:'7 JUEGOS', invite:'Programa de referidos', inviteSub:'Hasta 4,5% de las pérdidas de amigos', invited:'{count} amigos invitados',
         rps:'Piedra-Papel-Tijeras', rpsSub:'Duelo con apuestas', dice:'Dados', diceSub:'Mayor/menor/igual', coin:'Moneda', coinSub:'Cara o cruz', mines:'Minas', minesSub:'Encuentra diamantes, evita bombas', blackjack:'Blackjack', blackjackSub:'Llega a 21', crashSub:'Retira antes del crash', roulette:'Ruleta', rouletteSub:'Rojo, negro o zero', new:'NUEVO', updated:'ACTUALIZADO',
         game:'JUEGO', round:'RONDA', players:'JUGADORES', seconds:'SEG', bet:'APUESTA', nextRound:'PRÓXIMA RONDA', autoCashout:'RETIRO AUTOMÁTICO', placeBet:'APUESTA', verify:'VERIFICAR', participants:'JUGADORES', dealer:'CRUPIER', you:'TÚ', start:'INICIAR', more:'Pedir', enough:'Plantarse', red:'ROJO', black:'NEGRO', chooseColor:'ELIGE UN COLOR', bank:'BOTE', loadingRound:'Cargando ronda...', waiting:'ESPERANDO', last100:'ÚLTIMAS 100', place:'APOSTAR'
     }

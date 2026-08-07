@@ -1,5 +1,7 @@
+import crypto from 'crypto';
 import { getClient, query } from '../db/pool.js';
 import { holdBet, payout, HOUSE_EDGE } from '../services/balanceService.js';
+import { distributeLossCommissions } from '../services/referralCommissionService.js';
 import {
   createDeck, shuffleDeck, calculateScore, dealCards, isBust, resolveGame,
   MIN_BET, MAX_BET,
@@ -113,6 +115,8 @@ async function settleGame(state, userId, socket) {
       payoutAmount = Math.ceil(state.bet * 2 * (1 - HOUSE_EDGE));
       const result = await payout(userId, payoutAmount, 'blackjack', null, client, 0);
       balanceAfter = result.balanceAfter;
+    } else {
+      await distributeLossCommissions(client, { lossKey: `blackjack:${state.roundId || userId}:${userId}`, sourceUserId: userId, lossAmount: Number(state.bet), gameType: 'blackjack' });
     }
     await deleteGame(userId, client);
     await client.query('COMMIT');
@@ -164,6 +168,7 @@ export function registerSoloBlackjackHandlers(_io, socket) {
       const firstDeal = dealCards(deck, 2);
       const secondDeal = dealCards(firstDeal.deck, 2);
       const state = {
+        roundId: crypto.randomUUID(),
         userId,
         bet: betAmount,
         deck: secondDeal.deck,
@@ -245,11 +250,12 @@ export function registerSoloBlackjackHandlers(_io, socket) {
       state.deck = deck;
       const score = calculateScore(state.playerCards);
 
-      if (isBust(score)) {
-        const client = await getClient();
-        try {
-          await client.query('BEGIN');
-          await deleteGame(userId, client);
+        if (isBust(score)) {
+          const client = await getClient();
+          try {
+            await client.query('BEGIN');
+            await distributeLossCommissions(client, { lossKey: `blackjack:${state.roundId || userId}:${userId}`, sourceUserId: userId, lossAmount: Number(state.bet), gameType: 'blackjack' });
+            await deleteGame(userId, client);
           await client.query('COMMIT');
         } catch (err) {
           await client.query('ROLLBACK');
@@ -341,6 +347,7 @@ export function registerSoloBlackjackHandlers(_io, socket) {
         const score = calculateScore(state.playerCards);
 
         if (isBust(score)) {
+          await distributeLossCommissions(client, { lossKey: `blackjack:${state.roundId || userId}:${userId}`, sourceUserId: userId, lossAmount: Number(state.bet), gameType: 'blackjack' });
           await deleteGame(userId, client);
           await client.query('COMMIT');
           socket.emit('balance:update', { balance: held.balanceAfter });

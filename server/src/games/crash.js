@@ -1,5 +1,6 @@
 import provablyFair from '../services/provablyFairService.js';
 import { holdBet, payout, refund } from '../services/balanceService.js';
+import { distributeLossCommissions } from '../services/referralCommissionService.js';
 import { getClient } from '../db/pool.js';
 
 class CrashEngine {
@@ -124,11 +125,19 @@ class CrashEngine {
       try {
         await client.query('BEGIN');
         revealed = await provablyFair.revealRound(this.round, client);
-        await client.query(
+        const busted = await client.query(
           `UPDATE crash_bets SET status = 'busted', settled_at = NOW()
-           WHERE round_number = $1 AND status = 'active'`,
+           WHERE round_number = $1 AND status = 'active' RETURNING user_id, amount`,
           [this.round]
         );
+        for (const bet of busted.rows) {
+          await distributeLossCommissions(client, {
+            lossKey: `crash:${this.round}:${bet.user_id}`,
+            sourceUserId: bet.user_id,
+            lossAmount: Number(bet.amount),
+            gameType: 'crash',
+          });
+        }
         await client.query('COMMIT');
       } catch (err) {
         await client.query('ROLLBACK');

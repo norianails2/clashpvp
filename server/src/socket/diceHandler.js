@@ -3,6 +3,7 @@ import { holdBet, payout, refund, HOUSE_EDGE } from '../services/balanceService.
 import { createRoom } from '../services/roomService.js';
 import { rollDie, resolveDice, MIN_BET, MAX_BET } from '../games/dice.js';
 import { broadcastLobbyUpdate } from './lobbyHandler.js';
+import { distributeLossCommissions } from '../services/referralCommissionService.js';
 
 export function registerDiceHandlers(io, socket) {
   const { user } = socket.data;
@@ -106,6 +107,8 @@ export function registerDiceHandlers(io, socket) {
             await refund(room.opponent_id, room.bet_amount, 'dice', room.id, client);
           } else {
             await payout(winnerId, pot, 'dice', room.id, client, HOUSE_EDGE);
+            const loserId = winnerId === room.creator_id ? room.opponent_id : room.creator_id;
+            await distributeLossCommissions(client, { lossKey: `room:${room.id}:${loserId}`, sourceUserId: loserId, lossAmount: Number(room.bet_amount), gameType: 'dice' });
           }
 
           const finalData = { ...gd, rolls: newRolls, winnerId, draw };

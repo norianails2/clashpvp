@@ -3,6 +3,7 @@ import { holdBet, payout, refund, HOUSE_EDGE } from '../services/balanceService.
 import { createRoom } from '../services/roomService.js';
 import { isValidChoice, resolveCoin, SIDES, MIN_BET, MAX_BET } from '../games/coin.js';
 import { broadcastLobbyUpdate } from './lobbyHandler.js';
+import { distributeLossCommissions } from '../services/referralCommissionService.js';
 
 export function registerCoinHandlers(io, socket) {
   const { user } = socket.data;
@@ -104,6 +105,8 @@ export function registerCoinHandlers(io, socket) {
             await refund(room.opponent_id, room.bet_amount, 'coin', room.id, client);
           } else {
             await payout(winnerId, pot, 'coin', room.id, client, HOUSE_EDGE);
+            const loserId = winnerId === room.creator_id ? room.opponent_id : room.creator_id;
+            await distributeLossCommissions(client, { lossKey: `room:${room.id}:${loserId}`, sourceUserId: loserId, lossAmount: Number(room.bet_amount), gameType: 'coin' });
           }
 
           const finalData = { ...gd, picks: newPicks, flip, winnerId };

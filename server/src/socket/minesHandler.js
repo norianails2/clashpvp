@@ -1,4 +1,6 @@
+import crypto from 'crypto';
 import { holdBet, payout, HOUSE_EDGE } from '../services/balanceService.js';
+import { distributeLossCommissions } from '../services/referralCommissionService.js';
 import { query, getClient } from '../db/pool.js';
 import {
   generateMinePositions,
@@ -72,6 +74,7 @@ export function registerMinesHandlers(io, socket) {
 
       const minePositions = generateMinePositions(count);
       const game = {
+        roundId: crypto.randomUUID(),
         userId,
         betAmount,
         minesCount: count,
@@ -115,6 +118,12 @@ export function registerMinesHandlers(io, socket) {
         if (game.openedCells.includes(cellIndex)) throw new Error('Cell already opened');
 
         if (isMine(game.minePositions, cellIndex)) {
+          await distributeLossCommissions(client, {
+            lossKey: `mines:${game.roundId || userId}:${userId}`,
+            sourceUserId: userId,
+            lossAmount: Number(game.betAmount),
+            gameType: 'mines',
+          });
           await client.query('DELETE FROM solo_mines_games WHERE user_id = $1', [userId]);
           return { isMine: true, gameOver: true };
         }
